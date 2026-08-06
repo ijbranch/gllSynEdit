@@ -1119,6 +1119,7 @@ var
 {$ENDIF}
 begin
 {$IFDEF SYN_HEREDOC}
+  RangePointer.Ptr := nil;  // zero all 8 bytes; the fields below only cover the low dword
   RangePointer.Range := Ord(fRange);
   RangePointer.Length := 0;
   RangePointer.Checksum := 0;

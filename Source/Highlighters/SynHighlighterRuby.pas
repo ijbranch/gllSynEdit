@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+﻿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -1043,6 +1043,7 @@ var
 {$ENDIF}
 begin
 {$IFDEF SYN_HEREDOC}
+  RangePointer.Ptr := nil;  // zero all 8 bytes; the fields below only cover the low dword
   RangePointer.Range := Ord(fRange);
   RangePointer.Length := 0;
   RangePointer.Checksum := 0;
