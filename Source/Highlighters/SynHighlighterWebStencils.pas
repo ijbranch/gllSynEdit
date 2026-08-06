@@ -1,10 +1,10 @@
-unit SynHighlighterWebStencils;
+﻿unit SynHighlighterWebStencils;
 
 interface
 
 uses
   System.SysUtils, System.Classes, Vcl.Graphics, Generics.Collections,
-  SynEditTypes, SynEditHighlighter, SynUnicode;
+  SynEditTypes, SynEditHighlighter, SynFunc, SynUnicode;
 
 type
   TtkTokenKind = (
@@ -76,7 +76,7 @@ type
     FImportAliasAttri: TSynHighlighterAttributes;
     FImportVarAttri: TSynHighlighterAttributes;
 
-    function IsKeyword(const AKeyword: string): Boolean;
+    function IsKeyword(const AKeyword: string): Boolean; override;
     function IsDeclaredVariable(const AName: string): Boolean;
     procedure InitKeywords;
     procedure CleanupVariablesForScope(AScope: Integer);
@@ -106,7 +106,7 @@ type
     function GetEol: Boolean; override;
     function GetTokenID: TtkTokenKind;
     function GetTokenAttribute: TSynHighlighterAttributes; override;
-    function GetTokenKind: Integer; override;
+    function GetTokenKind: TSynNativeInt; override;
     function IsIdentChar(AChar: WideChar): Boolean; override;
     function IsWordBreakChar(AChar: WideChar): Boolean; override;
   public
@@ -119,7 +119,7 @@ type
     function GetRange: Pointer; override;
     procedure ResetRange; override;
     procedure SetRange(Value: Pointer); override;
-    procedure SetLine(const NewValue: String; LineNumber: Integer); override;
+    procedure SetLine(const NewValue: String; LineNumber: TSynNativeInt); override;
 
     procedure Next; override;
 
@@ -321,7 +321,7 @@ begin
   end;
 end;
 
-procedure TSynWebStencilsSyn.SetLine(const NewValue: String; LineNumber: Integer);
+procedure TSynWebStencilsSyn.SetLine(const NewValue: String; LineNumber: TSynNativeInt);
 begin
   // Reset state for new line BEFORE calling inherited
   FLastIdentifier := '';
@@ -1237,7 +1237,7 @@ begin
   end;
 end;
 
-function TSynWebStencilsSyn.GetTokenKind: Integer;
+function TSynWebStencilsSyn.GetTokenKind: TSynNativeInt;
 begin
   Result := Ord(FTokenID);
 end;
