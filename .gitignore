@@ -36,6 +36,7 @@ __recovery/
 *.drc
 *.rc
 *.res
+!Packages/11AndAbove/Delphi/*.res
 *.local
 
 # Output Folders  #

@@ -9,12 +9,17 @@ The master branch remains compatible with Delphi 12 Athens or later. You can als
 
 ---
 
-## Fork Reason
+## Fork Reason (gllSynEdit)
 
-This fork is only made for one reason, to add a highlighter for the Delphi WebStencils syntax.
-The TurpoPack/SynEdit repository has a pull request to add this component to the package.
+This repository is **gllSynEdit**, GITLAK's fork of
+[TurboPack SynEdit](https://github.com/TurboPack/SynEdit), scoped to
+**Delphi 13+ / Win64 only** and installed into the 64-bit RAD Studio IDE.
+Upstream content is kept unmodified except where `CHANGELOG.md` — the sole
+record of the fork delta — says otherwise. Take upstream updates by fetching
+the `upstream` remote and merging (never rebasing).
 
-I've made this free of charge, as a pay-back effort to the community.
+(The section heading is inherited from upstream, whose readme still carries a
+leftover fork note from the contributor of the WebStencils highlighter.)
 
 ## Introduction
 
