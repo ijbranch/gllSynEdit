@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+ï»¿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -10,9 +10,9 @@ the specific language governing rights and limitations under the License.
 
 The Original Code is: SynMacroRecorder.pas, released 2001-10-17.
 
-Author of this file is Flávio Etrusco.
-Portions created by Flávio Etrusco are Copyright 2001 Flávio Etrusco.
-Unicode translation by Maël Hörz.
+Author of this file is Flï¿½vio Etrusco.
+Portions created by Flï¿½vio Etrusco are Copyright 2001 Flï¿½vio Etrusco.
+Unicode translation by Maï¿½l Hï¿½rz.
 All Rights Reserved.
 
 Contributors to the SynEdit project are listed in the Contributors.txt file.
@@ -686,8 +686,9 @@ begin
         Delete(cmdStr, 1, p);
         iEvent := CreateMacroEvent(TSynEditorCommand(Cmd));
         try
-          fEvents.Add(iEvent);
+          // Init before Add: a failed init must not leave a freed event in fEvents
           iEvent.InitEventParameters(cmdStr);
+          fEvents.Add(iEvent);
         except
           iEvent.Free;
         end;

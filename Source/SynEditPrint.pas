@@ -662,6 +662,7 @@ var
   PrintControl: ID2D1PrintControl;
   CommandList: ID2D1CommandList;
   ClipR: TRect;
+  ScreenDC: HDC;
 begin
   if fSelectedOnly and not fSelAvail then
     Exit;
@@ -699,8 +700,9 @@ begin
 
   // Reset so that rendering for printing is not mixed up with Synedit rendering
   TSynDWrite.ResetRenderTarget;
+  ScreenDC := GetDC(0);
   try
-    CheckOSError(TSynDWrite.RenderTarget.BindDC(GetDC(0), TRect.Empty));
+    CheckOSError(TSynDWrite.RenderTarget.BindDC(ScreenDC, TRect.Empty));
     DeviceContext := TSynDWrite.RenderTarget as ID2D1DeviceContext;
 
     DeviceContext.GetDevice(Device);
@@ -740,6 +742,7 @@ begin
   finally
     // Reset so that it does not mess up the SynEdit drawing
     TSynDWrite.ResetRenderTarget;
+    ReleaseDC(0, ScreenDC);
   end;
 end;
 

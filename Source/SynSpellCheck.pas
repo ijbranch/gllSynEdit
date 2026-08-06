@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+﻿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -526,13 +526,13 @@ begin
 end;
 
 destructor TSynSpellCheck.Destroy;
-var
-  Ed: TCustomSynEdit;
 begin
   GlobalInstance := nil;
+  // Detach via RemoveEditor so each editor's plugin is freed too - a surviving
+  // plugin would keep a dangling reference to this component
   if Assigned(FEditors) then
-    for Ed in FEditors do
-      Ed.RemoveFreeNotification(Self);
+    while FEditors.Count > 0 do
+      RemoveEditor(FEditors.Last);
   FEditors.Free;
   FPlugins.Free;
   FAttributesChecked.Free;
