@@ -9,6 +9,16 @@ visible.
 
 ## [Unreleased]
 
+### Changed
+
+- Converted to the suite's Lib-DCU model (2026-08-13) — `Packages\11AndAbove\Delphi\SynEditDR.dproj`,
+  `Packages\11AndAbove\Delphi\SynEditDD.dproj`. DCU output moved from `.\$(Platform)\$(Config)`
+  (inside the Packages folder) to the house convention `37.0\$(Platform)\$(Config)` at the repo
+  root, and a post-build event on the runtime package copies `Source\*.dfm`/`*.res` beside the
+  DCUs (`{$R}` resources bind at link time). The IDE Library Path now serves
+  `37.0\Win64\Release` (Debug DCUs on the Debug DCU Path; `Source` + `Source\Highlighters`
+  on the Browsing Path) instead of compiling SynEdit from source into every consuming project.
+
 ### Added
 
 - `SynHighlighterWebStencils.pas` was on disk but wired into neither package — added to the
