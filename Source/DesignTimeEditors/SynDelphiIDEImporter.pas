@@ -10,8 +10,9 @@ uses
 type
   // Descends from TDefaultEditor (not TComponentEditor) on purpose: TComponentEditor.Edit
   // executes the first verb, so a plain double click in the form designer would silently
-  // overwrite every setting of the component. TDefaultEditor.Edit instead creates/jumps to
-  // the default event handler, which is the behaviour expected from a double click.
+  // overwrite the imported settings of the component (font, colors, gutter, selection, tabs
+  // and highlighting attributes). TDefaultEditor.Edit instead creates/jumps to the default
+  // event handler, which is the behaviour expected from a double click.
   TSynIDEImportEditor = class(TDefaultEditor)
   private
     function ConfirmImport(const AWhatWillBeOverwritten: string): Boolean;
