@@ -9,6 +9,20 @@ visible.
 
 ## [Unreleased]
 
+### Fixed
+
+- Cherry-picked upstream `92cb01b`, `012e45b` and `55331b2` (2026-08-12/16, upstream PR #359 by
+  Carlo Sirna) — `Source\DesignTimeEditors\SynDelphiIDEImporter.pas`. `TSynIDEImportEditor`
+  descended from `TComponentEditor`, whose inherited `Edit` executes the **first verb**, so a plain
+  double click on a `TSynEdit` or `TSynDelphiSyn` in the form designer silently ran "Import IDE
+  Settings" — overwriting the component's font, colours, gutter, selection, tab settings and
+  highlighter attributes with the IDE's, with no prompt and no undo. The class now descends from
+  `TDefaultEditor`, whose `Edit` creates or jumps to the default event handler (the behaviour a
+  double click is expected to have), and the verb itself gained a `mtWarning` confirmation
+  defaulting to **No** that names what will be overwritten. `System.UITypes` was added to the uses
+  clause for `MessageDlg`'s result and button constants. The unit ships in `SynEditDD.dpk`, so this
+  fork was exposed. `SynEditDD` builds clean in Win64 Debug and Release. (2026-08-22)
+
 ### Changed
 
 - Converted to the suite's Lib-DCU model (2026-08-13) — `Packages\11AndAbove\Delphi\SynEditDR.dproj`,
