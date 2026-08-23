@@ -58,6 +58,13 @@
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <DCC_COMBINING_SIGNED_UNSIGNED64>true</DCC_COMBINING_SIGNED_UNSIGNED64>
         <DCC_DcuOutput>..\..\..\37.0\$(Platform)\$(Config)</DCC_DcuOutput>
+        <!-- Release stays in the shared Bpl/Dcp folder because that folder is on PATH and is where
+             dependent packages resolve their requires from; only Debug is diverted, which is enough
+             to stop a Debug build replacing the installed Release package. -->
+        <DCC_BplOutput Condition="'$(Config)'=='Release'">$(BDSCOMMONDIR)\Bpl\$(Platform)</DCC_BplOutput>
+        <DCC_BplOutput Condition="'$(Config)'!='Release'">$(BDSCOMMONDIR)\Bpl\$(Platform)\$(Config)</DCC_BplOutput>
+        <DCC_DcpOutput Condition="'$(Config)'=='Release'">$(BDSCOMMONDIR)\Dcp\$(Platform)</DCC_DcpOutput>
+        <DCC_DcpOutput Condition="'$(Config)'!='Release'">$(BDSCOMMONDIR)\Dcp\$(Platform)\$(Config)</DCC_DcpOutput>
         <DCC_Description>TurboPack SynEdit Delphi designtime package</DCC_Description>
         <DCC_EXPLICIT_STRING_CAST>true</DCC_EXPLICIT_STRING_CAST>
         <DCC_EXPLICIT_STRING_CAST_LOSS>true</DCC_EXPLICIT_STRING_CAST_LOSS>

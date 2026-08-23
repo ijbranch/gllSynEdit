@@ -7,7 +7,15 @@ Scope: **Delphi 13+ / Win64 only**, installed into the 64-bit RAD Studio IDE. Up
 content is unmodified except where entries below say otherwise, so the fork delta stays
 visible.
 
-## [Unreleased]
+## [In-Service]
+
+> Libraries and packages are continuously deployed: changes below are live as soon as the package is rebuilt and installed - there is no separate release step, so no `[Unreleased]` backlog. Tagged version snapshots are listed beneath.
+
+### Fixed
+
+- Debug and Release package output no longer collide (2026-08-24)
+  **Why:** RAD Studio defaults `DCC_BplOutput` to `$(BDSCOMMONDIR)\Bpl\$(Platform)` and `DCC_DcpOutput` to `\Dcp\$(Platform)`, neither carrying `$(Config)`, so a Debug build silently replaced the installed Release package.
+  Release still writes to the shared `Bpl`/`Dcp` folders - that is what is on `PATH`, and it is where dependent packages resolve their `requires` from - while Debug is diverted to a `$(Config)` subfolder. Separating Release as well breaks package loading, so only Debug moves.
 
 ### Fixed
 
