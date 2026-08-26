@@ -1,4 +1,4 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <Base>True</Base>
         <AppType>Package</AppType>
@@ -55,7 +55,7 @@
     <PropertyGroup Condition="'$(Base)'!=''">
         <SanitizedProjectName>SynEditDD</SanitizedProjectName>
         <DCC_BpiOutput>..\cpp\$(Platform)\$(Config)</DCC_BpiOutput>
-        <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
+        <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
         <DCC_COMBINING_SIGNED_UNSIGNED64>true</DCC_COMBINING_SIGNED_UNSIGNED64>
         <DCC_DcuOutput>..\..\..\37.0\$(Platform)\$(Config)</DCC_DcuOutput>
         <!-- Release stays in the shared Bpl/Dcp folder because that folder is on PATH and is where
