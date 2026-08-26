@@ -11,7 +11,15 @@ visible.
 
 > Libraries and packages are continuously deployed: changes below are live as soon as the package is rebuilt and installed - there is no separate release step, so no `[Unreleased]` backlog. Tagged version snapshots are listed beneath.
 
-### Fixed- **C++Builder output turned off** (2026-08-26). `DCC_CBuilderOutput` was `All`, so every build emitted `.hpp` / `.bpi` / `.a` / `.obj` files for a compiler that is **never in scope here** (standing rule: "I dont use C++ at all"). Across the estate that was 616 files and 90 MB of output nobody consumes, regenerated on every build; `gllSynEdit` alone accounted for 560. Now `None`. The `DCC_HppOutput` / `DCC_BpiOutput` / `DCC_ObjOutput` properties are left in place deliberately - they only say *where* such files would go, so with generation off they are inert, and removing them would enlarge the diff without changing behaviour. Verified: the affected packages rebuilt clean in every enabled mode, emitted no C++ artefacts, and rebuilt clean again after the existing ones were deleted (so nothing was load-bearing).- **`readme.md` now states that this fork is Delphi-only** (2026-08-26) — `readme.md`. The inherited TurboPack text lists `SynEditCR.bpl` / `SynEditCD.bpl` among the package names as though they were part of the release. They are not built here: only `SynEditDR` and `SynEditDD` under `Packages\11AndAbove\Delphi` are, and `Packages\11AndAbove\CBuilder\` is upstream content this fork carries but never compiles. A note under that list says so, and records that the two Delphi packages now also have `DCC_CBuilderOutput=None` — a reader who genuinely needed C++ interop would otherwise find the `.hpp`/`.bpi` files simply absent with nothing to explain why.
+### Changed
+
+- `upstream/master` is merged as far as `ee3c6ba` (2026-08-27). Its three commits were cherry-picked on 2026-08-22 (the accidental "Import IDE Settings" guard), so the merge changes no file - `git diff` against the pre-merge tree is empty and there was nothing to conflict. It exists because this fork takes upstream by merging, and an unrecorded merge leaves `git rev-list` reporting a backlog that is not there.
+
+### Fixed
+
+- **C++Builder output turned off** (2026-08-26). `DCC_CBuilderOutput` was `All`, so every build emitted `.hpp` / `.bpi` / `.a` / `.obj` files for a compiler that is **never in scope here** (standing rule: "I dont use C++ at all"). Across the estate that was 616 files and 90 MB of output nobody consumes, regenerated on every build; `gllSynEdit` alone accounted for 560. Now `None`. The `DCC_HppOutput` / `DCC_BpiOutput` / `DCC_ObjOutput` properties are left in place deliberately - they only say *where* such files would go, so with generation off they are inert, and removing them would enlarge the diff without changing behaviour. Verified: the affected packages rebuilt clean in every enabled mode, emitted no C++ artefacts, and rebuilt clean again after the existing ones were deleted (so nothing was load-bearing).
+
+- **`readme.md` now states that this fork is Delphi-only** (2026-08-26) — `readme.md`. The inherited TurboPack text lists `SynEditCR.bpl` / `SynEditCD.bpl` among the package names as though they were part of the release. They are not built here: only `SynEditDR` and `SynEditDD` under `Packages\11AndAbove\Delphi` are, and `Packages\11AndAbove\CBuilder\` is upstream content this fork carries but never compiles. A note under that list says so, and records that the two Delphi packages now also have `DCC_CBuilderOutput=None` — a reader who genuinely needed C++ interop would otherwise find the `.hpp`/`.bpi` files simply absent with nothing to explain why.
 
 
 
@@ -20,8 +28,6 @@ visible.
 - Debug and Release package output no longer collide (2026-08-24)
   **Why:** RAD Studio defaults `DCC_BplOutput` to `$(BDSCOMMONDIR)\Bpl\$(Platform)` and `DCC_DcpOutput` to `\Dcp\$(Platform)`, neither carrying `$(Config)`, so a Debug build silently replaced the installed Release package.
   Release still writes to the shared `Bpl`/`Dcp` folders - that is what is on `PATH`, and it is where dependent packages resolve their `requires` from - while Debug is diverted to a `$(Config)` subfolder. Separating Release as well breaks package loading, so only Debug moves.
-
-### Fixed
 
 - Cherry-picked upstream `92cb01b`, `012e45b` and `55331b2` (2026-08-12/16, upstream PR #359 by
   Carlo Sirna) — `Source\DesignTimeEditors\SynDelphiIDEImporter.pas`. `TSynIDEImportEditor`
