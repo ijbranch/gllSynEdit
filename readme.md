@@ -46,6 +46,15 @@ C++Builder
 * SynEditCR.bpl (C++Builder Runtime)
 * SynEditCD.bpl (C++Builder Designtime)
 
+> **Not built in this fork.** `gllSynEdit` is Delphi-only: only `SynEditDR` and
+> `SynEditDD` (under `Packages\11AndAbove\Delphi`) are built, installed and
+> supported here. `Packages\11AndAbove\CBuilder\` is inherited from upstream and
+> is never compiled. As of 2026-08-26 the two Delphi packages also have
+> `DCC_CBuilderOutput=None`, so they no longer emit the `.hpp`/`.bpi`/`.a`/`.obj`
+> files a C++Builder consumer would need — that alone was 560 files regenerated on
+> every build for a compiler this estate does not use. Re-enable it on those two
+> projects if you ever genuinely need C++ interop.
+
 ---
 
 ## Installation
