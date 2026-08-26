@@ -18,6 +18,12 @@ Upstream content is kept unmodified except where `CHANGELOG.md` — the sole
 record of the fork delta — says otherwise. Take upstream updates by fetching
 the `upstream` remote and merging (never rebasing).
 
+**Merged as far as `ee3c6ba` (2026-08-27), which is upstream's tip.** Where a
+commit has already been cherry-picked here, merge it anyway once it reaches a
+tip: the merge changes nothing, but without it `git rev-list HEAD..upstream/master`
+keeps reporting a backlog that does not exist, because patch comparison cannot
+recognise an adapted cherry-pick.
+
 (The section heading is inherited from upstream, whose readme still carries a
 leftover fork note from the contributor of the WebStencils highlighter.)
 
