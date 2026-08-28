@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 GITLAK fork of TurboPack SynEdit (upstream `https://github.com/TurboPack/SynEdit`).
-Scope: **Delphi 13+ / Win64 only**, installed into the 64-bit RAD Studio IDE. Upstream
+Scope: **Delphi 13+**, built for Win32 and Win64, installed into the 64-bit RAD Studio IDE. Upstream
 content is unmodified except where entries below say otherwise, so the fork delta stays
 visible.
 
@@ -20,6 +20,13 @@ visible.
 - `upstream/master` is merged as far as `ee3c6ba` (2026-08-27). Its three commits were cherry-picked on 2026-08-22 (the accidental "Import IDE Settings" guard), so the merge changes no file - `git diff` against the pre-merge tree is empty and there was nothing to conflict. It exists because this fork takes upstream by merging, and an unrecorded merge leaves `git rev-list` reporting a backlog that is not there. `README.md` now carries the merged-through marker beside the merge-never-rebase rule, so the position is readable without running git.
 
 ### Fixed
+
+- **The fork's stated scope said "Win64 only", which is out of date** (2026-08-28) — `readme.md`, `CHANGELOG.md`, `CLAUDE.md`.
+  The global rule now covers **both Win32 and Win64** (Ian), superseding the earlier Win64-only position; packages build all four modes and the demos are verified on both platforms. All three documents said otherwise in their opening scope line, which is the first thing a reader sees.
+  Corrected in place rather than reconciled: an intermediate edit had tried to present "built for both" and "Win64 only" as two true statements about different things, which would have preserved a stale rule as though it were a deliberate distinction. `CLAUDE.md` now records that the phrase is superseded, so finding it in an old note reads as staleness rather than nuance.
+
+- **The install instructions sent C++Builder users to an `hpp` directory this fork does not produce** (2026-08-28) — `readme.md`.
+  Step 3 of *Installation* is upstream text telling the reader to add `source\hpp\Win32\Release` to the IDE's system include path. Since `DCC_CBuilderOutput` became `None` no `.hpp` is emitted, so that directory does not exist. The existing note under **Package names** explains why, but it is three sections away from the step someone is actually following, so a one-line pointer now sits with the step itself.
 
 - **Eight of the twelve demos could not build for Win64** (2026-08-28) — `Demos/EditAppDemos/frmEditor.pas`, `Demos/Folding/uFoldingDemoForm.pas`, `Demos/HighlighterDemo/SynHighlighterSample.pas`, `Demos/PrintDemo/DTestPrintPreview.pas`, `Demos/SearchReplaceDemo/SearchReplaceMain.pas`, `Demos/SimpleIDEDemo/SimpleIdeMain.pas`.
   All twelve built for Win32, which is why this had gone unnoticed. The cause is upstream's own `TSynNativeInt` in `Source/SynFunc.pas`, which is `Int32` below `COMPILERVERSION 36` and `NativeInt` from Delphi 12 on. On Win32 `NativeInt` *is* `Integer`, so nothing shows; on Win64 it is 64-bit and every demo event handler still declaring `Integer` stops matching the library's event type.

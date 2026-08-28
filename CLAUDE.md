@@ -8,7 +8,11 @@ merged-through marker.
 
 - **Delphi 13 (Florence, RAD Studio 37.0) and later.** D13+ is the global floor
   for every project and package (Ian, 2026-08-28).
-- **Windows, VCL, Win32 + Win64.** Never Win64x.
+- **Windows and VCL only.** Never Win64x.
+- **Win32 and Win64, both supported and both built** -- Win32 + Win64 x Debug +
+  Release, the suite-wide four-mode package rule, which is what the 8/8 figure
+  below counts. This **supersedes** an earlier "Win64 only" scope (Ian,
+  2026-08-28); if you find that phrase anywhere it is stale, not a distinction.
 - **C++Builder is never in scope.** `Packages/*/CBuilder/` is upstream content
   this fork carries but never compiles. The Delphi `.dproj` files carry
   `DCC_CBuilderOutput=None`; the `.cbproj` files still say `All`, which is

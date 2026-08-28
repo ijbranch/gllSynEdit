@@ -13,7 +13,7 @@ The master branch remains compatible with Delphi 12 Athens or later. You can als
 
 This repository is **gllSynEdit**, GITLAK's fork of
 [TurboPack SynEdit](https://github.com/TurboPack/SynEdit), scoped to
-**Delphi 13+ / Win64 only** and installed into the 64-bit RAD Studio IDE.
+**Delphi 13+**, Win32 and Win64, and installed into the 64-bit RAD Studio IDE.
 Upstream content is kept unmodified except where `CHANGELOG.md` — the sole
 record of the fork delta — says otherwise. Take upstream updates by fetching
 the `upstream` remote and merging (never rebasing).
@@ -76,6 +76,8 @@ steps:
 
 3. Add the **Source** and the **Source\Highlighters** subdirectories to the IDE's library path. For CBuilder, add the hpp subdirectory
 (e.g., d:\SynEdit\source\hpp\Win32\Release) to the IDE's system include path.
+
+> The CBuilder half of that step does not apply to this fork: `gllSynEdit` builds no C++ packages and emits no `.hpp`, so there is no hpp subdirectory to add. See the note under **Package names** above.
 
 4. Open & install the design-time package specific to the IDE being used. The IDE should notify you the components have been
 installed.
