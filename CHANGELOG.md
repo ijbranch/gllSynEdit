@@ -20,11 +20,14 @@ visible.
 
 - **`CLAUDE.md` added** (2026-08-28) — `CLAUDE.md`. The fork's rules lived only in `readme.md` and `CHANGELOG.md`, so the things most likely to bite were not written down anywhere a reader would look first.
   It records the scope (Delphi 13+, Win32 + Win64, never Win64x, C++Builder never in scope), the merge-never-rebase rule and why mass edits are far costlier here than in `glldzlib` — this fork has real git ancestry with upstream, so every edit to an upstream file is a future conflict, whereas `glldzlib` is an SVN snapshot.
-  It also records the `TSynNativeInt` trap in full, since that is the one thing about this codebase that a Win32-only build will never reveal, and the decision **not** to delete the pre-D13 `Packages/Berlin|Tokyo|Rio|Sydney` folders: upstream still ships all four and last touched them on 2026-06-05, so removing 60 dead files would cost a conflict every time upstream touches them again.
+  It also records the `TSynNativeInt` trap in full, since that is the one thing about this codebase that a Win32-only build will never reveal, and — at that point — a decision **not** to delete the pre-D13 `Packages/Berlin|Tokyo|Rio|Sydney` folders. **That decision was reversed the same day**: they were removed because they are not needed for D13+, see the entry above. What survives from it is the merge consequence, which is real either way: upstream still ships all four and last touched them on 2026-06-05, so a merge touching them raises a delete/modify conflict that must be resolved by keeping the deletion.
 
 - `upstream/master` is merged as far as `ee3c6ba` (2026-08-27). Its three commits were cherry-picked on 2026-08-22 (the accidental "Import IDE Settings" guard), so the merge changes no file - `git diff` against the pre-merge tree is empty and there was nothing to conflict. It exists because this fork takes upstream by merging, and an unrecorded merge leaves `git rev-list` reporting a backlog that is not there. `README.md` now carries the merged-through marker beside the merge-never-rebase rule, so the position is readable without running git.
 
 ### Fixed
+
+- **Two `.gitignore` rules pointed at a folder that no longer exists** (2026-08-28) — `.gitignore`.
+  `Packages/Sydney/CBuilder/Win64/` and `Packages/Sydney/cpp/` were left behind when the pre-D13 package folders were removed. The generic `Packages/*/cpp/` rule added the same day still covers the one remaining case, `11AndAbove`. Checked afterwards that no tracked file became ignored and that `37.0/` and `Packages/11AndAbove/cpp/` are still excluded by this repository's own file rather than a global one.
 
 - **The fork's stated scope said "Win64 only", which is out of date** (2026-08-28) — `readme.md`, `CHANGELOG.md`, `CLAUDE.md`.
   The global rule now covers **both Win32 and Win64** (Ian), superseding the earlier Win64-only position; packages build all four modes and the demos are verified on both platforms. All three documents said otherwise in their opening scope line, which is the first thing a reader sees.

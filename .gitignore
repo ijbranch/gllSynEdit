@@ -49,8 +49,6 @@ __recovery/
 ###################
 *.prjmgc
 
-Packages/Sydney/CBuilder/Win64/
-Packages/Sydney/cpp/
 # Build output directories #
 ############################
 # These were previously caught only by a machine-level core.excludesFile, so a
