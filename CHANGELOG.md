@@ -13,6 +13,11 @@ visible.
 
 ### Changed
 
+- **The pre-D13 package folders were removed** (2026-08-28) — `Packages/Berlin`, `Packages/Rio`, `Packages/Sydney`, `Packages/Tokyo`, 60 files.
+  They are pre-D13 and built nothing here, so under the Delphi 13+ rule they carried no weight.
+  Upstream still ships all four and last touched them on 2026-06-05, so a future merge that changes any of those files will raise a delete/modify conflict. **Resolve it by keeping the deletion** — `git rm` the path. That cost was accepted knowingly; `CLAUDE.md` records it so the conflict is recognised rather than reverted.
+  (An intermediate commit restored these folders in error before the intent was confirmed; `dda0d72` restored them and this removes them again deliberately.)
+
 - **`CLAUDE.md` added** (2026-08-28) — `CLAUDE.md`. The fork's rules lived only in `readme.md` and `CHANGELOG.md`, so the things most likely to bite were not written down anywhere a reader would look first.
   It records the scope (Delphi 13+, Win32 + Win64, never Win64x, C++Builder never in scope), the merge-never-rebase rule and why mass edits are far costlier here than in `glldzlib` — this fork has real git ancestry with upstream, so every edit to an upstream file is a future conflict, whereas `glldzlib` is an SVN snapshot.
   It also records the `TSynNativeInt` trap in full, since that is the one thing about this codebase that a Win32-only build will never reveal, and the decision **not** to delete the pre-D13 `Packages/Berlin|Tokyo|Rio|Sydney` folders: upstream still ships all four and last touched them on 2026-06-05, so removing 60 dead files would cost a conflict every time upstream touches them again.

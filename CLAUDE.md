@@ -30,13 +30,19 @@ SVN snapshot with no shared history, so mass edits there cost nothing. Here ever
 edit to an upstream file is a conflict on some future merge. Keep changes
 minimal, targeted, and recorded in `CHANGELOG.md`.
 
-### The pre-D13 package folders stay
+### The pre-D13 package folders were removed
 
-`Packages/Berlin`, `Tokyo`, `Rio` and `Sydney` are pre-D13 and build nothing
-here. Do **not** delete them. Checked 2026-08-28: upstream still ships all four,
-15 files each, and last touched them on 2026-06-05. Removing them buys 60 dead
-files and costs a conflict every time upstream touches them again.
+`Packages/Berlin`, `Tokyo`, `Rio` and `Sydney` are pre-D13 and built nothing
+here. Removed 2026-08-28 (Ian) -- 60 files. Do not restore them.
 
+**Expect merge conflicts, and resolve them by keeping the deletion.** Upstream
+still ships all four, 15 files each, and last touched them on 2026-06-05, so a
+future `git merge upstream/master` that changes any of those files will raise a
+delete/modify conflict. The resolution is `git rm` on the path, every time --
+the removal is deliberate, not an accident to be undone.
+
+That is the cost this fork accepted for a smaller tree, and it is the one place
+where the merge-never-rebase rule above will actually bite.
 ## Build verification
 
 The only package set built here is `Packages/11AndAbove/Delphi`:
