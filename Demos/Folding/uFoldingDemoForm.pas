@@ -89,8 +89,8 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ScanForFoldRanges(Sender: TObject; TopFoldRanges:
-      TSynFoldRanges; LinesToScan: TStrings; FromLine: Integer;
-      ToLine: Integer);
+      TSynFoldRanges; LinesToScan: TStrings; FromLine: NativeInt;
+      ToLine: NativeInt);
     procedure DialogFontEdit1BeforeExecute(Sender: TObject);
     procedure actFoldExecute(Sender: TObject);
     procedure actFoldUpdate(Sender: TObject);
@@ -258,7 +258,7 @@ end;
 
 procedure TFoldingDemoForm.ScanForFoldRanges(Sender: TObject;
   TopFoldRanges: TSynFoldRanges; LinesToScan: TStrings; FromLine,
-  ToLine: Integer);
+  ToLine: NativeInt);
 var
   CurLine: string;
   Line: Integer;

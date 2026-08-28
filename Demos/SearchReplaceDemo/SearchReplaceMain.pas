@@ -324,7 +324,7 @@ begin
 end;
 
 procedure TSearchReplaceDemoForm.SynEditorReplaceText(Sender: TObject; const
-  ASearch, AReplace: string; Line, Column: Integer; var Action:
+  ASearch, AReplace: string; Line, Column: NativeInt; var Action:
   TSynReplaceAction);
 var
   APos: TPoint;

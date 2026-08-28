@@ -222,7 +222,9 @@ end;
 function TEditor.GetCaretPos: TPoint;
 begin
   if fForm <> nil then
-    Result := TPoint(fForm.SynEditor.CaretXY)
+    // TBufferCoord holds two TSynNativeInt, which is 16 bytes on Win64, so it
+    // can no longer be hard cast to TPoint. Copy the fields across instead.
+    Result := Point(fForm.SynEditor.CaretXY.Char, fForm.SynEditor.CaretXY.Line)
   else
     Result := Point(-1, -1);
 end;
@@ -610,7 +612,7 @@ begin
   DoAssignInterfacePointer(False);
 end;
 procedure TEditorForm.SynEditorReplaceText(Sender: TObject; const ASearch,
-    AReplace: string; Line, Column: Integer; var Action: TSynReplaceAction);
+    AReplace: string; Line, Column: NativeInt; var Action: TSynReplaceAction);
 var
   APos: TPoint;
   EditRect: TRect;

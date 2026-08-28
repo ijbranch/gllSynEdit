@@ -101,10 +101,10 @@ type
     procedure SetRange(Value: Pointer); override;
     function GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes; override;
     function GetEol: Boolean; override;
-    function GetKeyWords(TokenKind: Integer): string; override;
+    function GetKeyWords(TokenKind: NativeInt): string; override;
     function GetTokenID: TtkTokenKind;
     function GetTokenAttribute: TSynHighlighterAttributes; override;
-    function GetTokenKind: Integer; override;
+    function GetTokenKind: NativeInt; override;
     function IsIdentChar(AChar: WideChar): Boolean; override;
     procedure Next; override;
   published
@@ -414,7 +414,7 @@ begin
   Result := Run = fLineLen + 1;
 end;
 
-function TSynSampleSyn.GetKeyWords(TokenKind: Integer): string;
+function TSynSampleSyn.GetKeyWords(TokenKind: NativeInt): string;
 begin
   Result := 
     'Hello,SynEdit,World';
@@ -440,7 +440,7 @@ begin
   end;
 end;
 
-function TSynSampleSyn.GetTokenKind: Integer;
+function TSynSampleSyn.GetTokenKind: NativeInt;
 begin
   Result := Ord(fTokenId);
 end;

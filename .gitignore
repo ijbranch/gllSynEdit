@@ -51,3 +51,13 @@ __recovery/
 
 Packages/Sydney/CBuilder/Win64/
 Packages/Sydney/cpp/
+# Build output directories #
+############################
+# These were previously caught only by a machine-level core.excludesFile, so a
+# clone on a machine without one would have committed build output. .dcu/.bpl/
+# .dcp above cover most of it, but not the .dfm and .res the compiler copies
+# into these folders.
+37.0/
+Packages/*/Delphi/Win32/
+Packages/*/Delphi/Win64/
+Packages/*/cpp/

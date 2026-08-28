@@ -188,7 +188,7 @@ begin
 end;
 
 procedure TTestPrintPreviewDlg.SynEditPrintPreviewPreviewPage(
-  Sender: TObject; PageNumber: Integer);
+  Sender: TObject; PageNumber: NativeInt);
 begin
   StatusBar.Panels[1].Text := ' Page: ' + IntToStr(SynEditPrintPreview.PageNumber);
 end;

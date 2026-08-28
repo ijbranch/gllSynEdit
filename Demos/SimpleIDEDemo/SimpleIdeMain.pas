@@ -138,8 +138,8 @@ type
   TDebugSupportPlugin = class(TSynEditPlugin)
   protected
     fForm: TSimpleIDEMainForm;
-    procedure LinesInserted(FirstLine, Count: Integer); override;
-    procedure LinesDeleted(FirstLine, Count: Integer); override;
+    procedure LinesInserted(FirstLine, Count: NativeInt); override;
+    procedure LinesDeleted(FirstLine, Count: NativeInt); override;
   public
     constructor Create(AForm: TSimpleIDEMainForm);
   end;
@@ -151,13 +151,13 @@ begin
   fForm := AForm;
 end;
 
-procedure TDebugSupportPlugin.LinesInserted(FirstLine, Count: Integer);
+procedure TDebugSupportPlugin.LinesInserted(FirstLine, Count: NativeInt);
 begin
 // Note: You will need this event if you want to track the changes to
 //       breakpoints in "Real World" apps, where the editor is not read-only
 end;
 
-procedure TDebugSupportPlugin.LinesDeleted(FirstLine, Count: Integer);
+procedure TDebugSupportPlugin.LinesDeleted(FirstLine, Count: NativeInt);
 begin
 // Note: You will need this event if you want to track the changes to
 //       breakpoints in "Real World" apps, where the editor is not read-only
@@ -203,7 +203,7 @@ begin
 end;
 
 procedure TSimpleIDEMainForm.SynEditorSpecialLineColors(Sender: TObject;
-  Line: Integer; var Special: Boolean; var FG, BG: TColor);
+  Line: NativeInt; var Special: Boolean; var FG, BG: TColor);
 var
   LI: TDebuggerLineInfos;
 begin
@@ -351,20 +351,20 @@ begin
 end;
 
 procedure TSimpleIDEMainForm.ClickDebugBand(Sender: TObject;
-    Button: TMouseButton; X, Y, Row, Line: Integer);
+    Button: TMouseButton; X, Y, Row, Line: NativeInt);
 begin
   if FDebugger <> nil then
     FDebugger.ToggleBreakpoint(Line);
 end;
 
 procedure TSimpleIDEMainForm.SynEditorTSynGutterBands1MouseCursor(Sender:
-    TObject; X, Y, Row, Line: Integer; var Cursor: TCursor);
+    TObject; X, Y, Row, Line: NativeInt; var Cursor: TCursor);
 begin
   Cursor := crHandPoint;
 end;
 
 procedure TSimpleIDEMainForm.SynEditorTSynGutterBands1PaintLines(RT:
-    ID2D1RenderTarget; ClipR: TRect; const FirstRow, LastRow: Integer; var
+    ID2D1RenderTarget; ClipR: TRect; const FirstRow, LastRow: NativeInt; var
     DoDefaultPainting: Boolean);
 var
   LH, Y: Integer;
