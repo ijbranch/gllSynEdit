@@ -13,6 +13,10 @@ visible.
 
 ### Changed
 
+- **`CLAUDE.md` added** (2026-08-28) — `CLAUDE.md`. The fork's rules lived only in `readme.md` and `CHANGELOG.md`, so the things most likely to bite were not written down anywhere a reader would look first.
+  It records the scope (Delphi 13+, Win32 + Win64, never Win64x, C++Builder never in scope), the merge-never-rebase rule and why mass edits are far costlier here than in `glldzlib` — this fork has real git ancestry with upstream, so every edit to an upstream file is a future conflict, whereas `glldzlib` is an SVN snapshot.
+  It also records the `TSynNativeInt` trap in full, since that is the one thing about this codebase that a Win32-only build will never reveal, and the decision **not** to delete the pre-D13 `Packages/Berlin|Tokyo|Rio|Sydney` folders: upstream still ships all four and last touched them on 2026-06-05, so removing 60 dead files would cost a conflict every time upstream touches them again.
+
 - `upstream/master` is merged as far as `ee3c6ba` (2026-08-27). Its three commits were cherry-picked on 2026-08-22 (the accidental "Import IDE Settings" guard), so the merge changes no file - `git diff` against the pre-merge tree is empty and there was nothing to conflict. It exists because this fork takes upstream by merging, and an unrecorded merge leaves `git rev-list` reporting a backlog that is not there. `README.md` now carries the merged-through marker beside the merge-never-rebase rule, so the position is readable without running git.
 
 ### Fixed
