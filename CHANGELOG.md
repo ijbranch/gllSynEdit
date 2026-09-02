@@ -7,6 +7,12 @@ Scope: **Delphi 13+**, built for Win32 and Win64, installed into the 64-bit RAD 
 content is unmodified except where entries below say otherwise, so the fork delta stays
 visible.
 
+## [Unreleased]
+
+### Changed
+
+- Repository moved to the `GITLAK-forks` Codeberg organisation: `origin` is now `https://codeberg.org/GITLAK-forks/gllSynEdit.git`. **Why:** the `GITLAK` account had reached Codeberg's hard limit of 100 repositories, and an organisation carries its own allowance (2026-09-03)
+
 ## [In-Service]
 
 > Libraries and packages are continuously deployed: changes below are live as soon as the package is rebuilt and installed - there is no separate release step, so no `[Unreleased]` backlog. Tagged version snapshots are listed beneath.
