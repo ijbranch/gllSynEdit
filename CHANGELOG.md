@@ -11,7 +11,14 @@ visible.
 
 ### Changed
 
+- Codeberg is retired; every repository URL points at GitHub again (2026-09-05).
+  **Why:** hosting consolidated back on GitHub. `origin` is the GitHub URL, the stale
+  `codeberg` remote has been removed from the working checkout, and the documentation that
+  says where to clone from was updated to match. The Codeberg entry below is superseded;
+  its URLs are left as written because rewriting them would falsify the record.
+
 - Repository moved to the `GITLAK-forks` Codeberg organisation: `origin` is now `https://codeberg.org/GITLAK-forks/gllSynEdit.git`. **Why:** the `GITLAK` account had reached Codeberg's hard limit of 100 repositories, and an organisation carries its own allowance (2026-09-03)
+  **Superseded 2026-09-05:** Codeberg is no longer used; see the entry above.
 
 ## [In-Service]
 
