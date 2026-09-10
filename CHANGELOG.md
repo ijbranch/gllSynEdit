@@ -9,7 +9,40 @@ visible.
 
 ## [Unreleased]
 
+### Removed
+
+- C++Builder content removed — 5 files (2026-09-10)
+  `.cbproj` projects and their `.cpp`/`.h`/`.bpr` companions, the C++Builder project
+  groups and the generated `.hpp`. **Why:** C++Builder is not used here and never has
+  been; the files were never built, so they were pure noise in every audit and search.
+  The `DCC_HppOutput`/`DCC_BpiOutput`/`DCC_ObjOutput` properties in `SynEditDD.dproj` and
+  `SynEditDR.dproj` went too, with the `Packages/11AndAbove/cpp` tree MSBuild kept recreating.
+  Kept deliberately: `Demos/Folding/demo.cpp` is syntax-highlighting SAMPLE DATA beside
+  `demo.js` and `demo.py`, not C++Builder code.
+
 ### Changed
+
+- Documentation brought level with the D13 / Win32+Win64 / no-C++Builder / no-non-Windows
+  state (2026-09-10) — `CLAUDE.md`, `New.md`, `readme.md`
+  Stale supported-version ranges, per-IDE folder paths, C++Builder offers, non-Windows
+  platform claims and Win64-only/Win32-only statements corrected against the current tree.
+  Dated reports and upstream-authored prose were left as history.
+
+- Non-Windows conditional compilation resolved away in 1 source file — 7 constructs (2026-09-10)
+  `{$IFDEF POSIX|LINUX|ANDROID|IOS|MACOS|OSX|UNIX}` blocks were dropped and
+  `{$IFDEF MSWINDOWS|WINDOWS}` blocks collapsed to their Windows branch, keeping exactly
+  what a Win32/Win64 compile keeps. Conditions that are not constant across both our
+  platforms (`WIN32`, `WIN64`, `CPUX64`, compound `{$IF}`) were left untouched, as were
+  files whose directive nesting is unbalanced by design (JEDI-style includes).
+  **Why:** the dead branches could never be reached here and only misled the reader.
+
+- Project platforms normalised to Win32 + Win64 only in 6 `.dproj` files (2026-09-10)
+  Non-Windows targets (`Android`, `Android64`, `iOS*`, `OSX*`, `Linux64`) and the
+  `Win64x` / `WinARM64EC` variants were removed together with their `Base_<Plat>` and
+  `Cfg_N_<Plat>` property groups, `<Deployment>` platform nodes and `<ProjectRoot>`
+  entries; a deactivated `Win32` or `Win64` was switched on.
+  **Why:** standing suite rule — every gll* project is Delphi 13, Win32 + Win64, nothing
+  else, so the four-mode package sweep is always possible.
 
 - Codeberg is retired; every repository URL points at GitHub again (2026-09-05).
   **Why:** hosting consolidated back on GitHub. `origin` is the GitHub URL, the stale
@@ -62,10 +95,6 @@ visible.
 - **C++Builder output turned off** (2026-08-26). `DCC_CBuilderOutput` was `All`, so every build emitted `.hpp` / `.bpi` / `.a` / `.obj` files for a compiler that is **never in scope here** (standing rule: "I dont use C++ at all"). Across the estate that was 616 files and 90 MB of output nobody consumes, regenerated on every build; `gllSynEdit` alone accounted for 560. Now `None`. The `DCC_HppOutput` / `DCC_BpiOutput` / `DCC_ObjOutput` properties are left in place deliberately - they only say *where* such files would go, so with generation off they are inert, and removing them would enlarge the diff without changing behaviour. Verified: the affected packages rebuilt clean in every enabled mode, emitted no C++ artefacts, and rebuilt clean again after the existing ones were deleted (so nothing was load-bearing).
 
 - **`readme.md` now states that this fork is Delphi-only** (2026-08-26) — `readme.md`. The inherited TurboPack text lists `SynEditCR.bpl` / `SynEditCD.bpl` among the package names as though they were part of the release. They are not built here: only `SynEditDR` and `SynEditDD` under `Packages\11AndAbove\Delphi` are, and `Packages\11AndAbove\CBuilder\` is upstream content this fork carries but never compiles. A note under that list says so, and records that the two Delphi packages now also have `DCC_CBuilderOutput=None` — a reader who genuinely needed C++ interop would otherwise find the `.hpp`/`.bpi` files simply absent with nothing to explain why.
-
-
-
-
 
 - Debug and Release package output no longer collide (2026-08-24)
   **Why:** RAD Studio defaults `DCC_BplOutput` to `$(BDSCOMMONDIR)\Bpl\$(Platform)` and `DCC_DcpOutput` to `\Dcp\$(Platform)`, neither carrying `$(Config)`, so a Debug build silently replaced the installed Release package.

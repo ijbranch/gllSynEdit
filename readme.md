@@ -2,6 +2,8 @@
 
 The master branch remains compatible with Delphi 12 Athens or later. You can also access the [11 Alexandira](https://github.com/TurboPack/SynEdit/tree/11Alexandria), [10.3 Rio](https://github.com/TurboPack/SynEdit/releases/tag/103RIO), [10.2 Tokyo](https://github.com/TurboPack/SynEdit/releases/tag/102Tokyo) and [10.1 Berlin](https://github.com/TurboPack/SynEdit/releases/tag/101Berlin) releases. Keep in mind they don't have the latest updates.
 
+> **In this fork:** `gllSynEdit` is scoped to **Delphi 13 (RAD Studio 37.0) and later**, Win32 and Win64. The older-release links above are upstream's; nothing here is built or tested against them.
+
 ### Table of contents
 1.  [Introduction](#Introduction)
 2.  [Package names](#Package-names)
@@ -33,10 +35,10 @@ leftover fork note from the contributor of the WebStencils highlighter.)
 
 
 SynEdit is a syntax highlighting edit control, not based on the Windows 
-common controls. SynEdit is compatible with both Delphi and C++ Builder.
+common controls. SynEdit is a Delphi component.
 
 This is a source-only release of TurboPack SynEdit. It includes
-designtime and runtime packages for Delphi and C++Builder and supports Win32 and Win64.
+designtime and runtime packages for Delphi and supports Win32 and Win64.
 
 ---
 
@@ -48,18 +50,16 @@ Delphi
 * SynEditDR.bpl (Delphi Runtime)
 * SynEditDD.bpl (Delphi Designtime)
 
-C++Builder
-* SynEditCR.bpl (C++Builder Runtime)
-* SynEditCD.bpl (C++Builder Designtime)
-
-> **Not built in this fork.** `gllSynEdit` is Delphi-only: only `SynEditDR` and
-> `SynEditDD` (under `Packages\11AndAbove\Delphi`) are built, installed and
-> supported here. `Packages\11AndAbove\CBuilder\` is inherited from upstream and
-> is never compiled. As of 2026-08-26 the two Delphi packages also have
-> `DCC_CBuilderOutput=None`, so they no longer emit the `.hpp`/`.bpi`/`.a`/`.obj`
-> files a C++Builder consumer would need — that alone was 560 files regenerated on
-> every build for a compiler this estate does not use. Re-enable it on those two
-> projects if you ever genuinely need C++ interop.
+> **Delphi-only fork.** `gllSynEdit` has only `SynEditDR` and `SynEditDD`
+> (under `Packages\11AndAbove\Delphi`); those are built, installed and supported
+> here. The upstream `Packages\11AndAbove\CBuilder\` projects (`SynEditCR.bpl`,
+> `SynEditCD.bpl`) were never compiled here and were **deleted 2026-09-10**, along
+> with the `cpp` output folder. As of 2026-08-26 the two Delphi packages also have
+> `DCC_CBuilderOutput=None`, and as of 2026-09-10 they no longer carry
+> `DCC_HppOutput`/`DCC_BpiOutput`/`DCC_ObjOutput` at all, so they emit none of the
+> `.hpp`/`.bpi`/`.a`/`.obj` files a C++Builder consumer would need — that alone was
+> 560 files regenerated on every build for a compiler this estate does not use.
+> Re-add them on those two projects if you ever genuinely need C++ interop.
 
 ---
 
@@ -74,10 +74,9 @@ steps:
 
 2. Start RAD Studio.
 
-3. Add the **Source** and the **Source\Highlighters** subdirectories to the IDE's library path. For CBuilder, add the hpp subdirectory
-(e.g., d:\SynEdit\source\hpp\Win32\Release) to the IDE's system include path.
+3. Add the **Source** and the **Source\Highlighters** subdirectories to the IDE's library path.
 
-> The CBuilder half of that step does not apply to this fork: `gllSynEdit` builds no C++ packages and emits no `.hpp`, so there is no hpp subdirectory to add. See the note under **Package names** above.
+> Upstream's extra step here — adding an hpp subdirectory to the C++Builder system include path — does not apply to this fork: `gllSynEdit` builds no C++ packages and emits no `.hpp`, so there is no hpp subdirectory to add. See the note under **Package names** above.
 
 4. Open & install the design-time package specific to the IDE being used. The IDE should notify you the components have been
 installed.

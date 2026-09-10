@@ -60,7 +60,6 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
         <SanitizedProjectName>SynEditDR</SanitizedProjectName>
-        <DCC_BpiOutput>..\cpp\$(Platform)\$(Config)</DCC_BpiOutput>
         <DCC_CBuilderOutput>None</DCC_CBuilderOutput>
         <DCC_COMBINING_SIGNED_UNSIGNED64>true</DCC_COMBINING_SIGNED_UNSIGNED64>
         <DCC_DcuOutput>..\..\..\37.0\$(Platform)\$(Config)</DCC_DcuOutput>
@@ -75,13 +74,11 @@
         <DCC_Description>TurboPack SynEdit Delphi runtime package</DCC_Description>
         <DCC_EXPLICIT_STRING_CAST>true</DCC_EXPLICIT_STRING_CAST>
         <DCC_EXPLICIT_STRING_CAST_LOSS>true</DCC_EXPLICIT_STRING_CAST_LOSS>
-        <DCC_HppOutput>..\cpp\$(Platform)\$(Config)</DCC_HppOutput>
         <DCC_IMMUTABLE_STRINGS>true</DCC_IMMUTABLE_STRINGS>
         <DCC_IMPLICIT_CONVERSION_LOSS>true</DCC_IMPLICIT_CONVERSION_LOSS>
         <DCC_IMPLICIT_INTEGER_CAST_LOSS>true</DCC_IMPLICIT_INTEGER_CAST_LOSS>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;System.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
-        <DCC_ObjOutput>..\cpp\$(Platform)\$(Config)</DCC_ObjOutput>
         <DCC_OutputNeverBuildDcps>true</DCC_OutputNeverBuildDcps>
         <DCC_UNSAFE_VOID_POINTER>true</DCC_UNSAFE_VOID_POINTER>
         <DCC_UnitSearchPath>..\..\..\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
@@ -342,7 +339,6 @@
             <Platforms>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">True</Platform>
-                <Platform value="Win64x">False</Platform>
             </Platforms>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>

@@ -8,15 +8,27 @@ merged-through marker.
 
 - **Delphi 13 (Florence, RAD Studio 37.0) and later.** D13+ is the global floor
   for every project and package (Ian, 2026-08-28).
-- **Windows and VCL only.** Never Win64x.
+- **Windows and VCL only.** Never Win64x. No non-Windows
+  `{$IFDEF POSIX|LINUX|ANDROID|IOS|MACOS|OSX|UNIX}` construct is left in `Source`
+  (verified 2026-09-10); there is no Linux/macOS/mobile support here and none is to
+  be re-added. **Two files were deliberately left untouched by that sweep**, because
+  their directive nesting is unbalanced by design and a mechanical resolve would
+  corrupt them: `Source/SynEditJedi.inc` (which still carries `MSWINDOWS` and other
+  platform conditionals) and `Source/Highlighters/SynHighlighterDelphi.pas`. Leave
+  both alone.
 - **Win32 and Win64, both supported and both built** -- Win32 + Win64 x Debug +
   Release, the suite-wide four-mode package rule, which is what the 8/8 figure
   below counts. This **supersedes** an earlier "Win64 only" scope (Ian,
   2026-08-28); if you find that phrase anywhere it is stale, not a distinction.
-- **C++Builder is never in scope.** `Packages/*/CBuilder/` is upstream content
-  this fork carries but never compiles. The Delphi `.dproj` files carry
-  `DCC_CBuilderOutput=None`; the `.cbproj` files still say `All`, which is
-  correct — they *are* C++ projects, and nothing here builds them.
+- **C++Builder is never in scope, and is now gone from the tree.**
+  `Packages/11AndAbove/CBuilder/` (the `SynEditCD`/`SynEditCR` `.cbproj` pair, their
+  `.cpp` files and the `SynEditCBuilder.groupproj`) and the `cpp` output folder were
+  deleted 2026-09-10. The Delphi `.dproj` files carry `DCC_CBuilderOutput=None` and
+  no longer carry `DCC_HppOutput`/`DCC_BpiOutput`/`DCC_ObjOutput` at all. Expect a
+  delete/modify merge conflict if upstream touches those files; resolve it with
+  `git rm`, as with the pre-D13 package folders below.
+  `Demos/Folding/demo.cpp` is NOT C++Builder code and was deliberately kept: it is
+  syntax-highlighting sample data beside `demo.js` and `demo.py`. Do not remove it.
 
 ## Upstream: merge, never rebase
 
