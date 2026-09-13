@@ -1,13 +1,17 @@
 # TurboPack SynEdit
 
-The master branch remains compatible with Delphi 12 Athens or later. You can also access the [11 Alexandira](https://github.com/TurboPack/SynEdit/tree/11Alexandria), [10.3 Rio](https://github.com/TurboPack/SynEdit/releases/tag/103RIO), [10.2 Tokyo](https://github.com/TurboPack/SynEdit/releases/tag/102Tokyo) and [10.1 Berlin](https://github.com/TurboPack/SynEdit/releases/tag/101Berlin) releases. Keep in mind they don't have the latest updates.
+The master branch supports **Delphi 12 Athens** and **Delphi 13 Florence** (COMPILERVERSION 36 and 37), Win32 and Win64, VCL. You can also access the [11 Alexandira](https://github.com/TurboPack/SynEdit/tree/11Alexandria), [10.3 Rio](https://github.com/TurboPack/SynEdit/releases/tag/103RIO), [10.2 Tokyo](https://github.com/TurboPack/SynEdit/releases/tag/102Tokyo) and [10.1 Berlin](https://github.com/TurboPack/SynEdit/releases/tag/101Berlin) releases. Keep in mind they don't have the latest updates.
 
-> **In this fork:** `gllSynEdit` is scoped to **Delphi 13 (RAD Studio 37.0) and later**, Win32 and Win64. The older-release links above are upstream's; nothing here is built or tested against them.
+> **In this fork:** `gllSynEdit` is scoped to **Delphi 13 (RAD Studio 37.0) and later**, Win32 and Win64. The older-release links above are upstream's; nothing here is built or tested against them. Because Delphi 13 is the floor here, the compiler-version conditionals below it have been resolved away and `SynEditJedi.inc` has been deleted - see `CHANGELOG.md`.
+>
+> A review of upstream `ee3c6ba` found 35 defects, all fixed here and **submitted to TurboPack on 2026-09-14**. Some may therefore return through a future merge.
 
 ### Table of contents
 1.  [Introduction](#Introduction)
 2.  [Package names](#Package-names)
 3.  [Installation](#Installation)
+4.  [Building and testing](#Building-and-testing)
+5.  [Documentation](#Documentation)
 
 ---
 
@@ -78,5 +82,60 @@ steps:
 
 > Upstream's extra step here — adding an hpp subdirectory to the C++Builder system include path — does not apply to this fork: `gllSynEdit` builds no C++ packages and emits no `.hpp`, so there is no hpp subdirectory to add. See the note under **Package names** above.
 
-4. Open & install the design-time package specific to the IDE being used. The IDE should notify you the components have been
-installed.
+4. Add the **Source\DesignTimeEditors** subdirectory as well if you intend to build the
+design-time package from source.
+
+5. Open & install the design-time package specific to the IDE being used. The IDE should notify you the components have been
+installed. In this fork that is `Packages\11AndAbove\Delphi\SynEditDD.dproj`, and it must be
+installed from the **64-bit** IDE (`bin64\bds.exe`) — design packages register per IDE bitness.
+
+---
+
+## Building and testing
+
+`build.cmd` at the repository root builds and tests everything, in the order that works:
+
+```
+build.cmd            packages + demos + tests
+build.cmd packages   the two packages only, four modes each
+build.cmd tests      the test suite only, both platforms
+```
+
+It exits non-zero if any build fails or any test fails, so it is usable as a pre-commit check.
+
+* **Packages** — `SynEditDR` (runtime) then `SynEditDD` (design-time), Win32 + Win64 x Debug +
+  Release, 8 builds. The order matters: building the design-time package first fails `E2225`
+  because it requires the runtime package's `.dcp`.
+* **Demos** — the 12 projects under `Demos\`, both platforms. They are the only consumers of the
+  public API in the repository, so build them after any change to a public type.
+* **Tests** — `Tests\SynEditTests.dproj`, a DUnitX console runner, both platforms. It needs
+  DUnitX on the unit search path; `build.cmd` passes `%DUNITX%`, defaulting to
+  `D:\gllDUnitX\Source`.
+
+`TestHighlighterContract` is data-driven over `GetPlaceableHighlighters`, so it asserts the
+scanning contract against **all 83 registered highlighters** at once, with no per-language
+knowledge:
+
+* `Next` consumes at least one character or reaches end of line — a token procedure that returns
+  without advancing `Run` spins the scanning loop for ever, inside a paint handler;
+* `GetRange` round-trips through `SetRange`, and carries **all** cross-line scanner state — a
+  field that is not in the range pointer is lost when the editor repaints from mid-document;
+* each highlighter scans its own `SampleSource` identically whether the range is restored per
+  line or not.
+
+Those are the invariants the editor depends on and that no build diagnoses. A highlighter that
+breaks them compiles perfectly.
+
+**Note:** building `SynEditDD` makes MSBuild rewrite the tracked
+`Packages\11AndAbove\Delphi\SynEditDD.res`, shrinking it from 4,812 bytes to 640. `build.cmd`
+reverts it; if you build by hand, `git checkout --` it before committing.
+
+---
+
+## Documentation
+
+* [Code folding](Doc/CodeFolding.md) — how `TSynCustomCodeFoldingHighlighter` works and how to
+  add folding to a highlighter.
+* [Multi-caret editing](Doc/Multi-caret.md).
+* [`What's New.md`](What's%20New.md) — `TSynDelphiSyn` and the IDE settings importer.
+* [`CHANGELOG.md`](CHANGELOG.md) — in this fork, the sole record of the delta against upstream.
