@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+﻿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -101,7 +101,8 @@ implementation
 {$R *.dfm}
 
 uses
-  UITypes;
+  UITypes,
+  SynEditStrConst;
 
 { TSynEditPrintMarginsDlg }
 
@@ -120,6 +121,9 @@ procedure TSynEditPrintMarginsDlg.GetMargins(
   SynEditMargins: TSynEditPrintMargins);
 var
   CurEdit: TEdit;
+  NewLeft, NewRight, NewTop, NewBottom, NewGutter: Double;
+  NewHeader, NewFooter: Double;
+  NewLeftHFTextIndent, NewRightHFTextIndent, NewHFInternalMargin: Double;
   function StringToFloat(Edit: TEdit): Double;
   begin
     CurEdit := Edit;
@@ -129,21 +133,41 @@ begin
   with SynEditMargins do begin
     if not FInternalCall then
       UnitSystem := TUnitSystem(CBUnits.ItemIndex);
+    // Parse every field before committing any of it. Assigning as we went left
+    // the margins half-old and half-new whenever a later field was malformed,
+    // while reporting nothing worse than an input error.
     try
-      Left := StringToFloat(EditLeft);
-      Right := StringToFloat(EditRight);
-      Top := StringToFloat(EditTop);
-      Bottom := StringToFloat(EditBottom);
-      Gutter := StringToFloat(EditGutter);
-      Header := StringToFloat(EditHeader);
-      Footer := StringToFloat(EditFooter);
-      LeftHFTextIndent := StringToFloat(EditLeftHFTextIndent);
-      RightHFTextIndent := StringToFloat(EditRightHFTextIndent);
-      HFInternalMargin := StringToFloat(EditHFInternalMargin);
+      NewLeft := StringToFloat(EditLeft);
+      NewRight := StringToFloat(EditRight);
+      NewTop := StringToFloat(EditTop);
+      NewBottom := StringToFloat(EditBottom);
+      NewGutter := StringToFloat(EditGutter);
+      NewHeader := StringToFloat(EditHeader);
+      NewFooter := StringToFloat(EditFooter);
+      NewLeftHFTextIndent := StringToFloat(EditLeftHFTextIndent);
+      NewRightHFTextIndent := StringToFloat(EditRightHFTextIndent);
+      NewHFInternalMargin := StringToFloat(EditHFInternalMargin);
     except
-      MessageDlg('Invalid number!', mtError, [mbOk], 0);
-      CurEdit.SetFocus;
+      // Only EConvertError is plausible here; catching Exception also absorbed
+      // an access violation from a nil CurEdit.
+      on EConvertError do
+      begin
+        MessageDlg(SYNS_EInvalidNumber, mtError, [mbOk], 0);
+        if Assigned(CurEdit) then
+          CurEdit.SetFocus;
+        Exit;
+      end;
     end;
+    Left := NewLeft;
+    Right := NewRight;
+    Top := NewTop;
+    Bottom := NewBottom;
+    Gutter := NewGutter;
+    Header := NewHeader;
+    Footer := NewFooter;
+    LeftHFTextIndent := NewLeftHFTextIndent;
+    RightHFTextIndent := NewRightHFTextIndent;
+    HFInternalMargin := NewHFInternalMargin;
     MirrorMargins := CBMirrorMargins.Checked;
   end;
 end;

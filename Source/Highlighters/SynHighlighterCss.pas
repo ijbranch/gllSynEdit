@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+ï»¿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -16,7 +16,7 @@ The Original Code is based on the SynHighlighterHTML.pas, released 2000-04-10 -
 this in turn was based on the hkHTMLSyn.pas file from the mwEdit component suite
 by Martin Waldenburg and other developers, the Initial Author of this file is
 Hideo Koiso.
-Unicode translation by Maël Hörz.
+Unicode translation by MaÃ«l HÃ¶rz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -116,6 +116,8 @@ type
     procedure LFProc;
     procedure NullProc;
     procedure SpaceProc;
+    /// <summary>Scans a quoted string, terminated by the same quote character
+    /// that opened it - double or single.</summary>
     procedure StringProc;
     procedure HashProc;
     procedure SlashProc;
@@ -125,6 +127,8 @@ type
     procedure PipeProc;
     procedure WildCardProc;
     procedure EqualProc;
+    /// <summary>Scans a '!important' marker, bounds-checked against the length
+    /// of the current line; anything else is handed to IdentProc.</summary>
     procedure ExclamProc;
   protected
     function GetSampleSource: string; override;
@@ -138,13 +142,17 @@ type
     destructor Destroy; override;
     function GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes; override;
     function GetEol: Boolean; override;
+    /// <summary>Returns the cross-line scanner state: fRange in the low byte,
+    /// fCommentRange in bits 8-15 and fParameterRange in bits 16-23.</summary>
     function GetRange: Pointer; override;
     function GetTokenID: TtkTokenKind;
     function GetTokenAttribute: TSynHighlighterAttributes; override;
     function GetTokenKind: TSynNativeInt; override;
     function IsIdentChar(AChar: WideChar): Boolean; override;
     procedure Next; override;
+    /// <summary>Restores the scanner state packed by <see cref="GetRange"/>.</summary>
     procedure SetRange(Value: Pointer); override;
+    /// <summary>Resets every range field to the start-of-document state.</summary>
     procedure ResetRange; override;
   published
     property CommentAttri: TSynHighlighterAttributes read fCommentAttri
@@ -546,7 +554,7 @@ begin
   fAttributeAttri.Foreground := $00ff0080;
   AddAttribute(fAttributeAttri);
 
-  fAtRuleAttri := TSynHighlighterAttributes.Create(SYNS_AttrAtRules, SYNS_FriendlyAttrAttribute);
+  fAtRuleAttri := TSynHighlighterAttributes.Create(SYNS_AttrAtRules, SYNS_FriendlyAttrAtRules);
   fAtRuleAttri.Style := [];
   fAtRuleAttri.Foreground := $00808000;
   AddAttribute(fAtRuleAttri);
@@ -594,6 +602,8 @@ begin
   EnumerateKeywords(Ord(tkProperty), Properties_CSS3, IsIdentChar, DoAddKeyword);
 
   fRange := rsSelector;
+  fCommentRange := rsSelector;
+  fParameterRange := rsSelector;
   fDefaultFilter := SYNS_FilterCSS;
 end;
 
@@ -665,11 +675,9 @@ end;
 procedure TSynCssSyn.WildCardProc;
 begin
   Inc(Run);
+  fTokenID := tkSymbol;
   if fLine[Run] = '=' then
-  begin
     Inc(Run);
-    fTokenID := tkSymbol;
-  end;
 end;
 
 procedure TSynCssSyn.CommentProc;
@@ -749,11 +757,9 @@ end;
 procedure TSynCssSyn.PipeProc;
 begin
   Inc(Run);
+  fTokenID := tkSymbol;
   if fLine[Run] = '=' then
-  begin
     Inc(Run);
-    fTokenID := tkSymbol;
-  end;
 end;
 
 procedure TSynCssSyn.PlusProc;
@@ -765,12 +771,9 @@ end;
 procedure TSynCssSyn.IdentProc;
 begin
   case fRange of
-    rsProperty:
-      begin
-        fRange := rsDeclaration;
-        fTokenID := tkSelector;
-        Inc(Run, fStringLen);
-      end;
+    // rsProperty is never entered; its old branch advanced by a stale
+    // fStringLen, which could be 0 and hang the scanner. Let it fall through to
+    // the else branch, which calls IdentKind and always makes progress.
     rsValue, rsParameter:
       begin
         fTokenID := tkValue;
@@ -878,11 +881,9 @@ end;
 procedure TSynCssSyn.TildeProc;
 begin
   Inc(Run);
+  fTokenID := tkSymbol;
   if fLine[Run] = '=' then
-  begin
     Inc(Run);
-    fTokenID := tkSymbol;
-  end;
 end;
 
 procedure TSynCssSyn.SpaceProc;
@@ -893,11 +894,14 @@ begin
 end;
 
 procedure TSynCssSyn.StringProc;
+var
+  OpenChar: WideChar;
 begin
   fTokenID := tkString;
-  Inc(Run);  // first '"'
-  while not (IsLineEnd(Run) or (fLine[Run] = '"')) do Inc(Run);
-  if fLine[Run] = '"' then Inc(Run);  // last '"'
+  OpenChar := fLine[Run];  // '"' or the single quote
+  Inc(Run);
+  while not (IsLineEnd(Run) or (fLine[Run] = OpenChar)) do Inc(Run);
+  if fLine[Run] = OpenChar then Inc(Run);  // closing quote
 end;
 
 procedure TSynCssSyn.HashProc;
@@ -925,22 +929,26 @@ begin
 end;
 
 procedure TSynCssSyn.ExclamProc;
+const
+  Important = 'important';
+var
+  I: TSynNativeInt;
 begin
-  if (fLine[Run + 1] = 'i') and
-    (fLine[Run + 2] = 'm') and
-    (fLine[Run + 3] = 'p') and
-    (fLine[Run + 4] = 'o') and
-    (fLine[Run + 5] = 'r') and
-    (fLine[Run + 6] = 't') and
-    (fLine[Run + 7] = 'a') and
-    (fLine[Run + 8] = 'n') and
-    (fLine[Run + 9] = 't') then
+  // The last character examined is fLine[Run + Length(Important)], so the line
+  // must hold that many characters beyond Run before any of them is read.
+  if fLineLen - Run > Length(Important) then
   begin
+    for I := 1 to Length(Important) do
+      if fLine[Run + I] <> Important[I] then
+      begin
+        IdentProc;
+        Exit;
+      end;
     fTokenID := tkImportant;
-    Inc(Run, 10);
-  end
-  else
-    IdentProc;
+    Inc(Run, Length(Important) + 1);
+    Exit;
+  end;
+  IdentProc;
 end;
 
 procedure TSynCssSyn.SlashProc;
@@ -982,7 +990,7 @@ begin
     #10: LFProc;
     #13: CRProc;
     #1..#9, #11, #12, #14..#32: SpaceProc;
-    '"': StringProc;
+    '"', #39: StringProc;
     '#': HashProc;
     '{': BraceOpenProc;
     '}': BraceCloseProc;
@@ -1052,17 +1060,25 @@ end;
 
 function TSynCssSyn.GetRange: Pointer;
 begin
-  Result := Pointer(fRange);
+  // fCommentRange and fParameterRange are cross-line state too: without them a
+  // repaint starting mid-document cannot restore what a '*/' or ')' returns to.
+  Result := Pointer(NativeInt(Ord(fRange)) or
+                   (NativeInt(Ord(fCommentRange))   shl 8) or
+                   (NativeInt(Ord(fParameterRange)) shl 16));
 end;
 
 procedure TSynCssSyn.SetRange(Value: Pointer);
 begin
-  fRange := TRangeState(Value);
+  fRange          := TRangeState( NativeInt(Value)         and $FF);
+  fCommentRange   := TRangeState((NativeInt(Value) shr  8) and $FF);
+  fParameterRange := TRangeState((NativeInt(Value) shr 16) and $FF);
 end;
 
 procedure TSynCssSyn.ResetRange;
 begin
   fRange:= rsSelector;
+  fCommentRange := rsSelector;
+  fParameterRange := rsSelector;
 end;
 
 function TSynCssSyn.GetSampleSource: string;

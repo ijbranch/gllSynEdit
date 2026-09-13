@@ -201,7 +201,7 @@ end;
 
 function TSynRegistrySyn.IsAtLineStart: Boolean;
 var
-  I: Integer;
+  I: TSynNativeInt;
 begin
   for I := 0 to Run - 1 do
     if FLine[I] > ' ' then
@@ -211,7 +211,7 @@ end;
 
 function TSynRegistrySyn.LineStartsWith(const S: string): Boolean;
 var
-  I: Integer;
+  I: TSynNativeInt;
 begin
   for I := 1 to Length(S) do
     if FLine[Run + I - 1] <> S[I] then
@@ -315,7 +315,7 @@ end;
 procedure TSynRegistrySyn.ValueWordProc;
 var
   S: string;
-  I: Integer;
+  I: TSynNativeInt;
   AllHex: Boolean;
 begin
   while CharInSet(FLine[Run], ['0'..'9', 'a'..'z', 'A'..'Z']) do
@@ -341,7 +341,7 @@ end;
 
 procedure TSynRegistrySyn.BackslashProc;
 var
-  I: Integer;
+  I: TSynNativeInt;
 begin
   // a '\' at the end of a value line continues the hex byte list
   FTokenID := tkSymbol;

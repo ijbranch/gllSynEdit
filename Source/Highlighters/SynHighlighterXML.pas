@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+ï»¿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -10,7 +10,7 @@ the specific language governing rights and limitations under the License.
 
 The Original Code is: SynHighlighterXML.pas, released 2000-11-20.
 The Initial Author of this file is Jeff Rafter.
-Unicode translation by Maël Hörz.
+Unicode translation by MaÃ«l HÃ¶rz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -111,8 +111,11 @@ type
     procedure LessThanProc;
     procedure GreaterThanProc;
     procedure CommentProc;
+    /// <summary>Scans a processing instruction up to its closing '?&gt;'.</summary>
     procedure ProcessingInstructionProc;
+    /// <summary>Scans a DOCTYPE declaration, including its internal subset.</summary>
     procedure DocTypeProc;
+    /// <summary>Scans a CDATA section up to its closing ']]&gt;'.</summary>
     procedure CDATAProc;
     procedure TextProc;
     procedure ElementProc;
@@ -172,6 +175,9 @@ type
       write fSpaceAttri;
     property SymbolAttri: TSynHighlighterAttributes read fSymbolAttri
       write fSymbolAttri;
+    { FWantBracesParsed is never read by the scanner, so this property has no
+      effect; it is kept (and now correctly initialised to True) only so that
+      existing DFMs continue to stream. }
     property WantBracesParsed: Boolean read FWantBracesParsed
       write FWantBracesParsed default True;
   end;
@@ -260,6 +266,9 @@ begin
 
   fRange := rsText;
   fDefaultFilter := SYNS_FilterXML;
+  { Matches the property's 'default True', which the streaming system relies on;
+    nothing in this unit actually reads the field - see WantBracesParsed. }
+  FWantBracesParsed := True;
 
   fBrackets := '<>()[]';
 end;
@@ -387,7 +396,7 @@ begin
 
   while not IsLineEnd(Run) do
   begin
-    if (fLine[Run] = '>') and (fLine[Run - 1] = '?')
+    if (fLine[Run] = '>') and (Run >= 1) and (fLine[Run - 1] = '?')
     then
     begin
       fRange := rsText;
@@ -433,7 +442,7 @@ begin
                    end;
                  end;
             '>': begin
-                   fRange := rsAttribute;
+                   fRange := rsText;
                    Inc(Run);
                    Break;
                  end;
@@ -468,7 +477,8 @@ begin
 
   while not IsLineEnd(Run) do
   begin
-    if (fLine[Run] = '>') and (fLine[Run - 1] = ']')
+    if (fLine[Run] = '>') and (Run >= 2) and
+       (fLine[Run - 1] = ']') and (fLine[Run - 2] = ']')
     then
     begin
       fRange := rsText;
@@ -708,7 +718,13 @@ begin
     rsCDATA: CDATAProc;
     else NextProcedure;
   end;
-  // ensure that one call of Next is enough to reach next token
+  // Load-bearing, not defensive. These highlighters deliberately emit a
+  // zero-length token when a scan stops on the character that changes the
+  // range - QAttributeValueProc at an '&', for instance, flips to
+  // rsQuoteEntityRef and exits without consuming anything - and rely on this
+  // retry to re-dispatch into the new range. TSynCustomHighlighter.Next is the
+  // backstop for the case where the retry does not advance either; it compares
+  // Run against fTokenPos, so this re-entrant call does not confuse it.
   if (fOldRun = Run) and not GetEol then Next;
   inherited;
 end;
@@ -824,7 +840,7 @@ begin
   case fLine[Run] of
     '0'..'9', 'a'..'z', 'A'..'Z', '_', '.', ':', '-':
       Result := True;
-    else if fLine[Run] > 'À' then // TODO: this here is very vague, see above
+    else if fLine[Run] > 'Ã€' then // TODO: this here is very vague, see above
       Result := True
     else
       Result := False;

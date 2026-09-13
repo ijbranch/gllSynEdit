@@ -356,6 +356,16 @@ type
     procedure ClearList;
     function DisplayItem(AIndex: Integer): string;
     function InsertItem(AIndex: Integer): string;
+    /// <summary>Inserts an item at the given position in both the insert list
+    /// and the display list, keeping the two lists in step.</summary>
+    /// <param name="Where">Zero-based insertion position; must be in
+    /// [0, count].</param>
+    /// <param name="ADisplayText">Text shown in the proposal list.</param>
+    /// <param name="AInsertText">Text inserted into the editor when the item
+    /// is chosen.</param>
+    /// <exception cref="ESynError">Raised when Where is out of range. Any
+    /// exception from the display list is re-raised after the matching insert
+    /// list entry has been rolled back.</exception>
     procedure AddItemAt(Where: Integer; ADisplayText, AInsertText: string);
     procedure AddItem(ADisplayText, AInsertText: string);
     procedure ResetAssignedList;
@@ -563,6 +573,7 @@ uses
   System.UITypes,
   SynEditTextBuffer,
   SynEditMiscProcs,
+  SynEditStrConst,
   SynEditKeyConst;
 
 const
@@ -969,9 +980,11 @@ begin
             Break;
         end;
       fcImage:
+        // Images is a published property that defaults to nil and is nilled
+        // again on free notification, so it must be guarded, not asserted -
+        // assertions are off in Release and this runs in a paint handler
+        if Assigned(Images) then
         begin
-          Assert(Assigned(Images));
-
           Images.Draw(TargetCanvas, X, Rect.Top, Integer(C^.Data));
 
           Inc(X, Images.Width);
@@ -2592,11 +2605,15 @@ end;
 
 procedure TSynBaseCompletionProposal.AddItemAt(Where: Integer; ADisplayText, AInsertText: string);
 begin
+  if not InRange(Where, 0, GetInsertList.Count) then
+    raise ESynError.CreateResFmt(@SYNS_ECannotInsertItemAt, [Where]);
+
+  GetInsertList.Insert(Where, AInsertText);
   try
-    GetInsertList.Insert(Where, AInsertText);
     GetItemList.Insert(Where, ADisplayText);
   except
-    raise Exception.Create('Cannot insert item at position ' + IntToStr(Where) + '.');
+    GetInsertList.Delete(Where);   // keep the two lists in step
+    raise;                         // preserve class, message and stack
   end;
 end;
 

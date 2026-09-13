@@ -389,18 +389,17 @@ begin
 
     SkipRun := 0;
     QuoteChar := #0;
-    if (FLine[Run + 2] = '-') and (FLine[Run + 3] in
-      [WideChar('"'), WideChar(''''), WideChar('`'), WideChar('\')]) then
+    if (FLine[Run + 2] = '-') and
+       CharInSet(FLine[Run + 3], ['"', '''', '`', '\']) then
     begin
       SkipRun := 2;
       if FLine[Run + 3] <> '\' then
         QuoteChar := FLine[Run + 3];
     end
-    else if (FLine[Run + 2] in
-      [WideChar('-'), WideChar('"'), WideChar(''''), WideChar('`'), WideChar('\')]) then
+    else if CharInSet(FLine[Run + 2], ['-', '"', '''', '`', '\']) then
     begin
       SkipRun := 1;
-      if not (FLine[Run + 2] in [WideChar('-'), WideChar('\')]) then
+      if not CharInSet(FLine[Run + 2], ['-', '\']) then
         QuoteChar := FLine[Run + 2];
     end;
     IndentedHeredoc := (SkipRun > 0) and (FLine[Run + 2] = '-');
@@ -430,7 +429,7 @@ begin
       else
         fRange := rsHeredoc;
       fHeredocLength := Len;
-      fHeredocChecksum := CalcFCS(FLine[Run + SkipRun], Len);
+      fHeredocChecksum := CalcFCS(FLine[Run + SkipRun], Len * SizeOf(WideChar));
 
       Inc(Run, SkipRun + Len);
       fTokenID := tkString;
@@ -559,13 +558,13 @@ begin
   fTokenID := tkString;
 
   if fRange = rsIndentedHeredoc then
-    while FLine[Run] in [#$0009, #$0020] do Inc(Run);
+    while CharInSet(FLine[Run], [#$09, #$20]) do Inc(Run);
 
   if ((Run = 0) and (fRange = rsHeredoc)) or (fRange = rsIndentedHeredoc) then
   begin
     i := 0;
 
-    while not IsLineEnd(FLine[Run + i]) do
+    while not IsLineEnd(Run + i) do
     begin
       if i > fHeredocLength then
       begin
@@ -581,7 +580,7 @@ begin
       Exit;
     end;
 
-    if (CalcFCS(FLine[Run], i) = fHeredocChecksum) then
+    if (CalcFCS(FLine[Run], i * SizeOf(WideChar)) = fHeredocChecksum) then
     begin
       fRange := rsUnknown;
       Run := Run + i;

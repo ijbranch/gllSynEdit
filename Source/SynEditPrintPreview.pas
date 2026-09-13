@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+ï»¿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -13,7 +13,7 @@ The Original Code is: SynEditPrintPreview.pas, released 2000-06-01.
 The Initial Author of the Original Code is Morten J. Skovrup.
 Portions written by Morten J. Skovrup are copyright 2000 Morten J. Skovrup.
 Portions written by Michael Hieke are copyright 2000 Michael Hieke.
-Unicode translation by Maël Hörz.
+Unicode translation by MaÃ«l HÃ¶rz.
 All Rights Reserved.
 
 Contributors to the SynEdit project are listed in the Contributors.txt file.
@@ -100,6 +100,9 @@ type
     procedure WMVScroll(var Msg: TWMVScroll); message WM_VSCROLL;
     procedure WMMouseWheel(var Message: TWMMouseWheel); message WM_MOUSEWHEEL;
     procedure WMMouseHWheel(var Message: TWMMouseWheel); message WM_MOUSEHWHEEL;
+    /// <summary>Paints the background around the sheet, the sheet shadow and
+    /// the sheet itself, then leaves the canvas clipped to the sheet ready for
+    /// the page content.</summary>
     procedure PaintPaper;
     function GetPageCount: NativeInt;
   protected
@@ -115,11 +118,7 @@ type
     procedure ScrollVertTo(Value: Integer); virtual;
     procedure UpdateScrollbars; virtual;
     procedure SizeChanged; virtual;
-  {$IF COMPILERVERSION <= 30}
-    procedure ChangeScale(M, D: Integer); override;
-  {$ELSE}
-    procedure ChangeScale(M, D: Integer; isDpiChange: Boolean); override;
-  {$ENDIF}
+      procedure ChangeScale(M, D: Integer; isDpiChange: Boolean); override;
     function DoMouseWheel(Shift: TShiftState; WheelDelta: Integer; MousePos: TPoint): Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -172,25 +171,15 @@ const
 
 { TSynEditPrintPreview }
 
-{$IF COMPILERVERSION <= 30}
-procedure TSynEditPrintPreview.ChangeScale(M, D: Integer);
-{$ELSE}
 procedure TSynEditPrintPreview.ChangeScale(M, D: Integer; isDpiChange: Boolean);
-{$ENDIF}
 begin
-{$IF COMPILERVERSION >= 31}
   if isDpiChange then
   begin
-{$ENDIF}
     FMargin_X := MulDiv(FMargin_X, M, D);
     FMargin_Y := MulDiv(FMargin_Y, M, D);
     FShadow_Size := MulDiv(FShadow_Size, M, D);
-{$IF COMPILERVERSION <= 30}
-  inherited ChangeScale(M, D);
-{$ELSE}
   end;
   inherited ChangeScale(M, D, isDpiChange);
-{$ENDIF}
 end;
 
 constructor TSynEditPrintPreview.Create(AOwner: TComponent);
@@ -307,18 +296,24 @@ begin
       Bottom := Top + FPageSize.Height;
       rgnPaper := CreateRectRgn(Left, Top, Right, Bottom);
     end;
-    if (NULLREGION <> ExtSelectClipRgn(Handle, rgnPaper, RGN_DIFF)) then
-      FillRect(rcClip);
-      // paper shadow
-    Brush.Color := clDkGray;
-    with FPaperRect do begin
-      for i := 1 to FShadow_Size do
-        PolyLine([Point(Left + i, Bottom + i), Point(Right + i, Bottom + i),
-          Point(Right + i, Top + i)]);
+    // FillRect/PolyLine below can raise, and preview painting repeats, so the
+    // region has to be freed on every path
+    try
+      if (NULLREGION <> ExtSelectClipRgn(Handle, rgnPaper, RGN_DIFF)) then
+        FillRect(rcClip);
+        // paper shadow
+      Brush.Color := clDkGray;
+      with FPaperRect do begin
+        for i := 1 to FShadow_Size do
+          PolyLine([Point(Left + i, Bottom + i), Point(Right + i, Bottom + i),
+            Point(Right + i, Top + i)]);
+      end;
+        // paint paper background
+        // SelectClipRgn copies the region, so rgnPaper can be freed right after
+      SelectClipRgn(Handle, rgnPaper);
+    finally
+      DeleteObject(rgnPaper);
     end;
-      // paint paper background
-    SelectClipRgn(Handle, rgnPaper);
-    DeleteObject(rgnPaper);
   end;
 end;
 

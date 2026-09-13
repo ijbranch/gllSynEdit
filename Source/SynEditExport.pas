@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+ï»¿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -15,7 +15,7 @@ mwEdit component suite by Martin Waldenburg and other developers, the Initial
 Author of this file is Michael Hieke.
 Portions created by Michael Hieke are Copyright 2000 Michael Hieke.
 Portions created by James D. Jacobson are Copyright 1999 Martin Waldenburg.
-Unicode translation by Maël Hörz.
+Unicode translation by MaÃ«l HÃ¶rz.
 All Rights Reserved.
 
 Contributors to the SynEdit project are listed in the Contributors.txt file.
@@ -91,8 +91,12 @@ type
     procedure AddDataNewLine(const AText: string);
     { Adds a newline to the output buffer. }
     procedure AddNewLine;
-    { Copies the data under this format to the clipboard. The clipboard has to
-      be opened explicitly when more than one format is to be set. }
+    /// <summary>Copies the data under this format to the clipboard. The clipboard
+    /// has to be opened explicitly when more than one format is to be set.</summary>
+    /// <param name="AFormat">The registered clipboard format to set.</param>
+    /// <exception>Raises EOutOfMemory if the global block cannot be allocated, and
+    /// an OS error if it cannot be locked; the block is freed unless the clipboard
+    /// has taken ownership of it.</exception>
     procedure CopyToClipboardFormat(AFormat: UINT);
     procedure DefineProperties(Filer: TFiler); override;
     { Has to be overridden in descendant classes to add the closing format
@@ -277,31 +281,38 @@ var
   Mem: HGLOBAL;
   P: PByte;
   SLen: Integer;
+  Owned: Boolean;
 begin
   SLen := Length(Text);
   Clipboard.Open;
   try
-    Clipboard.Clear;
-
     // set unicode text, this also works on Win9X, even if the clipboard-viewer
     // can't show it, Word 2000+ can paste it including the unicode only characters
     Mem := GlobalAlloc(GMEM_MOVEABLE or GMEM_DDESHARE,
       SIZE_T((SLen + 1) * SizeOf(WideChar)));
-    if Mem <> 0 then
-    begin
+    if Mem = 0 then
+      OutOfMemoryError;
+    Owned := False;
+    try
       P := GlobalLock(Mem);
+      if P = nil then
+        RaiseLastOSError;
       try
-        if P <> nil then
-        begin
-          Move(PWideChar(Text)^, P^, (SLen + 1) * sizeof(WideChar));
-          Clipboard.SetAsHandle(CF_UNICODETEXT, Mem);
-        end;
+        Move(PWideChar(Text)^, P^, (SLen + 1) * sizeof(WideChar));
       finally
-      GlobalUnlock(Mem);
+        GlobalUnlock(Mem);
       end;
+      // Only discard what the user had on the clipboard once the replacement is
+      // ready; a failure above must leave the existing contents alone.
+      Clipboard.Clear;
+      Clipboard.SetAsHandle(CF_UNICODETEXT, Mem);
+      // Don't free Mem!  It belongs to the clipboard now, and it will free it
+      // when it is done with it.
+      Owned := True;
+    finally
+      if not Owned then
+        GlobalFree(Mem);
     end;
-    // Don't free Mem!  It belongs to the clipboard now, and it will free it
-    // when it is done with it.
   finally
     Clipboard.Close;
   end;
@@ -320,27 +331,29 @@ var
   hData: THandle;
   hDataSize: TSynNativeInt;
   PtrData: PByte;
+  Owned: Boolean;
 begin
   hDataSize := TSynNativeInt(GetBufferSize + 1);
   hData := GlobalAlloc(GMEM_MOVEABLE or GMEM_ZEROINIT or GMEM_SHARE, SIZE_T(hDataSize));
-  if hData <> 0 then
+  if hData = 0 then
+    OutOfMemoryError;
+  Owned := False;
   try
     PtrData := GlobalLock(hData);
-    if Assigned(PtrData) then
-    begin
-      try
-        fBuffer.Position := 0;
-        fBuffer.Read(PtrData^, hDataSize - 1); // trailing #0
-      finally
-        GlobalUnlock(hData);
-      end;
-      Clipboard.SetAsHandle(ToWord(AFormat), hData);
-    end
-    else
-      Abort;
-  except
-    GlobalFree(hData);
-    OutOfMemoryError;
+    if PtrData = nil then
+      RaiseLastOSError;
+    try
+      fBuffer.Position := 0;
+      fBuffer.Read(PtrData^, hDataSize - 1); // trailing #0
+    finally
+      GlobalUnlock(hData);
+    end;
+    Clipboard.SetAsHandle(ToWord(AFormat), hData);
+    // The clipboard owns the block now and will free it when it is done.
+    Owned := True;
+  finally
+    if not Owned then
+      GlobalFree(hData);
   end;
 end;
 

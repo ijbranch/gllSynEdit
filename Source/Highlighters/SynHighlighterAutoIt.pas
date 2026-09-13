@@ -290,7 +290,7 @@ end;
 
 function TSynAutoItSyn.LineClosesComment: Boolean;
 var
-  P, WStart: Integer;
+  P, WStart: TSynNativeInt;
   W: string;
 begin
   Result := False;
@@ -344,7 +344,7 @@ end;
 
 procedure TSynAutoItSyn.DirectiveProc;
 var
-  WStart: Integer;
+  WStart: TSynNativeInt;
   Dir: string;
 begin
   Inc(Run);

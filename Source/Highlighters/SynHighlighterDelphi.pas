@@ -70,6 +70,13 @@ type
     procedure UnknownProc;
 
     function IdentKind(MayBe: PWideChar): TtkTokenKind;
+    /// <summary>True when <c>AIdent</c> is one of the standard Delphi data-type
+    /// names, which are painted with TypeAttri rather than KeyAttri.</summary>
+    function IsTypeName(const AIdent: string): Boolean;
+    /// <summary>True when the text at <c>Run</c> opens a multi-line string
+    /// literal: exactly three apostrophes followed by nothing but whitespace to
+    /// the end of the line.</summary>
+    function IsMultilineStringStart: Boolean;
   strict protected
     function GetSampleSource: string; override;
     function IsFilterStored: Boolean; override;
@@ -80,7 +87,7 @@ type
     function IsKeyword(const AKeyword: string): Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
-    {$IF COMPILERVERSION >= 34}class constructor Create;{$IFEND}
+    class constructor Create;
     function GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes; override;
     function GetEol: Boolean; override;
     function GetRange: Pointer; override;
@@ -114,7 +121,7 @@ implementation
 
 const
   // SORTED list of keywords for Binary Search (Delphi 13 + Standard Pascal)
-  DelphiKeywords: array[0..136] of string = (
+  DelphiKeywords: array[0..137] of string = (
     'absolute', 'abstract', 'and', 'ansistring', 'array', 'as', 'asm',
     'assembler', 'automated', 'begin', 'boolean', 'byte', 'bytebool',
     'cardinal', 'case', 'cdecl', 'class', 'const', 'constructor', 'contains',
@@ -134,12 +141,22 @@ const
     'shortint', 'shortstring', 'shr', 'single', 'smallint', 'static',
     'stdcall', 'stored', 'strict', 'string', 'stringresource', 'then',
     'threadvar', 'to', 'try', 'type', 'unit', 'unsafe', 'until', 'uses', 'var',
-    'virtual', 'while', 'with', 'word', 'wordbool', 'write', 'writeonly', 'xor'
+    'virtual', 'while', 'widestring', 'with', 'word', 'wordbool', 'write',
+    'writeonly', 'xor'
+  );
+
+  // SORTED list of the standard data-type names, checked before DelphiKeywords
+  // so that they paint as types. Matches TSynPasSyn's FuncType set.
+  DelphiTypes: array[0..21] of string = (
+    'ansistring', 'boolean', 'byte', 'bytebool', 'cardinal', 'currency',
+    'double', 'extended', 'int64', 'integer', 'longbool', 'longint', 'longword',
+    'real48', 'shortint', 'shortstring', 'single', 'smallint', 'string',
+    'widestring', 'word', 'wordbool'
   );
 
 { TSynDelphiSyn }
 
-{$IF COMPILERVERSION >= 34}class constructor TSynDelphiSyn.Create;
+class constructor TSynDelphiSyn.Create;
 begin
   // These are now initialized ONCE for the entire application lifetime
   // and are scoped specifically to TSynDelphiSyn.
@@ -147,7 +164,7 @@ begin
   FRE_BlockEnd := TRegEx.Create('\bend\b', [roIgnoreCase]);
   FRE_Code := TRegEx.Create('^\s*(function|procedure|constructor|destructor)\b', [roIgnoreCase]);
   FRE_Implementation := TRegEx.Create('^implementation\b', [roIgnoreCase]);
-end;{$IFEND}
+end;
 
 constructor TSynDelphiSyn.Create(AOwner: TComponent);
 begin
@@ -301,6 +318,23 @@ begin
   end;
 end;
 
+function TSynDelphiSyn.IsTypeName(const AIdent: string): Boolean;
+var
+  L, H, I, C: TSynNativeInt;
+begin
+  Result := False;
+  L := Low(DelphiTypes);
+  H := High(DelphiTypes);
+  while L <= H do
+  begin
+    I := (L + H) shr 1;
+    C := CompareText(DelphiTypes[I], AIdent);
+    if C = 0 then Exit(True)
+    else if C < 0 then L := I + 1
+    else H := I - 1;
+  end;
+end;
+
 function TSynDelphiSyn.IdentKind(MayBe: PWideChar): TtkTokenKind;
 var
   S: string;
@@ -309,7 +343,9 @@ begin
   // Note: fStringLen is usually calculated in IdentProc
   SetString(S, MayBe, fStringLen);
 
-  if IsKeyword(S) then
+  if IsTypeName(S) then
+    Result := tkType
+  else if IsKeyword(S) then
     Result := tkKey
   else
     Result := tkIdentifier;
@@ -542,33 +578,52 @@ begin
   while (FLine[Run] <= #32) and not IsLineEnd(Run) do Inc(Run);
 end;
 
+function TSynDelphiSyn.IsMultilineStringStart: Boolean;
+var
+  I: TSynNativeInt;
+begin
+  // Exactly three apostrophes: a fourth makes this '''' - the ordinary literal
+  // holding one escaped apostrophe - not a multi-line opener.
+  Result := (fLine[Run] = #39) and (fLine[Run + 1] = #39) and
+            (fLine[Run + 2] = #39) and (fLine[Run + 3] <> #39);
+  if not Result then Exit;
+
+  // Nothing but whitespace may follow the opener on its line.
+  I := Run + 3;
+  while not IsLineEnd(I) do
+  begin
+    if fLine[I] > #32 then Exit(False);
+    Inc(I);
+  end;
+end;
+
 procedure TSynDelphiSyn.StringProc;
 begin
   fTokenID := tkString;
 
-  // Check for Multiline String Start (Triple Quote)
-  if (fLine[Run] = #39) and (fLine[Run+1] = #39) and (fLine[Run+2] = #39) then
+  // Continuation of a multiline string takes precedence: a ''' terminator in
+  // column 1 must not be mistaken for a fresh opener.
+  if fRange <> rsMultilineString then
   begin
-    fRange := rsMultilineString;
-    Inc(Run, 3);
-  end
-  else if fRange = rsMultilineString then
-  begin
-    // Continuing a multiline string from previous line
-  end
-  else
-  begin
-    // Standard Single Quote String
-    Inc(Run);
-    while not IsLineEnd(Run) do
+    if IsMultilineStringStart then
     begin
-      if fLine[Run] = #39 then begin
-        Inc(Run);
-        if fLine[Run] <> #39 then Exit; // End of string
-      end;
+      fRange := rsMultilineString;
+      Inc(Run, 3);
+    end
+    else
+    begin
+      // Standard Single Quote String
       Inc(Run);
+      while not IsLineEnd(Run) do
+      begin
+        if fLine[Run] = #39 then begin
+          Inc(Run);
+          if fLine[Run] <> #39 then Exit; // End of string
+        end;
+        Inc(Run);
+      end;
+      Exit;
     end;
-    Exit;
   end;
 
   // Handle Multiline Body
@@ -735,14 +790,7 @@ begin
 end;
 
 initialization
-{$IF COMPILERVERSION < 34}
-  // These are now initialized ONCE for the entire application lifetime
-  // and are scoped specifically to TSynDelphiSyn.
-  TSynDelphiSyn.FRE_BlockBegin := TRegEx.Create('\b(begin|record|class|case|try)\b', [roIgnoreCase]);
-  TSynDelphiSyn.FRE_BlockEnd := TRegEx.Create('\bend\b', [roIgnoreCase]);
-  TSynDelphiSyn.FRE_Code := TRegEx.Create('^\s*(function|procedure|constructor|destructor)\b', [roIgnoreCase]);
-  TSynDelphiSyn.FRE_Implementation := TRegEx.Create('^implementation\b', [roIgnoreCase]);
-{$IFEND}
+  RegisterPlaceableHighlighter(TSynDelphiSyn);
 
 finalization
 

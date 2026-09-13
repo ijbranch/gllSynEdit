@@ -1,4 +1,4 @@
-unit SynDWrite;
+﻿unit SynDWrite;
 {-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
@@ -42,13 +42,6 @@ uses
   Vcl.ImgList,
   SynFunc;
 
-{$IF CompilerVersion <= 33}
-// some constants missing from old Delphi D2D1 unit
-const
-  DWRITE_WORD_WRAPPING_EMERGENCY_BREAK = 2;
-  D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT = $00000004;
-  WICBitmapInterpolationModeHighQualityCubic = $00000004;
-{$ENDIF}
 
 type
 {$REGION 'IDWriteFactory Redeclaration'}
@@ -1435,9 +1428,22 @@ type
     class function SolidBrush(Color: TColor): ID2D1SolidColorBrush; overload; static;
     class function SolidBrush(Color: TD2D1ColorF): ID2D1SolidColorBrush; overload; static;
     class function DottedStrokeStyle: ID2D1StrokeStyle; static;
+    /// <summary>
+    ///   Returns the cached gutter gradient brush, recreating it when either colour
+    ///   differs from the cached pair. The cache is only committed once the brush has
+    ///   actually been created.
+    /// </summary>
+    /// <param name="StartColor">Colour at the left edge of the gradient.</param>
+    /// <param name="EndColor">Colour at the right edge of the gradient.</param>
+    /// <returns>The gradient brush for the current render target.</returns>
     class function GradientGutterBrush(StartColor, EndColor: TColor): ID2D1LinearGradientBrush;
+    /// <summary>
+    ///   Releases the render target and the brushes bound to it. Safe to call before
+    ///   any brush cache has been created.
+    /// </summary>
     class procedure ResetRenderTarget; static;
     // if SynEdit inside a DLL call Finalize before unloading the DLL (https://github.com/TurboPack/SynEdit/issues/249)
+    /// <summary>Releases every cached Direct2D/DirectWrite singleton, brush and brush-cache key.</summary>
     class procedure Finalize;
   end;
 
@@ -1449,6 +1455,15 @@ type
     FCharWidth: NativeUInt;
     FLineHeight: NativeUInt;
   public
+    /// <summary>
+    ///   Builds a DirectWrite text format from a VCL font, deriving the character
+    ///   width and line height from the font's GDI-compatible metrics.
+    /// </summary>
+    /// <param name="AFont">Source font; its handle must be valid.</param>
+    /// <param name="TabWidth">Tab stop, in characters.</param>
+    /// <param name="CharExtra">Extra pixels added to the character width.</param>
+    /// <param name="LineSpacingExtra">Extra pixels split between the top and bottom of each line.</param>
+    /// <exception cref="EOSError">Raised if the font handle, the font face or its metrics cannot be obtained.</exception>
     constructor Create(AFont: TFont; TabWidth: NativeUInt = 2;
       CharExtra: NativeUInt = 0; LineSpacingExtra: NativeUInt = 0);
     property IDW: IDWriteTextFormat read FIDW;
@@ -1529,6 +1544,11 @@ function DWTextRange(startPosition: NativeUInt; length: NativeUInt): TDwriteText
 function DWFontFeature(nameTag: DWRITE_FONT_FEATURE_TAG; parameter: NativeUInt): TDwriteFontFeature;
 function DWGetTypography(Features: array of NativeInt): IDWriteTypography;
 function WicBitmapFromBitmap(Bitmap: TBitmap): IWICBitmap;
+/// <summary>Returns a new WIC bitmap holding <c>Source</c> scaled to the given size.</summary>
+/// <param name="Source">The bitmap to scale; it is not modified.</param>
+/// <param name="ScaledWidth">Width, in pixels, of the returned bitmap.</param>
+/// <param name="ScaledHeight">Height, in pixels, of the returned bitmap.</param>
+/// <returns>A newly created, fully cached <c>IWICBitmap</c>.</returns>
 function ScaledWicBitmap(Source: IWICBitmap;
   const ScaledWidth, ScaledHeight: NativeInt): IWICBitmap;
 procedure ImageListDraw(RT: ID2D1RenderTarget; IL: TCustomImageList; X, Y,
@@ -1552,6 +1572,7 @@ Uses
   System.Win.ComObj,
   Vcl.Forms,
   SynUnicode,
+  SynEditStrConst,
   SynEditTypes,
   SynEditMiscProcs;
 
@@ -1608,10 +1629,12 @@ function ScaledWicBitmap(Source: IWICBitmap;
 var
   Scaler: IWICBitmapScaler;
 begin
-  TSynDWrite.ImagingFactory.CreateBitmapScaler(Scaler);
-  Scaler.Initialize(Source, ToUInt32(ScaledWidth), ToUInt32(ScaledHeight),
-    WICBitmapInterpolationModeHighQualityCubic);
-  Result := IWICBitmap(Scaler);
+  CheckOSError(TSynDWrite.ImagingFactory.CreateBitmapScaler(Scaler));
+  CheckOSError(Scaler.Initialize(Source, ToUInt32(ScaledWidth), ToUInt32(ScaledHeight),
+    WICBitmapInterpolationModeHighQualityCubic));
+  // A scaler is a sibling of IWICBitmap, not a bitmap: materialise a real one.
+  CheckOSError(TSynDWrite.ImagingFactory.CreateBitmapFromSource(
+    Scaler, WICBitmapCacheOnLoad, Result));
 end;
 
 procedure ImageListDraw(RT: ID2D1RenderTarget; IL: TCustomImageList;
@@ -1692,7 +1715,6 @@ var
   Index: Cardinal;
   Exists: BOOL;
   NameLength: Cardinal;
-{$IF COMPILERVERSION < 31}LocalName: string;{$IFEND}
 begin
   Result := '';
 
@@ -1700,15 +1722,10 @@ begin
   CheckOSError(FontFamily.GetFamilyNames(Names));
   if Names.GetCount > 0 then
   begin
-    CheckOSError(Names.FindLocaleName(UserLocaleName{$IF COMPILERVERSION < 31}[0]{$IFEND}, Index, Exists));
+    CheckOSError(Names.FindLocaleName(UserLocaleName, Index, Exists));
     if not Exists then
     begin
-{$IF COMPILERVERSION < 31}
-      LocalName := 'en-us';
-      CheckOSError(Names.FindLocaleName(LocalName[1], Index, Exists));
-{$ELSE}
       CheckOSError(Names.FindLocaleName('en-us', Index, Exists));
-{$IFEND}
       if not Exists then
         Index := 0;
     end;
@@ -1808,6 +1825,9 @@ end;
 class procedure TSynDWrite.Finalize;
 begin
   FreeAndNil(TSynDWrite.FSolidBrushes);
+  TSynDWrite.FGradientGutterBrush := nil;
+  TSynDWrite.FGradientBrushStartColor := clNone;
+  TSynDWrite.FGradientBrushEndColor := clNone;
   TSynDWrite.SingletonDottedStrokeStyle := nil;
   TSynDWrite.SingletonRenderTarget := nil;
   TSynDWrite.SingletonGDIInterop := nil;
@@ -1837,14 +1857,11 @@ var
   BrushProperties: TD2D1BrushProperties;
   Stops: array [0..1] of TD2D1GradientStop;
   GradientStopCollection: ID2D1GradientStopCollection;
+  LocalBrush: ID2D1LinearGradientBrush;
 begin
   if (FGradientGutterBrush = nil) or (StartColor <> FGradientBrushStartColor) or
     (EndColor <> FGradientBrushEndColor) then
   begin
-    // store colors
-    FGradientBrushStartColor := StartColor;
-    FGradientBrushEndColor := EndColor;
-
     BrushProperties.opacity := 1;
     BrushProperties.transform := TD2DMatrix3X2F.Identity;
 
@@ -1859,7 +1876,12 @@ begin
     CheckOSError(RenderTarget.CreateLinearGradientBrush(
       D2D1LinearGradientBrushProperties(Point(0, 0), Point(1, 0)),
       @BrushProperties, GradientStopCollection,
-      FGradientGutterBrush));
+      LocalBrush));
+
+    // commit the cache only once both calls above have succeeded
+    FGradientGutterBrush := LocalBrush;
+    FGradientBrushStartColor := StartColor;
+    FGradientBrushEndColor := EndColor;
   end;
   Result := FGradientGutterBrush;
 end;
@@ -1928,7 +1950,9 @@ end;
 
 class procedure TSynDWrite.ResetRenderTarget;
 begin
-  FSolidBrushes.Clear;
+  // FSolidBrushes is created lazily by SolidBrush, so it may not exist yet
+  if Assigned(FSolidBrushes) then
+    FSolidBrushes.Clear;
   FGradientGutterBrush := nil;
   SingletonRenderTarget := nil;
 end;
@@ -2018,14 +2042,19 @@ var
   Baseline: Single;
 begin
   FUseGDINatural := AFont.Quality = TFontQuality.fqClearTypeNatural;
-  GetObject(AFont.Handle, SizeOf(TLogFont), @LogFont);
+  if GetObject(AFont.Handle, SizeOf(TLogFont), @LogFont) = 0 then
+    RaiseLastOSError;
   LogFont.lfWeight := ToInt32(GetCorrectFontWeight(AFont));
 
   CheckOSError(TSynDWrite.GDIInterop.CreateFontFromLOGFONT(LogFont, DWFont));
   CheckOSError(DWFont.CreateFontFace(FontFace));
-  FontFace.GetGdiCompatibleMetrics(-AFont.Height, 1, PDwriteMatrix(nil)^, FontMetrics);
+  CheckOSError(FontFace.GetGdiCompatibleMetrics(-AFont.Height, 1,
+    PDwriteMatrix(nil)^, FontMetrics));
+  // designUnitsPerEm is used as a divisor three times below
+  if FontMetrics.designUnitsPerEm = 0 then
+    raise ESynError.CreateResFmt(@SYNS_EInvalidFontMetrics, [AFont.Name]);
   CodePoint := Ord('W');
-  FontFace.GetGlyphIndices(CodePoint, 1, FontIndex);
+  CheckOSError(FontFace.GetGlyphIndices(CodePoint, 1, FontIndex));
   IDWriteFontFace(FontFace).GetGdiCompatibleGlyphMetrics(
     -AFont.Height, 1, nil, UseGDINatural,
     @FontIndex, 1, @GlyphMetrics);

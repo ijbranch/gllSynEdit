@@ -48,12 +48,12 @@ type
     FRange: TRangeState;
     FTokenID: TtkTokenKind;
     FKeywords: TStringList;
-    FDeclaredVariables: TDictionary<string, Integer>;
-    FCurrentScopeLevel: Integer;
-    FBraceLevel: Integer;
+    FDeclaredVariables: TDictionary<string, TSynNativeInt>;
+    FCurrentScopeLevel: TSynNativeInt;
+    FBraceLevel: TSynNativeInt;
     FLastIdentifier: string;
     FExpectingCollection: Boolean;  // Track when we expect a collection after "in"
-    FParenLevel: Integer; // Track parenthesis nesting level for stencils
+    FParenLevel: TSynNativeInt; // Track parenthesis nesting level for stencils
     FInStencilExpression: Boolean; // Track if we're in a stencil expression
     FExpectingAssignment: Boolean; // Track if we expect = in import aliases
     FJustParsedImportFilename: Boolean; // Track if we just parsed an import filename
@@ -76,10 +76,9 @@ type
     FImportAliasAttri: TSynHighlighterAttributes;
     FImportVarAttri: TSynHighlighterAttributes;
 
-    function IsKeyword(const AKeyword: string): Boolean; override;
     function IsDeclaredVariable(const AName: string): Boolean;
     procedure InitKeywords;
-    procedure CleanupVariablesForScope(AScope: Integer);
+    procedure CleanupVariablesForScope(AScope: TSynNativeInt);
 
     procedure CommentProc;
     procedure HashCommentProc;
@@ -99,26 +98,36 @@ type
     procedure ParenOpenProc;
     procedure ParenCloseProc;
 
-    function IsFilterStored: Boolean; override;
   protected
+    // These overrides must not be narrowed: IsFilterStored is protected in
+    // TSynCustomHighlighter, the rest of the overrides below are public there.
+    function IsFilterStored: Boolean; override;
     function GetSampleSource: UnicodeString; override;
     function GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes; override;
-    function GetEol: Boolean; override;
     function GetTokenID: TtkTokenKind;
+  public
+    function IsKeyword(const AKeyword: string): Boolean; override;
+    function GetEol: Boolean; override;
     function GetTokenAttribute: TSynHighlighterAttributes; override;
     function GetTokenKind: TSynNativeInt; override;
     function IsIdentChar(AChar: WideChar): Boolean; override;
     function IsWordBreakChar(AChar: WideChar): Boolean; override;
-  public
+
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
     class function GetLanguageName: string; override;
     class function GetFriendlyLanguageName: UnicodeString; override;
 
+    /// <summary>Packs the range state, brace level, scope level, stencil-expression
+    /// flag and paren level into the range pointer, clamping each field to its
+    /// bit width.</summary>
     function GetRange: Pointer; override;
     procedure ResetRange; override;
+    /// <summary>Unpacks the range pointer written by <see cref="GetRange"/>.</summary>
     procedure SetRange(Value: Pointer); override;
+    /// <summary>Starts a new line, preserving the states that legitimately carry
+    /// over from the previous one.</summary>
     procedure SetLine(const NewValue: String; LineNumber: TSynNativeInt); override;
 
     procedure Next; override;
@@ -149,6 +158,7 @@ type
 implementation
 
 uses
+  System.Math,
   SynEditStrConst;
 
 { TSynWebStencilsSyn }
@@ -176,7 +186,7 @@ begin
   FKeywords.CaseSensitive := False;
   InitKeywords;
 
-  FDeclaredVariables := TDictionary<string, Integer>.Create;
+  FDeclaredVariables := TDictionary<string, TSynNativeInt>.Create;
 
   FCommentAttri := TSynHighlighterAttributes.Create(SYNS_AttrComment, SYNS_FriendlyAttrComment);
   FCommentAttri.Style := [fsItalic];
@@ -301,9 +311,9 @@ begin
   Result := FDeclaredVariables.ContainsKey(LowerCase(AName));
 end;
 
-procedure TSynWebStencilsSyn.CleanupVariablesForScope(AScope: Integer);
+procedure TSynWebStencilsSyn.CleanupVariablesForScope(AScope: TSynNativeInt);
 var
-  Pair: TPair<string, Integer>;
+  Pair: TPair<string, TSynNativeInt>;
   ToRemove: TList<string>;
 begin
   ToRemove := TList<string>.Create;
@@ -330,8 +340,11 @@ begin
   FJustParsedImportFilename := False;
   FInStencilExpression := False;
 
-  // Preserve ForEach, If, and Switch state if we're in the middle of parsing one
-  if not (FRange in [rsForEach, rsForEachVar, rsForEachIn, rsIfCondition,
+  // Preserve the multi-line comment plus the ForEach, If, and Switch state if
+  // we're in the middle of parsing one.  rsComment is the only state here that
+  // genuinely spans lines, and SynEdit calls SetRange before SetLine, so failing
+  // to preserve it discards the range that was just restored.
+  if not (FRange in [rsComment, rsForEach, rsForEachVar, rsForEachIn, rsIfCondition,
                       rsDirectiveFunction, rsSwitchExpression, rsCaseValue,
                       rsImportFilename, rsImportAliases]) then
   begin
@@ -481,7 +494,7 @@ end;
 
 procedure TSynWebStencilsSyn.DirectiveProc;
 var
-  StartPos: Integer;
+  StartPos: TSynNativeInt;
   DirectiveName: string;
   IsFunction: Boolean;
 begin
@@ -832,7 +845,7 @@ end;
 
 procedure TSynWebStencilsSyn.IdentProc;
 var
-  StartPos: Integer;
+  StartPos: TSynNativeInt;
   TempStr: string;
   InStencilContext: Boolean;
   IsPrecedingDot: Boolean;
@@ -1056,7 +1069,7 @@ begin
         // Space only breaks stencil expressions if we're actually in one
         // and the next character isn't part of the stencil expression
         if FInStencilExpression and (FParenLevel = 0) and
-           (Run <= FLineLen) and not (FLine[Run] in ['@', '.']) then
+           (Run <= FLineLen) and not CharInSet(FLine[Run], ['@', '.']) then
           FInStencilExpression := False;
       end;
     '"', '''':
@@ -1250,24 +1263,26 @@ begin
   // Bits 16-23: FCurrentScopeLevel
   // Bit 24: FInStencilExpression
   // Bits 25-31: FParenLevel
+  // Each field is clamped to its own bit width, so an unbounded nesting level
+  // cannot spill into the field above it.
   Result := Pointer(
-    Ord(FRange) or
-    (FBraceLevel shl 8) or
-    (FCurrentScopeLevel shl 16) or
-    (Ord(FInStencilExpression) shl 24) or
-    (FParenLevel shl 25)
+    NativeInt(Ord(FRange)) or
+    (NativeInt(Min(FBraceLevel, $FF)) shl 8) or
+    (NativeInt(Min(FCurrentScopeLevel, $FF)) shl 16) or
+    (NativeInt(Ord(FInStencilExpression)) shl 24) or
+    (NativeInt(Min(FParenLevel, $7F)) shl 25)
   );
 end;
 
 procedure TSynWebStencilsSyn.SetRange(Value: Pointer);
 var
-  PackedValue: Integer;
+  PackedValue: NativeInt;
 begin
-  PackedValue := Integer(Value);
+  PackedValue := NativeInt(Value);
   FRange := TRangeState(PackedValue and $FF);
   FBraceLevel := (PackedValue shr 8) and $FF;
   FCurrentScopeLevel := (PackedValue shr 16) and $FF;
-  FInStencilExpression := Boolean((PackedValue shr 24) and $01);
+  FInStencilExpression := ((PackedValue shr 24) and $01) <> 0;
   FParenLevel := (PackedValue shr 25) and $7F;
 end;
 

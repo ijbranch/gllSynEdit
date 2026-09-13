@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+ï»¿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -8,8 +8,8 @@ Software distributed under the License is distributed on an "AS IS" basis,
 WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for
 the specific language governing rights and limitations under the License.
 
-The Original Code is SynEditWordWrap.pas by Flávio Etrusco, released 2003-12-11.
-Unicode translation by Maël Hörz.
+The Original Code is SynEditWordWrap.pas by FlÃ¡vio Etrusco, released 2003-12-11.
+Unicode translation by MaÃ«l HÃ¶rz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -39,6 +39,7 @@ uses
   Winapi.Windows,
   SynEditTypes,
   SynEditTextBuffer,
+  SynEditStrConst,
   SynEdit,
   SynFunc;
 
@@ -92,9 +93,7 @@ uses
   Winapi.D2D1,
   System.RTLConsts,
   System.Math,
-{$IF (COMPILERVERSION > 29) OR (NOT DEFINED(PACKAGE))}
   System.Threading,
-{$IFEND}
   SynUnicode,
   SynEditMiscProcs,
   SynDWrite;
@@ -142,7 +141,7 @@ constructor TSynWordWrapPlugin.Create(aOwner: TCustomSynEdit);
 begin
   inherited Create; // just to work as reminder in case I revert it to a TComponent...
   if aOwner = nil then
-    raise Exception.Create( 'Owner of TSynWordWrapPlugin must be a TCustomSynEdit' );
+    raise ESynError.CreateRes(@SYNS_EWordWrapOwner);
   FEditor := aOwner;
   FLineCount := FEditor.Lines.CountNative;
   FLineOffsets := TList<TSynNativeInt>.Create;
@@ -320,9 +319,6 @@ end;
 
 procedure TSynWordWrapPlugin.WrapLines;
 var
-{$IF (COMPILERVERSION <= 29) AND DEFINED(PACKAGE)}
-  I: TSynNativeInt;
-{$IFEND}
   cLine: TSynNativeInt;
   RowLengths: TArray<TArray<NativeInt>>;
 begin
@@ -335,14 +331,10 @@ begin
     Exit;
 
   SetLength(RowLengths, FEditor.Lines.CountNative);
-{$IF (COMPILERVERSION > 29) OR (NOT DEFINED(PACKAGE))}
   TParallel.&For(0, FEditor.Lines.CountNative - 1, procedure(I: TSynNativeInt)
-{$ELSE}
-  for I := 0 to FEditor.Lines.CountNative - 1 do
-{$IFEND}
   begin
     WrapLine(I, RowLengths[I]);
-  end{$IF (COMPILERVERSION > 29) OR (NOT DEFINED(PACKAGE))}){$IFEND};
+  end);
 
   for cLine := 0 to FEditor.Lines.CountNative - 1 do
   begin

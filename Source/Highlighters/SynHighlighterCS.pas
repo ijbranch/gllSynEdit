@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+ï»¿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -13,7 +13,7 @@ The Original Code is based on SynHighlighterCpp.pas, released 2000-04-10,
 which in turn is based on the dcjCppSyn.pas file from the mwEdit component
 suite by Martin Waldenburg and other developers, the Initial Author of this file
 is Michael Trier.
-Unicode translation by Maël Hörz.
+Unicode translation by MaÃ«l HÃ¶rz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -76,7 +76,7 @@ type
 
   TRangeState = (rsUnknown, rsAnsiC, rsAnsiCAsm, rsAnsiCAsmBlock, rsAsm,
     rsAsmBlock, rsDirective, rsDirectiveComment, rsString34, rsString39,
-    rsMultiLineString);
+    rsMultiLineString, rsVerbatimString);
 
   PIdentFuncTableFunc = ^TIdentFuncTableFunc;
   TIdentFuncTableFunc = function (Index: TSynNativeInt): TtkTokenKind of object;
@@ -172,12 +172,17 @@ type
     procedure AnsiCProc;
     procedure AndSymbolProc;
     procedure AsciiCharProc;
+    /// <summary>Scans '@', which introduces a verbatim string literal when a
+    /// quote follows it.</summary>
     procedure AtSymbolProc;
     procedure BraceCloseProc;
     procedure BraceOpenProc;
     procedure CRProc;
     procedure ColonProc;
     procedure CommaProc;
+    /// <summary>Scans '$', which introduces an interpolated ($"..") or verbatim
+    /// interpolated ($@"..") string literal.</summary>
+    procedure DollarProc;
     procedure DirectiveProc;
     procedure EqualProc;
     procedure GreaterProc;
@@ -206,6 +211,9 @@ type
     procedure XOrSymbolProc;
     procedure UnknownProc;
     procedure StringEndProc;
+    /// <summary>Scans the body of a verbatim string literal, in which '""' is
+    /// the only escape and which may run over several lines.</summary>
+    procedure VerbatimStringProc;
   protected
     function GetExtTokenID: TxtkTokenKind;
     function IsFilterStored: Boolean; override;
@@ -1039,8 +1047,87 @@ end;
 
 procedure TSynCSSyn.AtSymbolProc;
 begin
-  fTokenID := tkUnknown;
-  Inc(Run);
+  if fLine[Run + 1] = #34 then
+  begin
+    { verbatim string literal - @"..." - in which '\' is an ordinary character }
+    Inc(Run, 2);
+    fRange := rsVerbatimString;
+    VerbatimStringProc;
+  end
+  else
+  begin
+    fTokenID := tkUnknown;
+    Inc(Run);
+  end;
+end;
+
+procedure TSynCSSyn.DollarProc;
+begin
+  case fLine[Run + 1] of
+    #34:                                 {interpolated string - $"..."}
+      begin
+        Inc(Run);
+        StringProc;
+      end;
+    '@':                                 {verbatim interpolated string - $@"..."}
+      begin
+        if fLine[Run + 2] = #34 then
+        begin
+          Inc(Run);
+          AtSymbolProc;
+        end
+        else
+        begin
+          fTokenID := tkUnknown;
+          Inc(Run);
+        end;
+      end;
+  else
+    begin
+      fTokenID := tkUnknown;
+      Inc(Run);
+    end;
+  end;
+end;
+
+procedure TSynCSSyn.VerbatimStringProc;
+begin
+  fTokenID := tkString;
+
+  case FLine[Run] of
+    #0:
+      begin
+        NullProc;
+        Exit;
+      end;
+    #10:
+      begin
+        LFProc;
+        Exit;
+      end;
+    #13:
+      begin
+        CRProc;
+        Exit;
+      end;
+  end;
+
+  repeat
+    if FLine[Run] = #34 then
+    begin
+      if FLine[Run + 1] = #34 then
+        Inc(Run)                         {"" is the only escape there is}
+      else
+      begin
+        Inc(Run);
+        fRange := rsUnknown;
+        Exit;
+      end;
+    end;
+    Inc(Run);
+  until IsLineEnd(Run);
+  {still open at the end of the line, so re-arm the range}
+  fRange := rsVerbatimString;
 end;
 
 procedure TSynCSSyn.BraceCloseProc;
@@ -1067,7 +1154,7 @@ procedure TSynCSSyn.CRProc;
 begin
   fTokenID := tkSpace;
   Inc(Run);
-  if fLine[Run + 1] = #10 then Inc(Run);
+  if fLine[Run] = #10 then Inc(Run);
 end;
 
 procedure TSynCSSyn.ColonProc;
@@ -1746,6 +1833,7 @@ begin
     rsAnsiCAsmBlock, rsDirectiveComment: AnsiCProc;
     rsDirective: DirectiveProc;
     rsMultilineString: StringEndProc;
+    rsVerbatimString: VerbatimStringProc;
   else
     begin
       fRange := rsUnknown;
@@ -1767,6 +1855,7 @@ begin
     ':': ColonProc;
     ',': CommaProc;
     '#': DirectiveProc;
+    '$': DollarProc;
     '=': EqualProc;
     '>': GreaterProc;
     '?': QuestionProc;
@@ -1804,6 +1893,7 @@ begin
     SYN_ATTR_KEYWORD: Result := fKeyAttri;
     SYN_ATTR_STRING: Result := fStringAttri;
     SYN_ATTR_WHITESPACE: Result := fSpaceAttri;
+    SYN_ATTR_SYMBOL: Result := fSymbolAttri;
     else Result := nil;
   end;
 end;
@@ -1905,7 +1995,7 @@ function TSynCSSyn.UseUserSettings(settingIndex: TSynNativeInt): Boolean;
       begin
         lBuilder := TStringBuilder.Create(name);
         try
-          for I := 0 to lBuilder.Length do
+          for I := 0 to lBuilder.Length - 1 do
           begin
             if lBuilder[I] = ' ' then
               lBuilder[I] := '_';

@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+﻿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -603,7 +603,7 @@ type
     procedure Updated; override;
     procedure UpdateMouseCursor; virtual;
     procedure CalcTextAreaWidth;
-    procedure ChangeScale(M, D: Integer{$IF COMPILERVERSION > 30}; isDpiChange: Boolean{$IFEND}); override;
+    procedure ChangeScale(M, D: Integer; isDpiChange: Boolean); override;
     procedure DoBlockIndent;
     procedure DoBlockUnindent;
     procedure DoContextPopup(MousePos: TPoint; var Handled: Boolean); override;
@@ -680,8 +680,22 @@ type
     procedure ClearUndo;
     procedure ClearTrackChanges;
     procedure MarkSaved;
+    /// <summary>
+    ///   Places the current selection on the clipboard. Failure is silent; use
+    ///   <see cref="TryCopyToClipboard"/> when the outcome has to be acted on.
+    /// </summary>
     procedure CopyToClipboard;
+    /// <summary>
+    ///   Places the current selection on the clipboard and, only if that
+    ///   succeeded, deletes it.
+    /// </summary>
     procedure CutToClipboard;
+    /// <summary>Places the current selection on the clipboard.</summary>
+    /// <returns>
+    ///   True when the clipboard accepted the data. False means another process
+    ///   held the clipboard open (CLIPBRD_E_CANT_OPEN) and nothing was copied.
+    /// </returns>
+    function TryCopyToClipboard: Boolean;
     procedure EnsureCaretInView;
     procedure EnsureCursorPosVisible;
     procedure EnsureCursorPosVisibleEx(ForceToMiddle: Boolean;
@@ -1457,7 +1471,16 @@ end;
 
 procedure TCustomSynEdit.CopyToClipboard;
 begin
-  OleSetClipboard(TSynEditDataObject.Create(Self));
+  TryCopyToClipboard;
+end;
+
+function TCustomSynEdit.TryCopyToClipboard: Boolean;
+begin
+  // OleSetClipboard fails with CLIPBRD_E_CANT_OPEN whenever another process has
+  // the clipboard open - clipboard managers, RDP and VM clients and Office all
+  // hold it briefly. Discarding that HRESULT is what let CutToClipboard delete a
+  // selection that was never copied.
+  Result := Succeeded(OleSetClipboard(TSynEditDataObject.Create(Self)));
 end;
 
 procedure TCustomSynEdit.CutToClipboard;
@@ -1466,8 +1489,8 @@ begin
   begin
     BeginUndoBlock;
     try
-      CopyToClipboard;
-      DeleteSelections;
+      if TryCopyToClipboard then
+        DeleteSelections;
     finally
       EndUndoBlock;
     end;
@@ -2123,9 +2146,16 @@ begin
       if DragDetect(Handle, Point(X,Y)) then begin
         DataObject := TSynEditDataObject.Create(Self);
         DragSource := TSynDragSource.Create;
+        // DoDragDrop writes dwEffect only when it returns DRAGDROP_S_DROP. Left
+        // uninitialised, a stale DROPEFFECT_MOVE (2) on the stack - or any
+        // failure HRESULT, or an exception out of the drag loop - deletes the
+        // user's selection although no drop ever happened.
+        dwEffect := DROPEFFECT_NONE;
         try
           Include(fStateFlags, sfOleDragSource);
-          DoDragDrop(DataObject, DragSource, DROPEFFECT_COPY or DROPEFFECT_MOVE, dwEffect);
+          if DoDragDrop(DataObject, DragSource,
+               DROPEFFECT_COPY or DROPEFFECT_MOVE, dwEffect) <> DRAGDROP_S_DROP then
+            dwEffect := DROPEFFECT_NONE;
           DataObject := nil;
         finally
           Exclude(fStateFlags, sfOleDragSource);
@@ -2721,6 +2751,11 @@ var
 
         // Paint vertical part
         if InRange(Line, Range.FromLine, Range.ToLine) then
+          // The integer stroke width is deliberate, not a DPI rounding defect:
+          // this whole block runs under D2D1_ANTIALIAS_MODE_ALIASED (set above,
+          // restored to PER_PRIMITIVE after the loop), where Direct2D snaps the
+          // stroke to whole pixels anyway. The fractional variant below is kept
+          // for reference should the block ever become antialiased.
           //RT.DrawLine(Start, Stop, Brush, FCurrentPPI / 96.0, StrokeStyle);
           RT.DrawLine(Start, Stop, Brush, Round(FCurrentPPI / 96), StrokeStyle);
 
@@ -4641,7 +4676,14 @@ end;
 
 procedure TCustomSynEdit.WMGetText(var Msg: TWMGetText);
 begin
-  Msg.Result := LPARAM(StrLen(StrLCopy(PChar(Msg.Text), PChar(Text), ToUInt32(Msg.TextMax - 1))));
+  // TextMax is a WPARAM - unsigned and pointer-sized - so TextMax - 1 with
+  // TextMax = 0 wraps to High(NativeUInt) and ToUInt32 hands StrLCopy $FFFFFFFF
+  // as MaxLen while Text is nil. DefWindowProc answers wParam = 0 with 0.
+  if (Msg.TextMax = 0) or (Msg.Text = nil) then
+    Msg.Result := 0
+  else
+    Msg.Result := LPARAM(StrLen(StrLCopy(PChar(Msg.Text), PChar(Text),
+      ToUInt32(Msg.TextMax - 1))));
 end;
 
 procedure TCustomSynEdit.WMGetTextLength(var Msg: TWMGetTextLength);
@@ -4676,12 +4718,21 @@ begin
   if (Msg.LParam and GCS_RESULTSTR) <> 0 then
   begin
     imc := ImmGetContext(Handle);
+    if imc = 0 then
+      Exit;
     try
+      // ImmGetCompositionStringW returns a NEGATIVE error code for a released or
+      // invalid input context (IMM_ERROR_NODATA = -1, IMM_ERROR_GENERAL = -2).
+      // Used unchecked as an allocation size that is a heap write out of bounds.
       ImeCount := ImmGetCompositionStringW(imc, GCS_RESULTSTR, nil, 0);
+      if ImeCount <= 0 then
+        Exit;
       // ImeCount is always the size in bytes, also for Unicode
       GetMem(PW, ImeCount + sizeof(WideChar));
       try
-        ImmGetCompositionStringW(imc, GCS_RESULTSTR, PW, DWORD(ImeCount));
+        ImeCount := ImmGetCompositionStringW(imc, GCS_RESULTSTR, PW, DWORD(ImeCount));
+        if ImeCount < 0 then
+          Exit;
         PW[ImeCount div sizeof(WideChar)] := #0;
         CommandProcessor(ecImeStr, #0, PW);
       finally
@@ -4704,8 +4755,8 @@ begin
     imc := ImmGetContext(Handle);
     if imc <> 0 then
     begin
-      GetObjectW(Font.Handle, SizeOf(TLogFontW), @LogFontW);
-      ImmSetCompositionFontW(imc, @LogFontW);
+      if GetObjectW(Font.Handle, SizeOf(TLogFontW), @LogFontW) <> 0 then
+        ImmSetCompositionFontW(imc, @LogFontW);
       ImmReleaseContext(Handle, imc);
     end;
   end;
@@ -5691,9 +5742,9 @@ begin
   FOrigUndoRedo.OnModifiedChanged(Sender);
 end;
 
-procedure TCustomSynEdit.ChangeScale(M, D: Integer{$IF COMPILERVERSION > 30}; isDpiChange: Boolean{$IFEND});
+procedure TCustomSynEdit.ChangeScale(M, D: Integer; isDpiChange: Boolean);
 begin
-  if {$IF COMPILERVERSION <= 30}M <> D{$ELSE}isDpiChange{$IFEND} then
+  if isDpiChange then
   begin
     BeginUpdate;
     try
@@ -5703,12 +5754,11 @@ begin
       fGutter.ChangeScale(M,D);
       FBookmarkOptions.ChangeScale(M, D);
       fWordWrapGlyph.ChangeScale(M, D);
-{$IF COMPILERVERSION <= 35}Font.PixelsPerInch := M;{$IFEND}
     finally
       EndUpdate;
     end;
   end;
-  inherited ChangeScale(M, D{$IF COMPILERVERSION > 30}, isDpiChange{$IFEND});
+  inherited ChangeScale(M, D, isDpiChange);
 end;
 
 procedure TCustomSynEdit.UnHookTextBuffer;
@@ -7803,7 +7853,7 @@ var
   SelStorage: TSynSelStorage;
 begin
   if not Assigned(fSearchEngine) then
-    raise ESynEditError.Create('No search engine has been assigned');
+    raise ESynEditError.CreateRes(@SYNS_NoSearchEngineError);
 
   Result := 0;
   // can't search for or replace an empty string
@@ -8702,7 +8752,9 @@ end;
 
 procedure TCustomSynEdit.CreateWnd;
 var
-  DropTarget: TSynDropTarget;
+  DropTargetObj: TSynDropTarget;
+  DropTarget: IDropTarget;
+  HR: HResult;
 begin
   inherited;
   //  This is to avoid getting the text of the control while recreating
@@ -8712,14 +8764,29 @@ begin
     DragAcceptFiles(Handle, True);
 
   if not (csDesigning in ComponentState) then begin
-    DropTarget := TSynDropTarget.Create;
-    with DropTarget do begin
+    // Held as an interface, not an object reference: TSynDropTarget is a
+    // TInterfacedObject whose reference count is taken to 1 by RegisterDragDrop
+    // and released by RevokeDragDrop. If registration failed, the old code both
+    // lost drag-and-drop silently and leaked the target on every CreateWnd -
+    // which the VCL calls again on each handle recreation.
+    DropTargetObj := TSynDropTarget.Create;
+    with DropTargetObj do begin
       OnDragEnter := OleDragEnter;
       OnDragOver := OleDragOver;
       OnDragLeave := OleDragLeave;
       OnDrop := OleDrop;
     end;
-    RegisterDragDrop (Handle, DropTarget);
+    // Taking the interface reference here is what gives the object an owner. If
+    // RegisterDragDrop below fails, this local releases the last reference when
+    // CreateWnd returns and the target is freed instead of leaked.
+    DropTarget := DropTargetObj;
+    // OLE is no longer initialised from SynEditDataObject's initialization
+    // section (that runs under the loader lock in a runtime package), so make
+    // sure it has happened before the first OLE call on this thread.
+    EnsureOleInitialised;
+    HR := RegisterDragDrop(Handle, DropTarget);
+    if Failed(HR) and (HR <> DRAGDROP_E_ALREADYREGISTERED) then
+      raise ESynError.CreateResFmt(@SYNS_ERegisterDragDropFailed, [HR]);
   end;
 
   UpdateScrollBars;
@@ -10373,13 +10440,16 @@ end;
 
 function TSynEditMark.GetEdit: TCustomSynEdit;
 begin
-  if FEdit <> nil then try
-    if FEdit.Marks.IndexOf(self) = -1 then
-      FEdit := nil;
-  except
-    FEdit := nil;
-  end;
-  Result := FEdit;
+  // fMarkList is a TObjectList that OWNS its marks and is freed by
+  // TCustomSynEdit.Destroy, so a mark that is in the list always has a live
+  // editor and one that is not is detached and must not report one. That test is
+  // kept; what is removed is the try..except that used to wrap it. It was
+  // guarding a dangling-pointer dereference - undefined behaviour, not a
+  // reliable exception - and it swallowed genuine EListError/EOutOfMemory from a
+  // live editor as well.
+  if (fEdit <> nil) and (fEdit.Marks.IndexOf(Self) < 0) then
+    fEdit := nil;
+  Result := fEdit;
 end;
 
 function TSynEditMark.GetIsBookmark: Boolean;
@@ -10513,7 +10583,10 @@ begin
   end;
   FHandlers := AHandlers;
 
-  if phPaintTransient in Handlers then
+  // Guarded: the `if AOwner <> nil` above establishes nil as an expected input,
+  // and the one-argument overload passes AllPlugInHandlers, which contains
+  // phPaintTransient - so Create(nil) used to fault unconditionally.
+  if (FOwner <> nil) and (phPaintTransient in Handlers) then
     FOwner.FPaintTransientPlugins := True;
 end;
 

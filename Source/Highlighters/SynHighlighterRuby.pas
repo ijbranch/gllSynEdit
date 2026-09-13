@@ -33,7 +33,7 @@ of this file under either the MPL or the GPL.
 @author(Stefan Ascher <stievie2002@yahoo.com>)
 @created(21 May 2001)
 @lastmod(2001-11-13)
-The SynHighlighterVisualLisp unit provides SynEdit with a Ruby highlighter.
+The SynHighlighterRuby unit provides SynEdit with a Ruby highlighter.
 }
 
 unit SynHighlighterRuby;
@@ -98,6 +98,7 @@ type
     procedure EqualProc;
     procedure IdentProc;
     procedure LFProc;
+    /// <summary>Scans '&lt;', which under SYN_HEREDOC may open a here-document.</summary>
     procedure LowerProc;
     procedure NullProc;
     procedure NumberProc;
@@ -115,6 +116,7 @@ type
     function IsAtLineStart: Boolean;
     function LineStartsWith(const AText: string): Boolean;
 {$IFDEF SYN_HEREDOC}
+    /// <summary>Continues a here-document, ending it on the terminator line.</summary>
     procedure HeredocProc;
 {$ENDIF}
     procedure SetSecondKeys(const Value: TStrings);
@@ -268,7 +270,10 @@ end;
 
 function IsLiteralDelimiter(AChar: WideChar): Boolean;
 begin
-  Result := (AChar > #32) and not IsRubyIdentChar(AChar);
+  { A percent literal cannot open on a character that reads as an operator or a
+    closing bracket - '%=' is modulo-assign, not a literal delimited by '='. }
+  Result := (AChar > #32) and not IsRubyIdentChar(AChar) and
+    not CharInSet(AChar, ['=', '%', ',', ';', ')', ']', '}']);
 end;
 
 function MatchingDelimiter(AOpenDelim: WideChar): WideChar;
@@ -449,8 +454,8 @@ begin
 
     SkipRun := 0;
     QuoteChar := #0;
-    if (FLine[Run + 2] = '-') and (FLine[Run + 3] in
-      [WideChar('"'), WideChar(''''), WideChar('`')]) then
+    if (FLine[Run + 2] = '-') and
+      CharInSet(FLine[Run + 3], ['"', '''', '`']) then
     begin
       SkipRun := 2;
       QuoteChar := FLine[Run + 3];
@@ -489,7 +494,9 @@ begin
       else
         fRange := rsHeredoc;
       fHeredocLength := Len;
-      fHeredocChecksum := CalcFCS(FLine[Run + SkipRun], Len);
+      { CalcFCS walks bytes, so the length has to be in bytes - otherwise only
+        the first half of the UTF-16 terminator is hashed. }
+      fHeredocChecksum := CalcFCS(FLine[Run + SkipRun], Len * SizeOf(WideChar));
 
       Inc(Run, SkipRun + Len);
       fTokenID := tkString;
@@ -953,7 +960,7 @@ begin
   begin
     I := 0;
 
-    while not IsLineEnd(FLine[Run + I]) do
+    while not IsLineEnd(Run + I) do
     begin
       if I > fHeredocLength then
       begin
@@ -969,7 +976,7 @@ begin
       Exit;
     end;
 
-    if (CalcFCS(FLine[Run], I) = fHeredocChecksum) then
+    if (CalcFCS(FLine[Run], I * SizeOf(WideChar)) = fHeredocChecksum) then
     begin
       fRange := rsUnknown;
       Run := Run + I;

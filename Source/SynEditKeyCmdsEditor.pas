@@ -190,21 +190,27 @@ var
     TmpCommand: string;
   begin
     Result := False;
-    KeyLoc := 0;
     if AForm.ShowModal = mrOK then
     begin
       Result := True;
       NewStroke := FKeystrokes.Add;
       NewStroke.Command := AForm.Command;
       try
-        KeyLoc := TSynEditKeyStrokes(NewStroke.Collection).FindShortcut2(AForm.Keystroke, AForm.Keystroke2);
         NewStroke.ShortCut := AForm.Keystroke;
         NewStroke.ShortCut2 := AForm.Keystroke2;
       except
-        on ESynKeyError do
+        on E: ESynKeyError do
           begin
             // Shortcut already exists in the collection!
-            if FExtended then
+            // Recompute from the state SetShortCut actually searched on - the
+            // KeyLoc above used AForm.Keystroke2, but ShortCut2 has not been
+            // assigned yet, so a chord whose first key duplicates a single-key
+            // shortcut would leave KeyLoc = -1 and Items[-1] would raise
+            KeyLoc := TSynEditKeyStrokes(NewStroke.Collection)
+                        .FindShortcut2(AForm.Keystroke, NewStroke.ShortCut2);
+            if KeyLoc < 0 then
+              TmpCommand := E.Message
+            else if FExtended then
               TmpCommand := ConvertCodeStringToExtended(EditorCommandToCodeString(TSynEditKeyStrokes(NewStroke.Collection).Items[KeyLoc].Command))
             else TmpCommand := EditorCommandToCodeString(TSynEditKeyStrokes(NewStroke.Collection).Items[KeyLoc].Command);
 
@@ -266,7 +272,6 @@ var
     TmpCommand: string;
   begin
     Result := False;
-    KeyLoc := 0;
     if AForm.ShowModal = mrOK then
     begin
       Result := True;
@@ -274,15 +279,20 @@ var
       OldShortCut2 := FKeystrokes[SelItem.Index].ShortCut2;
 
       try
-        KeyLoc := TSynEditKeyStrokes(FKeystrokes[SelItem.Index].Collection).FindShortcut2(AForm.Keystroke, AForm.Keystroke2);
         FKeystrokes[SelItem.Index].Command := AForm.Command;
         FKeystrokes[SelItem.Index].ShortCut := AForm.Keystroke;
         FKeystrokes[SelItem.Index].ShortCut2 := AForm.Keystroke2;
       except
-        on ESynKeyError do
+        on E: ESynKeyError do
           begin
             // Shortcut already exists in the collection!
-            if FExtended then
+            // Recompute from the state SetShortCut actually searched on - see
+            // the matching comment in btnAddClick
+            KeyLoc := TSynEditKeyStrokes(FKeystrokes[SelItem.Index].Collection)
+                        .FindShortcut2(AForm.Keystroke, FKeystrokes[SelItem.Index].ShortCut2);
+            if KeyLoc < 0 then
+              TmpCommand := E.Message
+            else if FExtended then
               TmpCommand := ConvertCodeStringToExtended(EditorCommandToCodeString(TSynEditKeyStrokes(FKeystrokes[SelItem.Index].Collection).Items[KeyLoc].Command))
             else TmpCommand := EditorCommandToCodeString(TSynEditKeyStrokes(FKeystrokes[SelItem.Index].Collection).Items[KeyLoc].Command);
 

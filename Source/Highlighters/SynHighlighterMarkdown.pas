@@ -86,6 +86,9 @@ type
     procedure HtmlAttrQuoteValueProc;
     procedure HtmlAttrValueProc;
     procedure HtmlCommentProc;
+    /// <summary>Scans a '&lt;' that really opens an HTML tag or comment.</summary>
+    /// <returns>True when tag or comment state was entered; False leaves Run
+    /// untouched so the caller emits the character as ordinary text.</returns>
     function HtmlOpenProc: Boolean;
     procedure HtmlTagProc;
     function IndentedCodeBlockProc: Boolean;
@@ -107,6 +110,10 @@ type
     function GetRange: Pointer; override;
     function GetTokenAttribute: TSynHighlighterAttributes; override;
     function GetTokenKind: TSynNativeInt; override;
+    /// <summary>True when DefaultFilter has been changed from the Markdown default.</summary>
+    function IsFilterStored: Boolean; override;
+    /// <summary>Scans the next token, emitting runs of whitespace as tkSpace and
+    /// anything else unrecognised as tkUnknown.</summary>
     procedure Next; override;
     procedure ResetRange; override;
     procedure SetRange(Value: Pointer); override;
@@ -123,7 +130,7 @@ type
       read FEntityReferenceAttri write FEntityReferenceAttri;
     property HeadingAttri: TSynHighlighterAttributes read FHeadingAttri
       write FHeadingAttri;
-    property HtmlAttrNametAttri: TSynHighlighterAttributes
+    property HtmlAttrNameAttri: TSynHighlighterAttributes
       read FHtmlAttrNameAttri write FHtmlAttrNameAttri;
     property HtmlAttrValueAttri: TSynHighlighterAttributes
       read FHtmlAttrValueAttri write FHtmlAttrValueAttri;
@@ -144,6 +151,9 @@ type
 procedure SetEntities(Dict: TDictionary<String, String>);
 
 implementation
+
+uses
+  SynEditStrConst;
 
 var
   EntityReferenceDict: TDictionary<String, String>;
@@ -272,6 +282,10 @@ begin
 
   FBrackets := '<>()[]{}';
   FCaseSensitive := True;
+  // Without a default filter this highlighter contributed nothing to filter
+  // aggregation and streamed an empty DefaultFilter into every DFM - it was the
+  // only fixed-language highlighter in the folder without one.
+  fDefaultFilter := SYNS_FilterMarkdown;
 end;
 
 function TSynMarkdownSyn.DeleteProc: Boolean;
@@ -286,6 +300,11 @@ begin
     Exit(True);
   end;
   Result := False;
+end;
+
+function TSynMarkdownSyn.IsFilterStored: Boolean;
+begin
+  Result := fDefaultFilter <> SYNS_FilterMarkdown;
 end;
 
 destructor TSynMarkdownSyn.Destroy;
@@ -595,6 +614,18 @@ begin
       Exit(True);
     end;
 
+    // CommonMark only opens a tag when a tag name, a '/' plus a tag name, or a
+    // declaration / processing instruction follows the '<'.  Without this test
+    // an ordinary '<' ("while i < n") switches the scanner into HTML tag state
+    // and, because Next routes every non-rsUnKnown state away from the
+    // block-level procedures, never leaves it until a '>' turns up.
+    // Returning False leaves Run untouched, and Next's FTokenPos = Run guard
+    // then emits the '<' as ordinary text and advances.
+    if not (CharInSet(FLine[Run + 1], ['a' .. 'z', 'A' .. 'Z', '!', '?']) or
+      ((FLine[Run + 1] = '/') and
+      CharInSet(FLine[Run + 2], ['a' .. 'z', 'A' .. 'Z']))) then
+      Exit(False);
+
     FTokenID := tkUnknown;
     FRange.State := Ord(rsHtmlTag);
     FRange.Length := 0;
@@ -706,8 +737,19 @@ begin
 
   if FTokenPos = Run then
   begin
-    FTokenID := tkUnknown;
-    Inc(Run);
+    // Whitespace is consumed here, so this is the one place tkSpace can be
+    // assigned; without it the published SpaceAttri never reaches the display.
+    if CharInSet(FLine[Run], [#9, ' ']) then
+    begin
+      FTokenID := tkSpace;
+      while CharInSet(FLine[Run], [#9, ' ']) do
+        Inc(Run);
+    end
+    else
+    begin
+      FTokenID := tkUnknown;
+      Inc(Run);
+    end;
   end;
 
   inherited;
@@ -2925,7 +2967,7 @@ RegexEntityReference := TRegEx.Create
   ('(&([a-zA-Z0-9]+|#[0-9]{1,7}|#[xX][a-fA-F0-9]{1,6});)', [roCompiled]);
 RegexFencedCodeBlockBegin :=
   TRegEx.Create('^ {0,3}(([`~])\2{2,})(?: *)([^ ]*)(.*)$', [roCompiled]);
-RegexFencedCodeBlockEnd := TRegEx.Create('^ {0,3}(([`~])\2{2,})$',
+RegexFencedCodeBlockEnd := TRegEx.Create('^ {0,3}(([`~])\2{2,})[ \t]*$',
   [roCompiled]);
 RegexIndentedCodeBlock := TRegEx.Create('^( {0,3}\t| {4,}).*', [roCompiled]);
 RegexList := TRegEx.Create('^ *([-+*]|[0-9]{1,9}\.)(?= )', [roCompiled]);

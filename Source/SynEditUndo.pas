@@ -491,9 +491,6 @@ begin
     OldModified := GetModified;
     OldChangeNumber := Item.ChangeNumber;
 
-  {$IF COMPILERVERSION <= 30}
-    FKeepGoing := False;
-  {$ENDIF}
     repeat
       Item := FRedoList.Extract;
       LastItemHasGroupBreak := Item.GroupBreak;
@@ -593,9 +590,6 @@ begin
     OldModified := GetModified;
     OldChangeNumber := Item.ChangeNumber;
 
-  {$IF COMPILERVERSION <= 30}
-    FKeepGoing := False;
-  {$ENDIF}
     repeat
       Item := FUndoList.Extract;
       LastItem := Item;

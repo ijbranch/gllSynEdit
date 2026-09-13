@@ -128,9 +128,19 @@ end;
 function IsAnsiOnly(const WS: string): Boolean;
 var
   UsedDefaultChar: BOOL;
+  CP: Cardinal;
 begin
-  WideCharToMultiByte(UINT(DefaultSystemCodePage), 0, PWideChar(WS), Length(WS), nil, 0,
-    nil, @UsedDefaultChar);
+  if WS = '' then
+    Exit(True);
+  CP := UINT(DefaultSystemCodePage);
+  // WideCharToMultiByte fails with ERROR_INVALID_PARAMETER for UTF-7/UTF-8 when
+  // lpUsedDefaultChar is non-nil, and both round-trip every character anyway.
+  if (CP = CP_UTF8) or (CP = CP_UTF7) then
+    Exit(True);
+  UsedDefaultChar := False;
+  if WideCharToMultiByte(CP, 0, PWideChar(WS), Length(WS), nil, 0,
+    nil, @UsedDefaultChar) = 0 then
+    Exit(True);
   Result := not UsedDefaultChar;
 end;
 
@@ -304,7 +314,7 @@ function GetEncoding(Stream: TStream; out WithBOM: Boolean): TEncoding;
 
   function TBytesEqual(A, B: TBytes; const Len: Int64): Boolean;
   var
-    I: {$IF COMPILERVERSION < 29}Integer{$ELSE}Int64{$IFEND};
+    I: Int64;
   begin
     Result := True;
     for I := 0 to Len - 1 do
@@ -375,9 +385,17 @@ end;
 function IsWideCharMappableToAnsi(const WC: WideChar): Boolean;
 var
   UsedDefaultChar: BOOL;
+  CP: Cardinal;
 begin
-  WideCharToMultiByte(UINT(DefaultSystemCodePage), 0, PWideChar(@WC), 1, nil, 0, nil,
-    @UsedDefaultChar);
+  CP := UINT(DefaultSystemCodePage);
+  // See IsAnsiOnly: lpUsedDefaultChar is rejected for UTF-7/UTF-8, and neither
+  // code page ever substitutes a default character.
+  if (CP = CP_UTF8) or (CP = CP_UTF7) then
+    Exit(True);
+  UsedDefaultChar := False;
+  if WideCharToMultiByte(CP, 0, PWideChar(@WC), 1, nil, 0, nil,
+    @UsedDefaultChar) = 0 then
+    Exit(True);
   Result := not UsedDefaultChar;
 end;
 

@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+ï»¿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -12,7 +12,7 @@ The Original Code is: SynHighlighterJScript.pas, released 2000-04-14.
 The Original Code is based on the mwJScript.pas file from the
 mwEdit component suite by Martin Waldenburg and other developers, the Initial
 Author of this file is Tony de Buys.
-Unicode translation by Maël Hörz.
+Unicode translation by MaÃ«l HÃ¶rz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -99,11 +99,16 @@ type
     procedure OrSymbolProc;
     procedure PlusProc;
     procedure PointProc;
+    /// <summary>Scans '/', which may open a line comment, a block comment or be
+    /// a plain symbol; an escaped slash is always a symbol.</summary>
     procedure SlashProc;
     procedure SpaceProc;
     procedure StarProc;
+    /// <summary>Scans a quoted string, honouring backslash escapes.</summary>
     procedure StringProc;
     procedure LiteralsProc;
+    /// <summary>Continues a template literal until its closing backtick or the
+    /// start of a '${' substitution.</summary>
     procedure LiteralsRangeProc;
     procedure LiteralsTemplateRangeProc;
     procedure SymbolProc;
@@ -219,14 +224,15 @@ const
     'write', 'writeln', 'zIndex'
   );
 
+  // IMPORTANT!!! Cause JavaScript is case sensitive, list must be sorted by ASCII values
   KeyWords: array[0..61] of string = (
-    'abstract', 'boolean', 'break', 'byte', 'callee', 'case',
+    'NaN', 'abstract', 'boolean', 'break', 'byte', 'callee', 'case',
     'catch', 'char', 'const', 'constructor', 'continue',
     'debugger', 'default', 'delete', 'do', 'double', 'else',
     'enum', 'export', 'extends', 'false', 'final', 'finally',
     'float', 'for', 'function', 'goto', 'if', 'implements',
     'import', 'in', 'instanceof', 'int', 'interface', 'long',
-    'NaN', 'native', 'new', 'null', 'package', 'private',
+    'native', 'new', 'null', 'package', 'private',
     'protected', 'prototype', 'public', 'return', 'short',
     'start', 'static', 'super', 'switch', 'synchronized',
     'this', 'throw', 'throws', 'transient', 'true', 'try',
@@ -429,6 +435,13 @@ begin
       begin
         Inc(fLiteralLevel);
         fRange := rsLiteralTemplate;
+        // A literal that opens with '${' would otherwise emit a zero-length
+        // token here; consume the '${' as the template token instead.
+        if Run = fTokenPos then
+        begin
+          fTokenID := tkTemplate;
+          Inc(Run, 2);
+        end;
         Break;
       end;
       if OK then
@@ -567,8 +580,9 @@ end;
 procedure TSynJScriptSyn.SlashProc;
 begin
   Inc(Run);
-  { we should handle escaped slash \// } 
-  if (Run > 1) and (FLine[run-2] <> '\') or (Run=1) then
+  fTokenID := tkSymbol;
+  { we should handle escaped slash \// }
+  if (Run > 1) and (FLine[Run - 2] = '\') then Exit;
   case fLine[Run] of
     '/': begin
            fTokenID := tkComment;
@@ -592,8 +606,6 @@ begin
            Inc(Run);
            fTokenID := tkSymbol;
          end;
-    else
-      fTokenID := tkSymbol;
   end;
 end;
 
@@ -629,7 +641,7 @@ begin
       IsEscaped := False;
     end;
     Inc(Run);
-  until (FLine[Run] = l_strChar) and (FLine[Pred(Run)] <> '\') and not IsEscaped;
+  until (FLine[Run] = l_strChar) and not IsEscaped;
   if not IsLineEnd(Run) then
     Inc(Run);
 end;

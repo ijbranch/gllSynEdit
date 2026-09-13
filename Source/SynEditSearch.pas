@@ -99,6 +99,7 @@ implementation
 
 uses
   Windows,
+  SynEditStrConst,
   SysUtils;
 
 constructor TSynEditSearch.Create(aOwner: TComponent);
@@ -292,7 +293,7 @@ begin
   PatLen := Length(Pat);
 
   if Patlen = 0 then
-    raise Exception.Create('Pattern is empty');
+    raise ESynError.CreateRes(@SYNS_ESearchPatternEmpty);
 
   // never shrink Capacity
   fResults.Count := 0;

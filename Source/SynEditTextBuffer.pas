@@ -204,9 +204,7 @@ type
 
 implementation
 uses
-{$IF (COMPILERVERSION > 29) OR (NOT DEFINED(PACKAGE))}
   System.Threading,
-{$IFEND}
   System.Math;
 
 resourcestring
@@ -227,11 +225,7 @@ begin
   FMaxWidth := -1;
   FTabWidth := 8;
   FUTF8CheckLen := -1;
-{$IF COMPILERVERSION >= 31}
   Options := Options - [soWriteBOM, soTrailingLineBreak];
-{$ELSE}
-  WriteBOM := False;
-{$ENDIF}
   FDetectUTF8 := True;
   FDetectBinary := True;
   FTextWidthFunc := TextWidthFunc;
@@ -298,6 +292,13 @@ begin
   begin
     System.Move(FList[Index + 1], FList[Index],
       (FCount - Index) * SynEditStringRecSize);
+    // The Move leaves a bitwise copy of the last record in the slot it vacated,
+    // so that managed string is named by two array elements but counted once.
+    // SetLength (from SetCapacityNative, which Clear and Destroy both call)
+    // finalises every element of the shrunk region and would release it twice.
+    // Clear the tail RAW - Finalize would release the reference that the
+    // moved-down copy now owns.
+    FillChar(FList[FCount], SynEditStringRecSize, 0);
   end;
   FMaxWidth := -1;
   if Assigned(FOnDeleted) then
@@ -327,8 +328,15 @@ begin
       Finalize(FList[lLine]);
 
     if lLinesAfter > 0 then
+    begin
       System.Move(FList[AIndex + ANumLines], FList[AIndex], lLinesAfter * SynEditStringRecSize);
-    Dec(FCount, ANumLines);
+      Dec(FCount, ANumLines);
+      // See DeleteNative: the vacated tail still holds bitwise copies of live
+      // string references and must be cleared raw, not finalised.
+      FillChar(FList[FCount], ANumLines * SynEditStringRecSize, 0);
+    end
+    else
+      Dec(FCount, ANumLines);
     if Assigned(FOnDeleted) then
       FOnDeleted(Self, AIndex, ANumLines);
     Changed;
@@ -436,12 +444,6 @@ begin
 end;
 
 function TSynEditStringList.GetMaxWidth: TSynNativeInt;
-{$IF (COMPILERVERSION <= 29) AND DEFINED(PACKAGE)}
-var
-  I: TSynNativeInt;
-  LMaxW: TSynNativeInt;
-  PRec: PSynEditStringRec;
-{$IFEND}
 begin
   if FMaxWidth > 0 then
     Result := FMaxWidth
@@ -449,14 +451,10 @@ begin
     Result := 0
   else
   begin
-{$IF (COMPILERVERSION > 29) OR (NOT DEFINED(PACKAGE))}
     TParallel.&For(0, FCount - 1, procedure(I: TSynNativeInt)
     var
       LMaxW: TSynNativeInt;
       PRec: PSynEditStringRec;
-{$ELSE}
-    for I := 0 to FCount - 1 do
-{$IFEND}
     begin
       PRec := @FList[I];
       if sfTextWidthUnknown in PRec^.FFlags then
@@ -469,7 +467,7 @@ begin
         if PRec^.FTextWidth <= LMaxW then
           Break;
       until AtomicCmpExchange(FMaxWidth, PRec^.FTextWidth, LMaxW) = LMaxW;
-    end{$IF (COMPILERVERSION > 29) OR (NOT DEFINED(PACKAGE))}){$IFEND};
+    end);
     Result := Max(FMaxWidth, 0);
   end;
 end;
@@ -946,7 +944,7 @@ end;
 procedure TSynEditStringList.SetCapacityNative(const AValue: TSynNativeInt);
 begin
   if AValue < CountNative then
-    EListError.Create(SInvalidCapacity);
+    raise EListError.CreateRes(@SInvalidCapacity);
   SetLength(FList, AValue);
   FCapacity := AValue;
 end;

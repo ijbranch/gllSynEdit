@@ -42,7 +42,7 @@ type
   TSynRustSyn = class(TSynCustomHighlighter)
   private
     FRange: TRangeState;
-    FRangeLevel: Integer;
+    FRangeLevel: TSynNativeInt;
     FTokenID: TtkTokenKind;
     FKeywords: TStringList;
     FBuiltins: TStringList;
@@ -60,7 +60,7 @@ type
     FUnknownAttri: TSynHighlighterAttributes;
     function IdentKind(MayBe: PWideChar): TtkTokenKind;
     function IsIdentStart(AChar: WideChar): Boolean;
-    function RawStringEnd(StartPos, Hashes: Integer): Boolean;
+    function RawStringEnd(StartPos, Hashes: TSynNativeInt): Boolean;
     function TryStartRawString: Boolean;
     procedure BlockCommentProc;
     procedure RawStringProc;
@@ -234,9 +234,9 @@ begin
   Result := CharInSet(AChar, ['A'..'Z', 'a'..'z', '_']);
 end;
 
-function TSynRustSyn.RawStringEnd(StartPos, Hashes: Integer): Boolean;
+function TSynRustSyn.RawStringEnd(StartPos, Hashes: TSynNativeInt): Boolean;
 var
-  I: Integer;
+  I: TSynNativeInt;
 begin
   Result := True;
   for I := 0 to Hashes - 1 do
@@ -394,7 +394,7 @@ end;
 
 function TSynRustSyn.TryStartRawString: Boolean;
 var
-  P, Hashes: Integer;
+  P, Hashes: TSynNativeInt;
 begin
   Result := False;
   P := Run + 1;

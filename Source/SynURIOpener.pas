@@ -57,6 +57,15 @@ uses
   Classes;
 
 type
+  /// <summary>Reports a link that could not be launched.</summary>
+  /// <param name="Sender">The TSynURIOpener that attempted the launch.</param>
+  /// <param name="URI">The URI as handed to ShellExecute, including any
+  /// scheme prefix the opener added.</param>
+  /// <param name="ErrorCode">The ShellExecute failure code (&lt;= 32), for
+  /// example ERROR_FILE_NOT_FOUND or SE_ERR_NOASSOC.</param>
+  TSynURIOpenErrorEvent = procedure(Sender: TObject; const URI: string;
+    ErrorCode: Integer) of object;
+
   TSynURIOpener = class(TComponent)
   private
     FControlDown: Boolean;
@@ -64,9 +73,17 @@ type
     FEditor: TCustomSynEdit;
     FMouseDownX: TSynNativeInt;
     FMouseDownY: TSynNativeInt;
+    FOnOpenError: TSynURIOpenErrorEvent;
 
     FURIHighlighter: TSynURISyn;
     FVisitedURIs: TStringList;
+    /// <summary>Records the URI as visited and launches it with ShellExecute.
+    /// On failure the visited entry is rolled back and OnOpenError is
+    /// fired.</summary>
+    /// <param name="URI">The link text as found by the highlighter, without
+    /// any scheme prefix this method may add.</param>
+    /// <param name="LinkType">The highlighter token kind, cast to
+    /// TtkTokenKind, that decides the scheme prefix.</param>
     procedure OpenLink(URI: string; LinkType: TSynNativeInt);
     function MouseInSynEdit: Boolean;
   protected
@@ -93,6 +110,11 @@ type
     property Editor: TCustomSynEdit read FEditor write SetEditor;
     property URIHighlighter: TSynURISyn read FURIHighlighter 
       write SetURIHighlighter;
+    /// <summary>Fired when ShellExecute fails to launch a clicked link. The
+    /// URI is also removed again from the visited list, so a failed link is
+    /// not rendered as visited.</summary>
+    property OnOpenError: TSynURIOpenErrorEvent read FOnOpenError
+      write FOnOpenError;
   end;
 
 
@@ -155,7 +177,10 @@ end;
 
 function IsControlPressed: Boolean;
 begin
-  Result := GetAsyncKeyState(VK_CONTROL) <> 0;
+  // GetKeyState, not GetAsyncKeyState: the latter's bit 0 means "pressed since
+  // the last call for this key", so a Ctrl shortcut used elsewhere would make
+  // the next mouse move believe Ctrl is still held
+  Result := GetKeyState(VK_CONTROL) < 0;
 end;
 
 procedure TSynURIOpener.NewMouseCursor(Sender: TObject;
@@ -235,8 +260,18 @@ begin
 end;
 
 procedure TSynURIOpener.OpenLink(URI: string; LinkType: TSynNativeInt);
+var
+  Original: string;
+  VisitedIndex: Integer;   // TStringList.Find takes a var Integer
+  WasVisited: Boolean;
+  ShellResult: HINST;
 begin
-  FVisitedURIs.Add(URI);
+  Original := URI;
+  // The list is sorted, so Add of an entry that is already there is a no-op -
+  // remember that, or a failed launch would drop a genuinely visited URI
+  WasVisited := FVisitedURIs.Find(Original, VisitedIndex);
+  if not WasVisited then
+    FVisitedURIs.Add(Original);
 
   case TtkTokenKind(LinkType) of
     tkMailtoLink:
@@ -244,7 +279,16 @@ begin
     tkWebLink:
        URI := 'http://' + URI;
   end;
-  ShellExecute(0, nil, PChar(URI), nil, nil, 1{SW_SHOWNORMAL});
+
+  ShellResult := ShellExecute(0, nil, PChar(URI), nil, nil, SW_SHOWNORMAL);
+  if ShellResult <= 32 then
+  begin
+    // The link never opened, so it must not stay marked as visited
+    if not WasVisited and FVisitedURIs.Find(Original, VisitedIndex) then
+      FVisitedURIs.Delete(VisitedIndex);
+    if Assigned(FOnOpenError) then
+      FOnOpenError(Self, URI, Integer(ShellResult));
+  end;
 end;
 
 procedure TSynURIOpener.SetEditor(const Value: TCustomSynEdit);
@@ -304,7 +348,11 @@ var
   CursorHandle: THandle;
 
 initialization
-  CursorHandle := LoadCursor(0, IDC_LINK);
+  // Hand TScreen a private copy: TScreen.DeleteCursor calls DestroyCursor on
+  // the outgoing entry, which must never be done to a shared system cursor.
+  // CopyIcon is what the Win32 CopyCursor macro resolves to; the RTL declares
+  // no CopyCursor of its own
+  CursorHandle := CopyIcon(LoadCursor(0, IDC_LINK));
   if CursorHandle <> 0 then
     Screen.Cursors[crHandPoint] := CursorHandle;
 

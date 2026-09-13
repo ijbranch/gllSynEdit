@@ -42,7 +42,7 @@ type
   TSynLuaSyn = class(TSynCustomHighlighter)
   private
     FRange: TRangeState;
-    FLongLevel: Integer;
+    FLongLevel: TSynNativeInt;
     FTokenID: TtkTokenKind;
     FKeywords: TStringList;
     FBuiltins: TStringList;
@@ -56,8 +56,8 @@ type
     FSymbolAttri: TSynHighlighterAttributes;
     FUnknownAttri: TSynHighlighterAttributes;
     function IdentKind(MayBe: PWideChar): TtkTokenKind;
-    function LongBracketLevel(StartPos: Integer): Integer;
-    function IsLongBracketEnd(StartPos, Level: Integer): Boolean;
+    function LongBracketLevel(StartPos: TSynNativeInt): TSynNativeInt;
+    function IsLongBracketEnd(StartPos, Level: TSynNativeInt): Boolean;
     procedure CRProc;
     procedure IdentProc;
     procedure LFProc;
@@ -203,9 +203,9 @@ begin
     Result := tkIdentifier;
 end;
 
-function TSynLuaSyn.LongBracketLevel(StartPos: Integer): Integer;
+function TSynLuaSyn.LongBracketLevel(StartPos: TSynNativeInt): TSynNativeInt;
 var
-  P: Integer;
+  P: TSynNativeInt;
 begin
   Result := -1;
   if FLine[StartPos] <> '[' then
@@ -217,9 +217,9 @@ begin
     Result := P - StartPos - 1;
 end;
 
-function TSynLuaSyn.IsLongBracketEnd(StartPos, Level: Integer): Boolean;
+function TSynLuaSyn.IsLongBracketEnd(StartPos, Level: TSynNativeInt): Boolean;
 var
-  I, P: Integer;
+  I, P: TSynNativeInt;
 begin
   Result := False;
   if FLine[StartPos] <> ']' then
@@ -310,7 +310,7 @@ end;
 
 procedure TSynLuaSyn.MinusProc;
 var
-  Level: Integer;
+  Level: TSynNativeInt;
 begin
   if FLine[Run + 1] = '-' then
   begin
@@ -391,7 +391,7 @@ end;
 
 procedure TSynLuaSyn.BracketProc;
 var
-  Level: Integer;
+  Level: TSynNativeInt;
 begin
   Level := LongBracketLevel(Run);
   if Level >= 0 then

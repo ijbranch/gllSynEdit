@@ -1521,7 +1521,7 @@ begin
     begin
       IsEsc := False;
       if (Run > 0) or (fRange <> rsString) or
-        ((fLine[Run] <> #39) and (fLine[Run - 1] <> '\')) then
+        ((fLine[Run] <> #39) and ((Run <= 0) or (fLine[Run - 1] <> '\'))) then
       begin
         fRange := rsString;
         repeat
@@ -1957,8 +1957,14 @@ begin
       AnsiCProc;
     rsConsoleOutput:
       begin
-        while not IsLineEnd(Run) do
-          Inc(Run);
+        case fLine[Run] of
+           #0: NullProc;
+          #10: LFProc;
+          #13: CRProc;
+        else
+          while not IsLineEnd(Run) do
+            Inc(Run);
+        end;
       end;
     rsString:
       AsciiCharProc;
@@ -2335,6 +2341,28 @@ begin
         #13#10 +
         '  SELECT SCOPE_IDENTITY()'#13#10 +
         'GO';
+    sqlNexus:
+      Result := '/* NexusDB example source */'#13#10 +
+        'CREATE TABLE Customers ('#13#10 +
+        '  ID          INTEGER NOT NULL,'#13#10 +
+        '  CompanyName VARCHAR(40) NOT NULL,'#13#10 +
+        '  PRIMARY KEY (ID));'#13#10 +
+        #13#10 +
+        'SELECT TOP 10 ID, CompanyName'#13#10 +
+        'FROM Customers'#13#10 +
+        'WHERE CompanyName LIKE ''A%'''#13#10 +
+        'ORDER BY CompanyName ASC;';
+    sqlInformix:
+      Result := '-- Informix example source'#13#10 +
+        'CREATE PROCEDURE count_orders() RETURNING INT;'#13#10 +
+        '  DEFINE o_num INT;'#13#10 +
+        '  DEFINE total INT;'#13#10 +
+        '  LET total = 0;'#13#10 +
+        '  FOREACH SELECT order_num INTO o_num FROM orders'#13#10 +
+        '    LET total = total + 1;'#13#10 +
+        '  END FOREACH;'#13#10 +
+        '  RETURN total;'#13#10 +
+        'END PROCEDURE;';
   end;
 end;
 
@@ -2417,6 +2445,7 @@ begin
         tkKey: Result := InformixKW;
         tkDatatype: Result := InformixTypes;
         tkFunction: Result := InformixFunctions;
+        tkPLSQL: Result := InformixPLSQLKW;
       end;
   end;
 end;

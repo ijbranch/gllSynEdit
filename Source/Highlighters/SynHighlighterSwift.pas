@@ -44,7 +44,7 @@ type
   TSynSwiftSyn = class(TSynCustomHighlighter)
   private
     FRange: TRangeState;
-    FRangeLevel: Integer;
+    FRangeLevel: TSynNativeInt;
     FTokenID: TtkTokenKind;
     FKeywords: TStringList;
     FTypes: TStringList;
@@ -60,7 +60,7 @@ type
     FSpaceAttri: TSynHighlighterAttributes;
     FUnknownAttri: TSynHighlighterAttributes;
     function IdentKind(MayBe: PWideChar): TtkTokenKind;
-    function HashRun(APos, ACount: Integer): Boolean;
+    function HashRun(APos, ACount: TSynNativeInt): Boolean;
     procedure AttributeProc;
     procedure BacktickProc;
     procedure BlockCommentProc;
@@ -74,7 +74,7 @@ type
     procedure NumberProc;
     procedure SlashProc;
     procedure SpaceProc;
-    procedure StringProc(AHashCount: Integer);
+    procedure StringProc(AHashCount: TSynNativeInt);
     procedure SymbolProc;
     procedure UnknownProc;
   protected
@@ -218,9 +218,9 @@ begin
   Result := IsCharAlphaNumeric(AChar) or (AChar = '_') or (AChar = '$');
 end;
 
-function TSynSwiftSyn.HashRun(APos, ACount: Integer): Boolean;
+function TSynSwiftSyn.HashRun(APos, ACount: TSynNativeInt): Boolean;
 var
-  K: Integer;
+  K: TSynNativeInt;
 begin
   for K := 0 to ACount - 1 do
     if FLine[APos + K] <> '#' then
@@ -420,7 +420,7 @@ begin
     StringProc(0);
 end;
 
-procedure TSynSwiftSyn.StringProc(AHashCount: Integer);
+procedure TSynSwiftSyn.StringProc(AHashCount: TSynNativeInt);
 begin
   FTokenID := tkString;
   Inc(Run);
@@ -485,7 +485,7 @@ end;
 
 procedure TSynSwiftSyn.HashProc;
 var
-  N, P: Integer;
+  N, P: TSynNativeInt;
 begin
   N := 0;
   P := Run;

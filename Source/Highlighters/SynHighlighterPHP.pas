@@ -410,7 +410,7 @@ begin
 
             fRange := rsHeredoc;
             fHeredocLength := Len;
-            fHeredocChecksum := CalcFCS(FLine[Run], Len);
+            fHeredocChecksum := CalcFCS(FLine[Run], Len * SizeOf(WideChar));
 
             Inc(Run, Len);
             fTokenID := tkString;
@@ -1006,7 +1006,7 @@ begin
   begin
     I := 0;
 
-    while not (IsLineEnd(FLine[I]) or (FLine[I] = ';')) do
+    while not (IsLineEnd(I) or (FLine[I] = ';')) do
     begin
       if I > fHeredocLength then
       begin
@@ -1022,7 +1022,7 @@ begin
       Exit;
     end;
 
-    if (CalcFCS(FLine[0], I) = fHeredocChecksum) then
+    if (CalcFCS(FLine[0], I * SizeOf(WideChar)) = fHeredocChecksum) then
     begin
       fRange := rsUnknown;
       Run := I;
@@ -1051,7 +1051,13 @@ begin
     end;
   end;
 
-  // ensure that one call of Next is enough to reach next token
+  // Load-bearing, not defensive. These highlighters deliberately emit a
+  // zero-length token when a scan stops on the character that changes the
+  // range - QAttributeValueProc at an '&', for instance, flips to
+  // rsQuoteEntityRef and exits without consuming anything - and rely on this
+  // retry to re-dispatch into the new range. TSynCustomHighlighter.Next is the
+  // backstop for the case where the retry does not advance either; it compares
+  // Run against fTokenPos, so this re-entrant call does not confuse it.
   if (fOldRun = Run) and not GetEol then Next;
 
   inherited;
@@ -1084,6 +1090,8 @@ begin
     '`': String96Proc;
     '$': VariableProc;
     '^': XOrSymbolProc;
+    #$0080..#$FFFF:
+      if IsIdentChar(fLine[Run]) then IdentProc else UnknownProc;
     else UnknownProc;
   end;
 end;

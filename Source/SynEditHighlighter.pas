@@ -172,7 +172,16 @@ type
     function GetTokenLength: TSynNativeInt; virtual;
     function GetTokenPos: TSynNativeInt; virtual;
     function IsKeyword(const AKeyword: string): Boolean; virtual;
+    /// <summary>
+    ///   Advances the scanner to the next token. Descendants override this,
+    ///   dispatch to a token procedure and then call <c>inherited</c> as their
+    ///   last statement; the inherited implementation is the library's single
+    ///   progress guard - if the token procedure consumed no characters and the
+    ///   line end has not been reached, it forces <c>Run</c> forward so the
+    ///   caller's "while not GetEol do Next" loop cannot spin.
+    /// </summary>
     procedure Next; virtual;
+    /// <summary>Scans the current line from the present position to its end.</summary>
     procedure NextToEol;
     procedure SetLine(const Value: string; LineNumber: TSynNativeInt); virtual;
     procedure SetRange(Value: Pointer); virtual;
@@ -415,6 +424,18 @@ const
     clDkGray, clRed, clLime, clYellow, clBlue, clFuchsia, clAqua, clWhite
   );
 
+  // The palette index comes straight out of HKCU and is not trusted: a corrupt
+  // or foreign value must not index Pal16 out of bounds. With range checks off
+  // (the stock Release setting) that would read arbitrary memory and assign it
+  // as a TColor; with them on it would raise ERangeError.
+  function Pal16Color(AIndex: Integer; ADefault: TColor): TColor;
+  begin
+    if (AIndex >= Low(Pal16)) and (AIndex <= High(Pal16)) then
+      Result := Pal16[AIndex]
+    else
+      Result := ADefault;
+  end;
+
   function LoadOldStyle(RootKey: HKEY; AttrKey, AttrName: string): Boolean;
   var
     descript: string;
@@ -426,6 +447,9 @@ const
     fgIndex16: string;
     bgIndex16: string;
     reg: TRegistry;
+    NewBg: TColor;
+    NewFg: TColor;
+    NewStyle: TFontStyles;
 
     function Get(var Name: string): string;
     var
@@ -458,18 +482,26 @@ const
                 bgDefault := Get(descript);
                 fgIndex16 := Get(descript);
                 bgIndex16 := Get(descript);
+                // Parse into locals first. Assigning Background before parsing
+                // the foreground would leave the attribute half-updated when the
+                // second value is malformed, while still reporting "nothing was
+                // loaded" to the caller. StrToIntDef removes the EConvertError
+                // that the empty except below used to absorb.
                 if bgDefault = '1' then
-                  Background := clWindow
+                  NewBg := clWindow
                 else
-                  Background := Pal16[StrToInt(bgIndex16)];
+                  NewBg := Pal16Color(StrToIntDef(bgIndex16, -1), clWindow);
                 if fgDefault = '1' then
-                  Foreground := clWindowText
+                  NewFg := clWindowText
                 else
-                  Foreground := Pal16[StrToInt(fgIndex16)];
-                Style := [];
-                if Pos('B', fontStyle) > 0 then Style := Style + [fsBold];
-                if Pos('I', fontStyle) > 0 then Style := Style + [fsItalic];
-                if Pos('U', fontStyle) > 0 then Style := Style + [fsUnderline];
+                  NewFg := Pal16Color(StrToIntDef(fgIndex16, -1), clWindowText);
+                NewStyle := [];
+                if Pos('B', fontStyle) > 0 then NewStyle := NewStyle + [fsBold];
+                if Pos('I', fontStyle) > 0 then NewStyle := NewStyle + [fsItalic];
+                if Pos('U', fontStyle) > 0 then NewStyle := NewStyle + [fsUnderline];
+                Background := NewBg;
+                Foreground := NewFg;
+                Style := NewStyle;
                 Result := True;
               end;
             finally
@@ -481,6 +513,11 @@ const
         reg.Free;
       end;
     except
+      // The key can genuinely vanish or lose its ACL between OpenKeyReadOnly and
+      // the reads. Everything else - a bad index, unparseable text - is handled
+      // above, so this no longer hides a defect of ours.
+      on ERegistryException do
+        Result := False;
     end;
   end; { LoadOldStyle }
 
@@ -512,13 +549,13 @@ const
           begin
             try
               if ValueExists('Foreground Color')
-                then fgColor := Pal16[ReadInteger('Foreground Color')]
+                then fgColor := Pal16Color(ReadInteger('Foreground Color'), clWindowText)
               else if ValueExists('Foreground Color New') then
                 fgColor := StringToColor(ReadString('Foreground Color New'))
               else
                 Exit;
               if ValueExists('Background Color')
-                then bgColor := Pal16[ReadInteger('Background Color')]
+                then bgColor := Pal16Color(ReadInteger('Background Color'), clWindow)
               else if ValueExists('Background Color New') then
                 bgColor := StringToColor(ReadString('Background Color New'))
               else
@@ -558,6 +595,9 @@ const
         reg.Free;
       end;
     except
+      // As in LoadOldStyle: only an environment failure reaches here now.
+      on ERegistryException do
+        Result := False;
     end;
   end; { LoadNewStyle }
 
@@ -1110,8 +1150,27 @@ end;
 
 procedure TSynCustomHighlighter.Next;
 begin
-  if fOldRun <> Run then
-    fOldRun := Run;
+  // The comparison is against fTokenPos - which every descendant sets to Run as
+  // the first statement of its own Next - and NOT against fOldRun. fOldRun is a
+  // field, so a descendant that calls Next re-entrantly (as the HTML, PHP and
+  // XML highlighters used to) would have it updated by the inner call and the
+  // test would then be trivially true on the way out: a false positive, and a
+  // spurious Inc(Run) with it.
+  if (Run = fTokenPos) and not GetEol then
+  begin
+    // The descendant's token procedure returned without consuming anything.
+    // Every scanning loop in the library is "while not GetEol do Next", so left
+    // alone this spins for ever - inside a paint handler, with the message loop
+    // blocked. Forcing progress degrades a scanner defect to wrong colours on
+    // one line instead of an unkillable freeze.
+    // Assert only: in a debug build this names the offending highlighter and the
+    // column, which is what turns such a report into a one-line fix. Assertions
+    // are off in every stock Release configuration, so this costs nothing there.
+    Assert(False, ClassName + '.Next did not advance Run at position ' +
+      IntToStr(fTokenPos));
+    Inc(Run);
+  end;
+  fOldRun := Run;
 end;
 
 procedure TSynCustomHighlighter.NextToEol;

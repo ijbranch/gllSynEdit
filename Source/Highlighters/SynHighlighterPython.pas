@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+ï»¿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -13,7 +13,7 @@ The Original Code is based on the odPySyn.pas file from the
 mwEdit component suite by Martin Waldenburg and other developers, the Initial
 Author of this file is Olivier Deckmyn.
 Portions created by M.Utku Karatas and Dennis Chuah.
-Unicode translation by Maël Hörz.
+Unicode translation by MaÃ«l HÃ¶rz.
 All Rights Reserved.
 
 Contributors to the SynEdit and mwEdit projects are listed in the
@@ -105,6 +105,7 @@ type
     procedure UnicodeStringProc;
     procedure StringProc;
     procedure String2Proc;
+    /// <summary>Continues a string opened on an earlier line, up to EndChar.</summary>
     procedure StringEndProc(EndChar: WideChar);
     procedure UnknownProc;
   protected
@@ -123,12 +124,17 @@ type
     function GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes;
       override;
     function GetEol: Boolean; override;
+    /// <summary>Returns the line-end range, with the quote character of a
+    /// backslash-continued string packed into bits 8..23.</summary>
     function GetRange: Pointer; override;
     function GetTokenID: TtkTokenKind;
     function GetTokenAttribute: TSynHighlighterAttributes; override;
     function GetTokenKind: TSynNativeInt; override;
     procedure Next; override;
+    /// <summary>Restores the range and the packed quote character written by
+    /// <see cref="GetRange"/>.</summary>
     procedure SetRange(Value: Pointer); override;
+    /// <summary>Clears the range and the remembered string quote character.</summary>
     procedure ResetRange; override;
     procedure InitFoldRanges(FoldRanges: TSynFoldRanges); override;
     procedure ScanForFoldRanges(FoldRanges: TSynFoldRanges;
@@ -1030,18 +1036,18 @@ begin
         Inc(Run);
         fRange:=rsUnknown;
         EXIT;
-      end else if FLine[Run]='\' then ;  {The same backslash stuff above...}
-          begin
-             if FLine[Run + 1] = fStringStarter then
-               begin
-                 fBackslashCount := 1;
+      end else if FLine[Run]='\' then  {The same backslash stuff above...}
+      begin
+        if FLine[Run + 1] = fStringStarter then
+        begin
+          fBackslashCount := 1;
 
-                 while ((Run > fBackslashCount) and (FLine[Run - fBackslashCount] = '\')) do
-                   fBackslashCount := fBackslashCount + 1;
+          while ((Run > fBackslashCount) and (FLine[Run - fBackslashCount] = '\')) do
+            fBackslashCount := fBackslashCount + 1;
 
-                 if (fBackslashCount mod 2 = 1) then Inc(Run);
-             end;
-           end;// if FLine[Run]...
+          if (fBackslashCount mod 2 = 1) then Inc(Run);
+        end;
+      end;// if FLine[Run]...
 
       Inc(Run);
     until IsLineEnd(Run);
@@ -1093,7 +1099,7 @@ begin
       case fLine[Run] of
         '&', '}', '{', ':', ',', ']', '[', '*', '`',
         '^', ')', '(', ';', '/', '=', '-', '+', '!', '\',
-        '%', '|', '~' :
+        '%', '|', '~', '@' :
           SymbolProc;
         #13: CRProc;
         '#': CommentProc;
@@ -1138,7 +1144,13 @@ end;
 
 function TSynPythonSyn.GetRange: Pointer;
 begin
-  Result := Pointer(fRange);
+  // rsMultilineString3 is a short string continued by a trailing backslash, so
+  // the quote character that opened it has to travel with the range, otherwise
+  // a repaint that starts mid-string hunts for the wrong terminator.
+  if fRange = rsMultilineString3 then
+    Result := Pointer(NativeUInt(Ord(fRange)) or (NativeUInt(Word(fStringStarter)) shl 8))
+  else
+    Result := Pointer(NativeUInt(Ord(fRange)));
 end;
 
 function TSynPythonSyn.GetTokenID: TtkTokenKind;
@@ -1176,6 +1188,7 @@ end;
 procedure TSynPythonSyn.ResetRange;
 begin
   fRange := rsUnknown;
+  fStringStarter := #0;
 end;
 
 procedure TSynPythonSyn.InitFoldRanges(FoldRanges: TSynFoldRanges);
@@ -1273,7 +1286,11 @@ end;
 
 procedure TSynPythonSyn.SetRange(Value: Pointer);
 begin
-  fRange := TRangeState(Value);
+  fRange := TRangeState(NativeUInt(Value) and $FF);
+  if fRange = rsMultilineString3 then
+    fStringStarter := WideChar((NativeUInt(Value) shr 8) and $FFFF)
+  else
+    fStringStarter := #0;
 end;
 
 function TSynPythonSyn.IsFilterStored: Boolean;

@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+﻿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -35,23 +35,14 @@ uses
   Vcl.Graphics, Vcl.Themes;
 
 type
-{$IF COMPILERVERSION < 29}
-  FixedInt = LongInt;
-{$IFEND}
 
-{$IF COMPILERVERSION < 36}
-  TSynInt64 = Integer;
-{$ELSE}
   TSynInt64 = Int64;
-{$IFEND}
 
-{$IF COMPILERVERSION < 36}
-  TSynNativeInt = Int32;
-  TSynNativeUInt = UInt32;
-{$ELSE}
   TSynNativeInt = NativeInt;
   TSynNativeUInt = NativeUInt;
-{$IFEND}
+
+  /// <summary>Pointer to the scanner-width integer used throughout SynEdit.</summary>
+  PSynNativeInt = ^TSynNativeInt;
 
   TPointHelper = record helper for TPoint
   public
@@ -78,62 +69,22 @@ type
 
   TStringsHelper = class helper for TStrings
   strict private
-    {$IF COMPILERVERSION < 31}function GetUseLocale: Boolean; inline;{$IFEND}
-    {$IF COMPILERVERSION < 31}function GetTrailingLineBreak: Boolean; inline;{$IFEND}
-    {$IF COMPILERVERSION < 31}procedure SetUseLocale(const AValue: Boolean); inline;{$IFEND}
-    {$IF COMPILERVERSION < 31}procedure SetTrailingLineBreak(const AValue: Boolean); inline;{$IFEND}
   public
     procedure DeleteNative(const AIndex: NativeInt); inline;
     function GetItemsNative(const AIndex: NativeInt): string; inline;
     function GetObjectsNative(const AIndex: NativeInt): TObject; inline;
     procedure SetItemsNative(const AIndex: NativeInt; const AValue: string); inline;
     procedure SetObjectsNative(const AIndex: NativeInt; const AValue: TObject); inline;
-    {$IF COMPILERVERSION < 31}function Updating: Boolean;{$IFEND}
-    {$IF COMPILERVERSION < 31}property UseLocale: Boolean read GetUseLocale write SetUseLocale;{$IFEND}
-    {$IF COMPILERVERSION < 31}property TrailingLineBreak: Boolean read GetTrailingLineBreak write SetTrailingLineBreak;{$IFEND}
     property ItemsNative[const AIndex: NativeInt]: string read GetItemsNative write SetItemsNative;
     property ObjectsNative[const AIndex: NativeInt]: TObject read GetObjectsNative write SetObjectsNative;
   end;
 
-{$IF COMPILERVERSION < 34}TControlHelper = class helper for TControl
-  strict private
-    {$IF COMPILERVERSION < 33}function GetCurrentPPI: Integer;{$IFEND}
-  public
-    {$IF COMPILERVERSION < 34}function ClientToScreen(const ARect: TRect): TRect; overload;{$IFEND}
-    {$IF COMPILERVERSION < 32}function FCurrentPPI: Integer;{$IFEND}
-    {$IF COMPILERVERSION < 31}procedure ScaleForPPI(ANewPPI: Integer);{$IFEND}
-    {$IF COMPILERVERSION < 33}property CurrentPPI: Integer read GetCurrentPPI;{$IFEND}
-  end;{$IFEND}
 
-{$IF COMPILERVERSION < 34}TScreenHelper = class helper for TScreen
-  public
-    function DefaultPixelsPerInch: Integer;
-  end;{$IFEND}
 
-{$IF COMPILERVERSION < 32}TThreadHelper = class helper for TThread
-  public
-    class procedure ForceQueue(const AThread: TThread; const AThreadProc: TThreadProcedure; ADelay: Integer = 0); overload; static;
-  end;{$IFEND}
 
-{$IF COMPILERVERSION < 33}TCustomStyleServicesHelper = class helper for TCustomStyleServices
-  public
-    function DrawElement(ADC: HDC; ADetails: TThemedElementDetails; const AR: TRect; AClipRect: PRect = nil; ADPI: Integer = 0): Boolean; overload;
-  end;{$IFEND}
 
-{$IF COMPILERVERSION < 36}TFontHelper = class helper for TFont
-  strict private
-{$IF COMPILERVERSION < 36}function GetIsDPIRelated: Boolean;{$IFEND}
-{$IF COMPILERVERSION < 36}function GetIsScreenFont: Boolean;{$IFEND}
-{$IF COMPILERVERSION < 36}procedure SetIsDPIRelated(const AValue: Boolean);{$IFEND}
-{$IF COMPILERVERSION < 36}procedure SetIsScreenFont(const AValue: Boolean);{$IFEND}
-  public
-{$IF COMPILERVERSION < 36}property IsDPIRelated: Boolean read GetIsDPIRelated write SetIsDPIRelated;{$IFEND}
-{$IF COMPILERVERSION < 36}property IsScreenFont: Boolean read GetIsScreenFont write SetIsScreenFont;{$IFEND}
-  end;{$IFEND}
 
-{$IF COMPILERVERSION < 34}function StyleServices(AControl: TControl = nil): TCustomStyleServices;{$IFEND}
 
-{$IF COMPILERVERSION < 33}function GetSystemMetricsForDpi(nIndex: Integer; dpi: UINT): Integer; stdcall;{$IFEND}
 
 function Bounds(ALeft, ATop, ARight, ABottom: Int64): TRect; overload;inline;
 
@@ -256,23 +207,9 @@ begin
   Result := Objects[Int32(AIndex)];
 end;
 
-{$IF COMPILERVERSION < 31}function TStringsHelper.GetUseLocale: Boolean;
-begin
-  Result := False;
-end;{$IFEND}
 
-{$IF COMPILERVERSION < 31}function TStringsHelper.GetTrailingLineBreak: Boolean;
-begin
-  Result := False;
-end;{$IFEND}
 
-{$IF COMPILERVERSION < 31}procedure TStringsHelper.SetUseLocale(const AValue: Boolean);
-begin
-end;{$IFEND}
 
-{$IF COMPILERVERSION < 31}procedure TStringsHelper.SetTrailingLineBreak(const AValue: Boolean);
-begin
-end;{$IFEND}
 
 procedure TStringsHelper.SetItemsNative(const AIndex: NativeInt; const AValue: string);
 begin
@@ -284,85 +221,27 @@ begin
   Objects[Int32(AIndex)] := AValue;
 end;
 
-{$IF COMPILERVERSION < 31}function TStringsHelper.Updating: Boolean;
-begin
-  Result := UpdateCount > 0;
-end;{$IFEND}
 
 { TControlHelper }
 
-{$IF COMPILERVERSION < 34}function TControlHelper.ClientToScreen(const ARect: TRect): TRect;
-var
-  lOrigin: TPoint;
-begin
-  Result := ARect;
-  lOrigin := ClientOrigin;
-  OffsetRect(Result, lOrigin.X, lOrigin.Y);
-end;{$IFEND}
 
-{$IF COMPILERVERSION < 32}function TControlHelper.FCurrentPPI: Integer;
-begin
-  Result := Screen.PixelsPerInch;
-end;{$IFEND}
 
-{$IF COMPILERVERSION < 33}function TControlHelper.GetCurrentPPI: Integer;
-begin
-  Result := Screen.PixelsPerInch;
-end;{$IFEND}
 
-{$IF COMPILERVERSION < 31}procedure TControlHelper.ScaleForPPI(ANewPPI: Integer);
-begin
-end;{$IFEND}
 
 { TScreenHelper }
 
-{$IF COMPILERVERSION < 34}function TScreenHelper.DefaultPixelsPerInch: Integer;
-begin
-  Result := Winapi.Windows.USER_DEFAULT_SCREEN_DPI;
-end;{$IFEND}
 
-{$IF COMPILERVERSION < 32}class procedure TThreadHelper.ForceQueue(const AThread: TThread; const AThreadProc: TThreadProcedure; ADelay: Integer);
-begin
-  TThread.Queue(AThread, AThreadProc);
-end;{$IFEND}
 
 { TCustomStyleServicesHelper }
 
-{$IF COMPILERVERSION < 33}function TCustomStyleServicesHelper.DrawElement(ADC: HDC; ADetails: TThemedElementDetails; const AR: TRect; AClipRect: PRect; ADPI: Integer): Boolean;
-begin
-  Result := DrawElement(ADC, ADetails, AR, AClipRect);
-end;{$IFEND}
 
 { TFontHelper }
 
-{$IF COMPILERVERSION < 36}function TFontHelper.GetIsDPIRelated: Boolean;
-begin
-  Result := False;
-end;{$IFEND}
 
-{$IF COMPILERVERSION < 36}function TFontHelper.GetIsScreenFont: Boolean;
-begin
-  Result := False;
-end;{$IFEND}
 
-{$IF COMPILERVERSION < 36}procedure TFontHelper.SetIsDPIRelated(const AValue: Boolean);
-begin
-end;{$IFEND}
 
-{$IF COMPILERVERSION < 36}procedure TFontHelper.SetIsScreenFont(const AValue: Boolean);
-begin
-end;{$IFEND}
 
-{$IF COMPILERVERSION < 34}function StyleServices(AControl: TControl): TCustomStyleServices;
-begin
-  Result := Vcl.Themes.StyleServices;
-end;{$IFEND}
 
-{$IF COMPILERVERSION < 33}
-{$WARN SYMBOL_PLATFORM OFF}
-function GetSystemMetricsForDpi(nIndex: Integer; dpi: UINT): Integer; stdcall; external 'user32.dll' name 'GetSystemMetricsForDpi' delayed;
-{$WARN SYMBOL_PLATFORM ON}
-{$IFEND}
 
 function Bounds(ALeft, ATop, ARight, ABottom: Int64): TRect;
 begin

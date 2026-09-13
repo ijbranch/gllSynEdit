@@ -130,6 +130,12 @@ function CeilOfIntDiv(Dividend, Divisor: Int32): Int32; overload;
 // In Windows Vista or later use the Consolas font
 function DefaultFontName: string;
 
+/// <summary>Returns the GDI weight to use for the given font: FW_BOLD when the
+/// font is styled bold, otherwise the weight the installed face actually
+/// reports.</summary>
+/// <param name="Font">The font whose face name and style are inspected.</param>
+/// <returns>A GDI FW_* weight; FW_NORMAL if no device context is available or
+/// the face reports nothing.</returns>
 function GetCorrectFontWeight(Font: TFont): TSynNativeInt;
 
 // Calculates the difference between two lines
@@ -831,9 +837,11 @@ end;
 
 function WeightEnumFontsProc(EnumLogFontExDV: PEnumLogFontExDV;
   EnumTextMetric: PEnumTextMetric;
-  FontType: DWORD; LParam: LPARAM): Integer; stdcall;
+  FontType: DWORD; AData: LPARAM): Integer; stdcall;
 begin;
-  PInteger(LPARAM)^ :=  EnumLogFontExDV.elfEnumLogfontEx.elfLogFont.lfWeight;
+  // AData points at a TSynNativeInt, so write the whole width - the old
+  // PInteger wrote only the low 4 bytes of an 8-byte target
+  PSynNativeInt(AData)^ := EnumLogFontExDV.elfEnumLogfontEx.elfLogFont.lfWeight;
   Result := 0;
 end;
 
@@ -848,11 +856,15 @@ begin
   begin
     Result := FW_NORMAL;
     DC := GetDC(0);
-    FillChar(LogFont, SizeOf(LogFont), 0);
-    LogFont.lfCharSet := DEFAULT_CHARSET;
-    StrPLCopy(LogFont.lfFaceName, Font.Name, Length(LogFont.lfFaceName) - 1);
-    EnumFontFamiliesEx(DC, LogFont, @WeightEnumFontsProc, LPARAM(@Result), 0);
-    ReleaseDC(0, DC);
+    if DC = 0 then Exit;
+    try
+      FillChar(LogFont, SizeOf(LogFont), 0);
+      LogFont.lfCharSet := DEFAULT_CHARSET;
+      StrPLCopy(LogFont.lfFaceName, Font.Name, Length(LogFont.lfFaceName) - 1);
+      EnumFontFamiliesEx(DC, LogFont, @WeightEnumFontsProc, LPARAM(@Result), 0);
+    finally
+      ReleaseDC(0, DC);
+    end;
   end;
 end;
 

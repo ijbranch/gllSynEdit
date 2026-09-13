@@ -1,4 +1,4 @@
-{------------------------------------------------------------------------------
+﻿{------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -106,7 +106,10 @@ type
     function FuncProperty: TtkTokenKind;
     function FuncTypeScoped: TtkTokenKind;
     function FuncType: TtkTokenKind;
-    function HashKey(Str: PWideChar): NativeInt;
+    /// <summary>Hashes the identifier at <c>Str</c> to an index into
+    /// <c>fIdentFuncTable</c>. Unsigned: the accumulator is deliberately allowed
+    /// to wrap, and a signed type would yield a negative remainder.</summary>
+    function HashKey(Str: PWideChar): Cardinal;
     function IdentKind(MayBe: PWideChar): TtkTokenKind;
     procedure InitIdent;
     procedure AddressOpProc;
@@ -148,12 +151,17 @@ type
 
     function GetDefaultAttribute(Index: Integer): TSynHighlighterAttributes; override;
     function GetEol: Boolean; override;
+    /// <summary>Returns the cross-line scanner state: the range ordinal in the
+    /// low byte and the pending block-comment terminator in bit 8.</summary>
     function GetRange: Pointer; override;
     function GetTokenAttribute: TSynHighlighterAttributes; override;
     function GetTokenID: TtkTokenKind;
     function GetTokenKind: TSynNativeInt; override;
     procedure Next; override;
+    /// <summary>Resets the scanner to the start-of-document state, including the
+    /// block-comment terminator.</summary>
     procedure ResetRange; override;
+    /// <summary>Restores the scanner state packed by <see cref="GetRange"/>.</summary>
     procedure SetRange(Value: Pointer); override;
     function IsIdentChar(AChar: WideChar): Boolean; override;
 
@@ -298,6 +306,7 @@ begin
 
   InitIdent;
   FRange := rsUnknown;
+  FCommentClose := ')';
   FAsmStart := False;
   FDefaultFilter := SYNS_FilterDWS;
 
@@ -322,7 +331,7 @@ end;
   {$OVERFLOWCHECKS OFF}
   {$DEFINE OVERFLOWCHECK_ON}
 {$ENDIF}
-function TSynDWSSyn.HashKey(Str: PWideChar): NativeInt;
+function TSynDWSSyn.HashKey(Str: PWideChar): Cardinal;
 var
   C: Word;
 begin
@@ -336,7 +345,7 @@ begin
       Inc(Str);
    end;
    fStringLen := Str - fToIdent;
-   Result := Result mod Length(fIdentFuncTable);
+   Result := Result mod ToUInt32(Length(fIdentFuncTable));
 end;
 {$IFDEF OVERFLOWCHECK_ON}
   {$OVERFLOWCHECKS ON}
@@ -345,11 +354,11 @@ end;
 
 function TSynDWSSyn.IdentKind(MayBe: PWideChar): TtkTokenKind;
 var
-  Key: NativeInt;
+  Key: Cardinal;
 begin
   fToIdent := MayBe;
   Key := HashKey(MayBe);
-  if Key <= High(fIdentFuncTable) then
+  if Key <= Cardinal(High(fIdentFuncTable)) then
     Result := fIdentFuncTable[Key]
   else
     Result := tkIdentifier;
@@ -357,9 +366,13 @@ end;
 
 procedure TSynDWSSyn.InitIdent;
 
-  procedure SetIdentFunc(h: NativeInt; const func: TIdentFuncTableFunc);
+  // Cardinal, matching HashKey: taking a signed parameter here is what let the
+  // NativeInt regression write outside the table on Win64, and on Win32 it costs
+  // a W1071 narrowing on every call.
+  procedure SetIdentFunc(h: Cardinal; const func: TIdentFuncTableFunc);
   begin
-    fIdentFuncTable[h]:=func;
+    if h <= Cardinal(High(fIdentFuncTable)) then
+      fIdentFuncTable[h]:=func;
   end;
 
 var
@@ -870,7 +883,7 @@ end;
 procedure TSynDWSSyn.StringAposMultiProc;
 begin
   fTokenID := tkString;
-  if (Run>0) or IsLineEnd(Run+1) then
+  if (Run > 0) or (IsLineEnd(Run + 1) and (fLine[Run] <> '''')) then
      Inc(Run);
   fRange := rsHereDocSingle;
   while not IsLineEnd(Run) do
@@ -1036,8 +1049,16 @@ begin
 end;
 
 function TSynDWSSyn.GetRange: Pointer;
+var
+  Value: NativeInt;
 begin
-  Result := Pointer(fRange);
+  // The range ordinal lives in the low byte, so that the plain
+  // TRangeState(GetLineRange(...)) casts elsewhere keep working; bit 8 carries
+  // fCommentClose, which rsAnsi alone cannot distinguish.
+  Value := NativeInt(Ord(fRange));
+  if fCommentClose = '/' then
+    Value := Value or $100;
+  Result := Pointer(Value);
 end;
 
 type
@@ -1186,7 +1207,6 @@ begin
        IsMultiLineStatement(Line, [rsAsm, rsAnsiAsm, rsBorAsm, rsDirectiveAsm], True, FT_Asm) or
        IsMultiLineStatement(Line, [rsHereDocDouble], True, FT_HereDocDouble)  or
        IsMultiLineStatement(Line, [rsHereDocSingle], True, FT_HereDocSingle)  or
-       IsMultiLineStatement(Line, [rsHereDocSingle], True, FT_HereDocSingle)  or
        IsMultiLineStatement(Line, [rsBor], True, FT_Comment) or
        IsMultiLineStatement(Line, [rsDirective], False)
     then
@@ -1304,12 +1324,17 @@ end;
 
 procedure TSynDWSSyn.SetRange(Value: Pointer);
 begin
-  fRange := TRangeState(Value);
+  fRange := TRangeState(NativeInt(Value) and $FF);
+  if (NativeInt(Value) and $100) <> 0 then
+    fCommentClose := '/'
+  else
+    fCommentClose := ')';
 end;
 
 procedure TSynDWSSyn.ResetRange;
 begin
   fRange:= rsUnknown;
+  fCommentClose := ')';
 end;
 
 function TSynDWSSyn.GetSampleSource: string;
@@ -1350,7 +1375,7 @@ end;
 
 function TSynDWSSyn.IsFilterStored: Boolean;
 begin
-  Result := fDefaultFilter <> SYNS_FilterPascal;
+  Result := fDefaultFilter <> SYNS_FilterDWS;
 end;
 
 // IsCurrentToken

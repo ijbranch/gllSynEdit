@@ -527,7 +527,11 @@ end;
 
 destructor TSynSpellCheck.Destroy;
 begin
-  GlobalInstance := nil;
+  // A rejected construction (singleton guard in Create) still runs this
+  // destructor on the half-built instance - it must not clear the class-wide
+  // reference that belongs to the instance which is still alive
+  if GlobalInstance = Self then
+    GlobalInstance := nil;
   // Detach via RemoveEditor so each editor's plugin is freed too - a surviving
   // plugin would keep a dangling reference to this component
   if Assigned(FEditors) then
@@ -679,8 +683,8 @@ function TSynSpellCheck.SpellCheckLine(Editor: TCustomSynEdit; Line:
     CheckOSError(SpellChecker.Check(PChar(Token), SpellingErrors));
     while SpellingErrors.Next(SpellingError) = S_OK do
     begin
-      SpellingError.Get_StartIndex(StartIndex);
-      SpellingError.Get_Length(Len);
+      CheckOSError(SpellingError.Get_StartIndex(StartIndex));
+      CheckOSError(SpellingError.Get_Length(Len));
 
       if ToSynNativeInt(StartIndex) + 1 < StartChar then Continue;
       if ToSynNativeInt(StartIndex + Len) > EndChar then Break;
@@ -956,15 +960,19 @@ var
   AWord: string;
   Ed: TCustomSynEdit;
   Indicator: TSynIndicator;
+  SC: ISpellChecker;
 begin
   Ed := TCustomSynEdit(Target);
   if Ed.Indicators.IndicatorAtPos(Ed.CaretXY, Indicator) and
     (Indicator.Id = TSynSpellCheck.SpellErrorIndicatorId) then
   begin
-    Ed.Indicators.Clear(Ed.CaretY, Indicator);
+    SC := TSynSpellCheck.GlobalInstance.SpellChecker;
+    if not Assigned(SC) then Exit;
     AWord := Copy(Ed.Lines[Ed.CaretY - 1], Indicator.CharStart,
        Indicator.CharEnd - Indicator.CharStart);
-    TSynSpellCheck.GlobalInstance.SpellChecker.Add(PChar(AWord));
+    CheckOSError(SC.Add(PChar(AWord)));
+    // Only drop the squiggle once the word really was added
+    Ed.Indicators.Clear(Ed.CaretY, Indicator);
   end;
 end;
 
@@ -1012,15 +1020,19 @@ var
   AWord: string;
   Ed: TCustomSynEdit;
   Indicator: TSynIndicator;
+  SC: ISpellChecker;
 begin
   Ed := TCustomSynEdit(Target);
   if Ed.Indicators.IndicatorAtPos(Ed.CaretXY, Indicator) and
     (Indicator.Id = TSynSpellCheck.SpellErrorIndicatorId) then
   begin
-    Ed.Indicators.Clear(Ed.CaretY, Indicator);
+    SC := TSynSpellCheck.GlobalInstance.SpellChecker;
+    if not Assigned(SC) then Exit;
     AWord := Copy(Ed.Lines[Ed.CaretY - 1], Indicator.CharStart,
        Indicator.CharEnd - Indicator.CharStart);
-    TSynSpellCheck.GlobalInstance.SpellChecker.Ignore(PChar(AWord));
+    CheckOSError(SC.Ignore(PChar(AWord)));
+    // Only drop the squiggle once the word really was ignored
+    Ed.Indicators.Clear(Ed.CaretY, Indicator);
   end;
 end;
 

@@ -58,7 +58,7 @@ type
     FUnknownAttri: TSynHighlighterAttributes;
     function IdentKind(MayBe: PWideChar): TtkTokenKind;
     function IsAtLineStart: Boolean;
-    function RestIsBlank(FromPos: Integer): Boolean;
+    function RestIsBlank(FromPos: TSynNativeInt): Boolean;
     procedure UpdateValueState;
     procedure BlockCommentProc;
     procedure CommentProc;
@@ -213,7 +213,7 @@ end;
 
 function TSynMatlabSyn.IsAtLineStart: Boolean;
 var
-  I: Integer;
+  I: TSynNativeInt;
 begin
   for I := 0 to Run - 1 do
     if FLine[I] > ' ' then
@@ -221,9 +221,9 @@ begin
   Result := True;
 end;
 
-function TSynMatlabSyn.RestIsBlank(FromPos: Integer): Boolean;
+function TSynMatlabSyn.RestIsBlank(FromPos: TSynNativeInt): Boolean;
 var
-  P: Integer;
+  P: TSynNativeInt;
 begin
   P := FromPos;
   while not CharInSet(FLine[P], [#0, #10, #13]) do
@@ -315,7 +315,7 @@ end;
 
 procedure TSynMatlabSyn.BlockCommentProc;
 var
-  P: Integer;
+  P: TSynNativeInt;
 begin
   if (Run = FTokenPos) and CharInSet(FLine[Run], [#0, #10, #13]) then
   begin

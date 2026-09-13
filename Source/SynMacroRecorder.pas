@@ -54,6 +54,7 @@ resourcestring
   sCannotPlay = 'Cannot playback macro; already playing or recording';
   sCannotPause = 'Can only pause when recording';
   sCannotResume = 'Can only resume when paused';
+  sCannotHandleCharOrData = 'TSynBasicEvent cannot handle Char <> #0 or Data <> nil';
 
 type
   TSynMacroState = (msStopped, msRecording, msPlaying, msPaused);
@@ -130,7 +131,12 @@ type
   public
     procedure Initialize(aCmd: TSynEditorCommand; aChar: WideChar; aData: Pointer);
       override;
+    /// <summary>Reads the repeat count and the caret position, the latter as two
+    /// fixed-width Int64 fields so that a macro stream is portable between Win32
+    /// and Win64.</summary>
     procedure LoadFromStream(aStream: TStream); override;
+    /// <summary>Writes the command and repeat count, then the caret position as two
+    /// fixed-width Int64 fields. Symmetrical with <see cref="LoadFromStream"/>.</summary>
     procedure SaveToStream(aStream: TStream); override;
     procedure Playback(aEditor: TCustomSynEdit); override;
   public
@@ -143,7 +149,11 @@ type
   public
     procedure Initialize(aCmd: TSynEditorCommand; aChar: WideChar; aData: Pointer);
       override;
+    /// <summary>Reads the repeat count and clears Data. A recorded address belongs
+    /// to the process that recorded it, so it is never restored.</summary>
     procedure LoadFromStream(aStream: TStream); override;
+    /// <summary>Writes the command and repeat count only. Data is a live process
+    /// address and is deliberately not persisted.</summary>
     procedure SaveToStream(aStream: TStream); override;
     procedure Playback(aEditor: TCustomSynEdit); override;
   end;
@@ -260,7 +270,8 @@ end;
 
 procedure TSynDataEvent.LoadFromStream(aStream: TStream);
 begin
-  aStream.Read(fData, SizeOf(fData));
+  inherited;
+  fData := nil;      // a recorded address is meaningless in a new process
 end;
 
 procedure TSynDataEvent.Playback(aEditor: TCustomSynEdit);
@@ -271,7 +282,7 @@ end;
 procedure TSynDataEvent.SaveToStream(aStream: TStream);
 begin
   inherited;
-  aStream.Write(fData, SizeOf(fData));
+  // fData is a live process address and is deliberately not persisted.
 end;
 
 { TCustomSynMacroRecorder }
@@ -440,10 +451,12 @@ begin
   Stop;
   if aClear then
     Clear;
-  fEvents := TList.Create;
+  if fEvents = nil then
+    fEvents := TList.Create;
   aSrc.Read(cnt, sizeof(cnt));
   i := 0;
-  fEvents.Capacity := TSynNativeInt(aSrc.Size div SizeOf(TSynEditorCommand));
+  fEvents.Capacity := fEvents.Count +
+    TSynNativeInt(aSrc.Size div SizeOf(TSynEditorCommand));
   while (aSrc.Position < aSrc.Size) and (i < cnt) do
   begin
     aSrc.Read(iCommand, SizeOf(TSynEditorCommand));
@@ -748,7 +761,7 @@ begin
   Command := aCmd;
 {$IFDEF SYN_DEVELOPMENT_CHECKS}
   if (aChar <> #0) or (aData <> nil) then
-    raise Exception.Create('TSynBasicEvent cannot handle Char <> #0 or Data <> nil');
+    raise ESynError.Create(sCannotHandleCharOrData);
 {$ENDIF}
 end;
 
@@ -875,8 +888,14 @@ begin
 end;
 
 procedure TSynPositionEvent.LoadFromStream(aStream: TStream);
+var
+  LChar, LLine: Int64;
 begin
-  aStream.Read(fPosition, SizeOf(Position));
+  inherited;
+  aStream.Read(LChar, SizeOf(LChar));
+  aStream.Read(LLine, SizeOf(LLine));
+  fPosition.Char := TSynNativeInt(LChar);
+  fPosition.Line := TSynNativeInt(LLine);
 end;
 
 procedure TSynPositionEvent.Playback(aEditor: TCustomSynEdit);
@@ -888,9 +907,14 @@ begin
 end;
 
 procedure TSynPositionEvent.SaveToStream(aStream: TStream);
+var
+  LChar, LLine: Int64;
 begin
   inherited;
-  aStream.Write(Position, SizeOf(Position));
+  LChar := fPosition.Char;
+  LLine := fPosition.Line;
+  aStream.Write(LChar, SizeOf(LChar));
+  aStream.Write(LLine, SizeOf(LLine));
 end;
 
 { TSynStringEvent }

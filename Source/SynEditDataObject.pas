@@ -1,4 +1,4 @@
-unit SynEditDataObject;
+﻿unit SynEditDataObject;
 {
   The contents of this file are subject to the Mozilla Public License
   Version 1.1 (the "License"); you may not use this file except in compliance
@@ -79,6 +79,17 @@ function MakeGlobal (const S: string): hGlobal; overload;
 function MakeGlobal (var P; Size: NativeInt): hGlobal; overload;
 function HasFormat(DataObject: IDataObject; Format: TClipFormat): Boolean;
 function GetInternalClipText: TArray<string>;
+/// <summary>
+///   Initialises OLE for the calling thread on first use. Deferred out of the
+///   unit initialization section, which runs under the loader lock in a runtime
+///   package, where COM initialisation is unsafe.
+/// </summary>
+/// <remarks>
+///   Safe to call repeatedly. If the host already owns COM in another apartment
+///   model (RPC_E_CHANGED_MODE) the ownership is left with the host and the
+///   finalization section does not uninitialise it.
+/// </remarks>
+procedure EnsureOleInitialised;
 
 const
   IntClipFormatDelimiter = #$EEFF;   // from private unicode area
@@ -90,11 +101,34 @@ var
 implementation
 
 uses
+  System.SyncObjs,
+  System.Win.ComObj,
   Vcl.Clipbrd,
   SynEdit,
   SynEditTypes,
   SynExportHTML,
   SynFunc;
+
+var
+  // 0 = not attempted, 1 = initialised here (we own it), -1 = attempted and the
+  // host owns OLE, so it must not be uninitialised on our behalf.
+  GOleInitialised: Integer = 0;
+
+procedure EnsureOleInitialised;
+var
+  LResult: HResult;
+begin
+  if TInterlocked.CompareExchange(GOleInitialised, 1, 0) = 0 then
+  begin
+    LResult := OleInitialize(nil);
+    if Failed(LResult) then
+    begin
+      TInterlocked.Exchange(GOleInitialised, -1);
+      if LResult <> RPC_E_CHANGED_MODE then
+        OleCheck(LResult);
+    end;
+  end;
+end;
 
 function MakeGlobal (const S: string): hGlobal;
 var
@@ -187,6 +221,8 @@ var
 
 begin
   inherited Create;
+
+  EnsureOleInitialised;
 
   Ed := ASynEdit as TCustomSynEdit;
 
@@ -392,10 +428,15 @@ end;
 const
   CF_HTML = 'HTML Format';
 initialization
-  OleInitialize(nil);
+  // OLE is initialised on first use by EnsureOleInitialised, not here: this unit
+  // ships in a runtime package, whose initialization runs under the loader lock.
+  // RegisterClipboardFormat is safe there.
   SynEditClipboardFormat := RegisterClipboardFormat ('Internal SynEdit clipboard format');
   HTMLClipboardFormat := RegisterClipboardFormat(CF_HTML);
 finalization
-  OleFlushClipboard;
-  OleUninitialize;
+  if GOleInitialised = 1 then
+  begin
+    OleFlushClipboard;
+    OleUninitialize;
+  end;
 end.

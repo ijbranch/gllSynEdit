@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+﻿{-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
@@ -71,6 +71,8 @@ type
     procedure LFProc;
     procedure NullProc;
     procedure NumberProc;
+    /// <summary>Scans an ECMAScript private name (#name) as a single identifier token.</summary>
+    procedure PrivateNameProc;
     procedure RegexProc;
     procedure SlashProc;
     procedure SpaceProc;
@@ -376,6 +378,14 @@ begin
     Inc(Run);
 end;
 
+procedure TSynTypeScriptSyn.PrivateNameProc;
+begin
+  Inc(Run); // consume '#' - guarantees progress
+  while IsIdentChar(FLine[Run]) do
+    Inc(Run);
+  FTokenID := tkIdentifier;
+end;
+
 procedure TSynTypeScriptSyn.RegexProc;
 var
   InClass: Boolean;
@@ -584,6 +594,7 @@ begin
       #13: CRProc;
       #1..#9, #11, #12, #14..#32: SpaceProc;
       'A'..'Z', 'a'..'z', '_', '$': IdentProc;
+      '#': PrivateNameProc;
       '0'..'9': NumberProc;
       '/': SlashProc;
       '"', '''': StringProc;
@@ -596,6 +607,8 @@ begin
       '@': DecoratorProc;
       '+', '-', '*', '%', '=', '<', '>', '!', '&', '|', '^', '~', '?', ':',
       ';', ',', '.', '(', ')', '[', ']', '{', '}': SymbolProc;
+      #$0080..#$FFFF:
+        if IsIdentChar(FLine[Run]) then IdentProc else UnknownProc;
     else
       UnknownProc;
     end;

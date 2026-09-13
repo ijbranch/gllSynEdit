@@ -1068,15 +1068,9 @@ begin
   FFont := TFont.Create;
   FFont.Name := DefaultFontName;
   FFont.Style := [];
-{$IF COMPILERVERSION <= 33}
-  FFont.PixelsPerInch := Screen.PixelsPerInch;
-{$ELSE}
   FFont.PixelsPerInch := Screen.DefaultPixelsPerInch;
-{$ENDIF}
   FFont.Size := 8;
-  {$IF CompilerVersion >= 36}
-  FFont.IsScreenFont := True;
-  {$IFEND CompilerVersion >= 36}
+    FFont.IsScreenFont := True;
   FUseFontStyle := True;
   FFont.OnChange := FontChanged;
   FontChanged(Self);
@@ -1585,11 +1579,7 @@ begin
     FInternalGlyph.AlphaFormat := afDefined;
   end;
 
-{$IF COMPILERVERSION <= 33}
-  FPPI := Screen.PixelsPerInch;
-{$ELSE}
   FPPI := Screen.DefaultPixelsPerInch;
-{$ENDIF}
 
   FVisible := True;
   FGlyph := TBitmap.Create;
@@ -1835,15 +1825,9 @@ begin
     ScaledW := MulDiv(FWidth, FPPI, 96);
     ScaledH := MulDiv(FHeight, FPPI, 96);
 
-  {$IF COMPILERVERSION <= 30}
-    rcSrc := TRectF.Create(Rect(Number * FWidth, 0, (Number + 1) * FWidth, FHeight));
-    rcDest := TRectF.Create(Rect(0, 0, ScaledW, ScaledH));
-    rcDest := rcDest.FitInto(TRectF.Create(Rect(X, Y, X + ScaledW, Y + LineHeight)));
-  {$ELSE}
-    rcSrc := Rect(Number * FWidth, 0, (Number + 1) * FWidth, FHeight);
+      rcSrc := Rect(Number * FWidth, 0, (Number + 1) * FWidth, FHeight);
     rcDest := Rect(0, 0, ScaledW, ScaledH);
     rcDest := rcDest.FitInto(Rect(X, Y, X + ScaledW, Y + LineHeight));
-  {$ENDIF}
 
     BM := D2D1BitmapFromBitmap(FImages, RT);
     RT.DrawBitmap(BM, PD2D1RectF(@rcDest), 1,
@@ -2443,23 +2427,14 @@ begin
     then
     begin
       // paint wrapped line glyphs
-    {$IF COMPILERVERSION <= 30}
-      RectF := TRectF.Create(LineRect);
-      RectF := TRectF.Create(Rect(0, 0, 0, 0));
-    {$ELSE}
-      RectF := LineRect;
+          RectF := LineRect;
       RectF := Rect(0, 0, 0, 0);
-    {$ENDIF}
       RectF.Size := SynEdit.WordWrapGlyph.Size;
       RectF.Offset(LineRect.Left + LineRect.Width - RectF.Width,
         LineRect.Top + (LineRect.Height - RectF.Height) / 2);
       if not LineRect.Contains(RectF.Round) then
       begin
-      {$IF COMPILERVERSION <= 30}
-        RectF := RectF.FitInto(TRectF.Create(LineRect));
-      {$ELSE}
-        RectF := RectF.FitInto(LineRect);
-      {$ENDIF}
+              RectF := RectF.FitInto(LineRect);
         RectF.Offset(LineRect.Right - RectF.Right, 0);
       end;
       RT.DrawBitmap(WordWrapGlyph, PD2D1RectF(@RectF), 1000);
@@ -4411,9 +4386,7 @@ begin
   FFont := TFont.Create;
   FFont.Name := DefaultFontName;
   FFont.Size := 10;
-  {$IF CompilerVersion >= 36}
-  FFont.IsScreenFont := True;
-  {$ENDIF}
+    FFont.IsScreenFont := True;
   FColor := clWindow;
   FOptions := SYNEDIT_DEFAULT_OPTIONS;
   FScrollOptions := SYNEDIT_DEFAULT_SCROLLOPTIONS;

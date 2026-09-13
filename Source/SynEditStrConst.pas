@@ -1,4 +1,4 @@
-{-------------------------------------------------------------------------------
+﻿{-------------------------------------------------------------------------------
 Version 1.1 (the "License"); you may not use this file except in compliance
 with the License. You may obtain a copy of the License at
 http://www.mozilla.org/MPL/
@@ -270,6 +270,15 @@ resourcestring
   SYNS_NoSearchEngineError      = 'No search engine has been assigned';
   SYNS_SaveError                = 'Saving highlighter to file "%s" failed';
   SYNS_LoadError                = 'Loading highlighter from file "%s" failed';
+  SYNS_ERegisterDragDropFailed  = 'RegisterDragDrop failed with HRESULT $%.8x; ' +
+                                  'the editor will not accept drops';
+  SYNS_EInvalidFontMetrics      = 'The font "%s" reports designUnitsPerEm = 0; ' +
+                                  'its metrics cannot be used';
+  SYNS_ECannotInsertItemAt      = 'Cannot insert a completion item at position %d';
+  SYNS_EScrollBarsOwner         = 'TSynEditScrollBars requires a TCustomSynEdit owner';
+  SYNS_ESearchPatternEmpty      = 'The search pattern is empty';
+  SYNS_EWordWrapOwner           = 'The owner of a TSynWordWrapPlugin must be a TCustomSynEdit';
+  SYNS_EInvalidNumber           = 'Invalid number';
 
   SYNS_Untitled                 = 'Untitled';
   SYNS_Line                     = 'Line';
@@ -511,7 +520,8 @@ resourcestring
   SYNS_FilterLLVMIR             =  'LLVM IR files (*.ll)|*.ll';
   SYNS_FilterURI                =  'All Files (*.*)|*.*';
   SYNS_FilterVrml97             =  'Vrml97/X3D World (*.wrl;*.wrml;*.vrl;*.vrml;*.x3d)|*.wrl;*.wrml;*.vrl;*.vrml;*.x3d';
-  SYNS_FilterYAML               =  'YAML files (*.yaml)|*.yaml';
+  SYNS_FilterYAML               =  'YAML files (*.yaml;*.yml)|*.yaml;*.yml';
+  SYNS_FilterMarkdown           =  'Markdown Files (*.md;*.markdown)|*.md;*.markdown';
 
   // friendly language names
   SYNS_FriendlyLangHP48                 =  'HP48';

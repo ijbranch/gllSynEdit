@@ -1,4 +1,4 @@
-unit SynAccessibility;
+﻿unit SynAccessibility;
 {-------------------------------------------------------------------------------
 The contents of this file are subject to the Mozilla Public License
 Version 1.1 (the "License"); you may not use this file except in compliance
@@ -322,6 +322,9 @@ type
     function AddToSelection: HResult; stdcall;
     function RemoveFromSelection: HResult; stdcall;
     function ScrollIntoView(alignToTop: BOOL): HResult; stdcall;
+    /// <summary>Returns an empty SAFEARRAY of children (a text range has none).</summary>
+    /// <param name="RetVal">Receives the empty array, or nil on allocation failure.</param>
+    /// <returns>S_OK when the array was created, E_OUTOFMEMORY when it was not.</returns>
     function GetChildren(out RetVal: PSafeArray): HResult; stdcall;
   public
     constructor Create(ASynEdit: TCustomSynEdit; ABB, ABE: TBufferCoord);
@@ -346,7 +349,13 @@ type
     function Get_Value(out RetVal: WideString): HResult; stdcall;
     function Get_IsReadOnly(out RetVal: BOOL): HResult; stdcall;
     // ITextProvider
+    /// <summary>Returns a one-element SAFEARRAY holding a text range over the current selection.</summary>
+    /// <param name="RetVal">Receives the array, or nil if it could not be created or populated.</param>
+    /// <returns>S_OK on success, otherwise an error code.</returns>
     function GetSelection(out RetVal: PSafeArray): HResult; stdcall;
+    /// <summary>Returns a one-element SAFEARRAY holding a text range over the visible lines.</summary>
+    /// <param name="RetVal">Receives the array, or nil if it could not be created or populated.</param>
+    /// <returns>S_OK on success, otherwise an error code.</returns>
     function GetVisibleRanges(out RetVal: PSafeArray): HResult; stdcall;
     function RangeFromChild(const childElement: IRawElementProviderSimple;
                             out RetVal: ITextRangeProvider): HResult; stdcall;
@@ -513,9 +522,12 @@ begin
   TextRange := TSynTextRangeProvider.Create(FSynEdit, FSynEdit.BlockBegin,
     FSynEdit.BlockEnd) as IUnknown;
   Index := 0;
-  Result := SafeArrayPutElement(RetVal, Index, Pointer(TextRange)^);
+  Result := SafeArrayPutElement(RetVal, Index, TextRange);
   if Result <> S_OK then
+  begin
     SafeArrayDestroy(RetVal);
+    RetVal := nil;
+  end;
 end;
 
 function TSynUIAutomationProvider.GetVisibleRanges(
@@ -543,9 +555,12 @@ begin
     FSynEdit.DisplayToBufferPos(DC2)) as IUnknown;
 
   Index := 0;
-  Result := SafeArrayPutElement(RetVal, Index, Pointer(TextRange)^);
+  Result := SafeArrayPutElement(RetVal, Index, TextRange);
   if Result <> S_OK then
+  begin
     SafeArrayDestroy(RetVal);
+    RetVal := nil;
+  end;
 end;
 
 function TSynUIAutomationProvider.Get_DocumentRange(
@@ -1013,9 +1028,9 @@ function TSynTextRangeProvider.GetChildren(out RetVal: PSafeArray): HResult;
 begin
   RetVal := SafeArrayCreateVector(VT_UNKNOWN, 0, 0);
   if RetVal = nil then
-    Result := S_OK
+    Result := E_OUTOFMEMORY
   else
-    Result := S_FALSE;
+    Result := S_OK;
 end;
 
 function TSynTextRangeProvider.GetEnclosingElement(

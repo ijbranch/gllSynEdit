@@ -98,6 +98,8 @@ type
     function IdentKind(MayBe: PWideChar): TtkTokenKind;
     procedure InitIdent;
     procedure AndSymbolProc;
+    /// <summary>Scans a `command` backquote literal as a string.</summary>
+    procedure BackTickProc;
     procedure CRProc;
     procedure ColonProc;
     procedure CommentProc;
@@ -112,11 +114,15 @@ type
     procedure NumberProc;
     procedure OrSymbolProc;
     procedure PlusProc;
+    /// <summary>Scans the q/qq/qw/qx/qr quote-like operators with any
+    /// delimiter, delegating to IdentProc for ordinary 'q' identifiers.</summary>
     procedure qFunctionProc;
     procedure SlashProc;
     procedure SpaceProc;
     procedure StarProc;
+    /// <summary>Scans a double-quoted, interpolating string.</summary>
     procedure StringInterpProc;
+    /// <summary>Scans a single-quoted string, in which only \' and \\ escape.</summary>
     procedure StringLiteralProc;
     procedure StringEndProc;
     procedure SymbolProc;
@@ -939,56 +945,36 @@ end;
 
 procedure TSynPerlSyn.qFunctionProc;                                            //Fiala
 var
-  myBracket: char;
-
-  function GetFirstBracket: char;
-  var
-    I: TSynNativeInt;
-  begin
-    Result := #0;
-    I := Run + 1;
-    while not IsLineEnd(I) do
-    begin
-      if CharInSet(FLine[I], [' ', #8, '(', '{']) then
-        { we will return opening bracket }
-        case FLine[I] of
-          '(': begin
-            Result := ')';
-            Break;
-          end;
-          '{': begin
-            Result := '}';
-            Break;
-          end;
-        end
-      { when other than opening bracket or space, we will stop }
-      else
-        Break;
-      Inc(I)
-    end;
-
-  end;
-
+  Start: TSynNativeInt;
+  OpenDelim, CloseDelim: WideChar;
 begin
-  { qfunction }
-//  myBracket := GetFirstBracket;
-//  if ((Run = 0) or (Run > 0) and (FLine[Run-1] = ' ')) and (myBracket <> #0) then
-  if (FLine[Run+1] = 'q') and (FLine[Run+2] = '(') or  (FLine[Run+1] = '(') then
+  { q, qq, qw, qx and qr take an arbitrary delimiter.  Anything else starting
+    with 'q' is an ordinary identifier ('quotemeta' and friends), which has to
+    go to IdentProc - IdentProc has no 'q' branch, so there is no recursion. }
+  Start := Run + 1;
+  if CharInSet(FLine[Start], ['q', 'w', 'x', 'r']) then Inc(Start);
+  OpenDelim := FLine[Start];
+  { Deliberately NOT IsCharAlphaNumeric: that returns a Windows BOOL, and Delphi's
+    'not' on a LongBool is a bitwise complement, so 'not IsCharAlphaNumeric(x)'
+    is true for every x. }
+  if (OpenDelim > #32) and
+     not CharInSet(OpenDelim, ['a'..'z', 'A'..'Z', '0'..'9',
+                               '_', '=', ',', ';', ')', ']', '}']) then
   begin
-    myBracket := ')';
+    case OpenDelim of
+      '(': CloseDelim := ')';
+      '[': CloseDelim := ']';
+      '{': CloseDelim := '}';
+      '<': CloseDelim := '>';
+    else  CloseDelim := OpenDelim;
+    end;
     fTokenID := tkString;
-    repeat
-      Inc(Run);
-    until (FLine[Run] = myBracket) or IsLineEnd(Run);
-    if not IsLineEnd(Run) then
-      Inc(Run);
+    Run := Start;
+    repeat Inc(Run) until (FLine[Run] = CloseDelim) or IsLineEnd(Run);
+    if not IsLineEnd(Run) then Inc(Run);
   end
   else
-  begin
-  { standard identifier }
-    fTokenID := tkIdentifier;
-    Inc(run);
-  end;
+    IdentProc;
 end;
 
 procedure TSynPerlSyn.SlashProc;
@@ -1043,7 +1029,7 @@ var
   fBackslashCount: TSynNativeInt;
 begin
   { modification for first quote is backshlashed }
-  if (FRange = rsUnknown ) and (FLine[Run - 1] = '\') then                      // Fiala
+  if (FRange = rsUnknown ) and (Run > 0) and (FLine[Run - 1] = '\') then        // Fiala
   begin
     Inc(Run);
     fTokenID := tkSymbol;
@@ -1087,10 +1073,29 @@ begin
   repeat
     case FLine[Run] of
       #0, #10, #13: Break;
+      #92:
+        { Inside a single-quoted string Perl recognises only \' and \\ as
+          escapes; a backslash before anything else is a literal backslash. }
+        if CharInSet(FLine[Run + 1], [#39, #92]) then Inc(Run);
     end;
     Inc(Run);
   until FLine[Run] = #39;
   if FLine[Run] <> #0 then Inc(Run);
+end;
+
+procedure TSynPerlSyn.BackTickProc;
+begin
+  { `command` - a backquoted command runs the command and yields its output,
+    so it scans exactly like a string. }
+  fTokenID := tkString;
+  Inc(Run);                              { skip the opening backtick }
+  while not IsLineEnd(Run) and (FLine[Run] <> '`') do
+  begin
+    if (FLine[Run] = '\') and not IsLineEnd(Run + 1) then
+      Inc(Run);
+    Inc(Run);
+  end;
+  if not IsLineEnd(Run) then Inc(Run);   { skip the closing backtick }
 end;
 
 procedure TSynPerlSyn.SymbolProc;
@@ -1156,6 +1161,7 @@ begin
     '*': StarProc;
     '"': StringInterpProc;
     #39: StringLiteralProc;
+    '`': BackTickProc;
     '^': XOrSymbolProc;
     '(', ')', '[', ']', '\', '{', '}', ',', ';', '?', '~': SymbolProc;
     else UnknownProc;

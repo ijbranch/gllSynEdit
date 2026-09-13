@@ -167,6 +167,10 @@ type
     destructor Destroy; override;
     function Add(Text: string; Font: TFont; Alignment: TAlignment;
       LineNumber: Integer): TSynNativeInt;
+    /// <summary>Removes and frees the header/footer item whose Index property
+    /// matches, if there is one.</summary>
+    /// <param name="Index">The item's own FIndex value, as returned by
+    /// Add.</param>
     procedure Delete(Index: Integer);
     procedure Clear;
     function Count: TSynNativeInt;
@@ -533,12 +537,18 @@ end;
 procedure THeaderFooter.Delete(Index: Integer);
 var
   i: TSynNativeInt;
+  Item: THeaderFooterItem;
 begin
   for i := 0 to FItems.Count - 1 do
   begin
     if THeaderFooterItem(FItems[i]).FIndex = Index then
     begin
+      // FItems is a plain TList and does not own its elements - Clear frees
+      // them by hand - so dropping the pointer alone would leak the item and
+      // the TFont it owns
+      Item := THeaderFooterItem(FItems[i]);
       FItems.Delete(i);
+      Item.Free;
       Break;
     end;
   end;
