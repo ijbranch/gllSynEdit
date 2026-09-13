@@ -11,12 +11,13 @@
 {$ENDIF}
 
 {------------------------------------------------------------------------------}
-{ Pull in all defines from SynEditJedi.inc (must be done after the common      }
-{ compiler defines to  work correctly). Use SynEdit-prefix to avoid problems   }
-{ with other versions of jedi.inc in the search-path.                          }
+{ SynEditJedi.inc was removed here. It detected compilers from Delphi 1 (VER80)}
+{ to Delphi 13 (VER370) in 2,160 lines and 502 defines, and this library used  }
+{ none of the symbols it produced: the whole runtime package (135 units,       }
+{ 221,548 lines) compiles clean against an empty stub of it. It also carried   }
+{ the only deliberately unbalanced directive nesting in the tree, which is an  }
+{ obstacle to any mechanical pass over the sources.                            }
 {------------------------------------------------------------------------------}
-
-{$I SynEditJedi.inc}
 
 {------------------------------------------------------------------------------}
 {  Please change this to suit your needs (to activate an option remove the dot }
