@@ -59,3 +59,10 @@ __recovery/
 Packages/*/Delphi/Win32/
 Packages/*/Delphi/Win64/
 Packages/*/cpp/
+
+# Test project build output #
+#############################
+Tests/Win32/
+Tests/Win64/
+Tests/bin/
+Tests/*.xml
