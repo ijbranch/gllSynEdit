@@ -9,6 +9,24 @@ visible.
 
 ## [Unreleased]
 
+### Reviewed and deliberately NOT taken from upstream, so they are not re-derived later
+
+- **Upstream swept 2026-09-18: `11Alexandria` and `multicursor` reviewed, nothing taken.**
+  Neither branch had a prior record here.
+  - `30cd5cc` (`11Alexandria`) - DECLINED by its own text: the commit edits that branch's README
+    to say it "is for legacy 11Alexandria support only and doesn't have the latest updates". One
+    commit since a 2023 merge-base, so "1 behind" is a dead branch, not a backlog.
+  - `fb9e365` (`multicursor`) - DECLINED, superseded. A 2020 experimental spike
+    (`Source/SynEditMultiCaret.pas`, 1,180 new lines) on a single-commit branch, abandoned
+    upstream and replaced by the `TSynSelection`/`TSynSelections` design **this fork already
+    carries** (`ExecuteMultiCaretCommand`, `CommandInfo.StoreMultiCaret`, plus
+    `Doc/Multi-caret.md`). It rewrites 430 lines of `SynEdit.pas` from a 2020 base, so it could
+    not merge cleanly and would not build - it would drop a dead parallel implementation into a
+    fork that has the finished one.
+  **Condition to reopen:** only if upstream revives either branch with post-2023 work. This
+  triage covered those two branches only; `master`, `pyscripter`, `DelphiFeatures` and `GDI` are
+  worth checking on a future sweep.
+
 ### Added
 
 - **`build.cmd` — one command that builds and tests everything, in the order that works**
