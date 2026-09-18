@@ -15,6 +15,14 @@ The master branch supports **Delphi 12 Athens** and **Delphi 13 Florence** (COMP
 
 ---
 
+## Documentation
+
+| For | Read |
+|---|---|
+| Something failed, or you need the unit map — the public surface, what a highlighter must satisfy, the `TSynNativeInt` trap, 11 symptom rows | [Help.md](Help.md) |
+| Doing a job — first editor, highlighters, folding, search, multiple carets, indicators, completion, spell check, export | [Users Guide.md](Users%20Guide.md) |
+| What changed and when | [CHANGELOG.md](CHANGELOG.md) |
+
 ## Fork Reason (gllSynEdit)
 
 This repository is **gllSynEdit**, GITLAK's fork of

@@ -9,6 +9,44 @@ visible.
 
 ## [Unreleased]
 
+### Added
+
+- **`Help.md` and `Users Guide.md`, to the estate documentation standard** (2026-09-18) —
+  `Help.md`, `Users Guide.md`, `readme.md`.
+  `Help.md` carries both flavours, because 135 units and 84 highlighter units cannot be navigated
+  without a map and the traps here are genuinely error-text-shaped (`E2225`, `E2037`, `E2089`,
+  `F2039`, the `.res` rewrite). Sections: the scope of this fork, the public surface, what a
+  highlighter has to satisfy, non-ASCII content in the sources, multi-caret editing, the
+  `TSynNativeInt` trap, building and how the estate consumes it, 11 symptom rows, tests,
+  third-party dependencies.
+  `Users Guide.md` is task-ordered: get it into a project, the smallest thing that works,
+  highlighters, code folding, search and replace, multiple carets and selections, indicators,
+  completion proposal and auto-correct, spell checking, export and print.
+  **The estate's consumption model is written down**, because it decides whether a library fix
+  reaches an application: no DBiWorkflow project sets `<UsePackages>true</UsePackages>` (0 of 31),
+  so everything links statically and a fix here needs an application rebuild. The real consumer is
+  `DBiReportsScanEdit`; `DBiMiniTimeSync` and `DBiTimeSync` carry `SynEditDR` in `DCC_UsePackage`
+  only, which is inert IDE boilerplate — neither uses the editor.
+
+### Fixed
+
+- **"all 83 registered highlighters" is off by one — it is 82** (2026-09-18) — `readme.md`,
+  `CLAUDE.md`, `CHANGELOG.md`; the new documents say 82 throughout.
+  `SynEditTests.dpr` links **83 highlighter units**, and the figure appears to have been taken
+  from that. But `SynHighlighterMulti` registers no placeable highlighter — it is `TSynMultiSyn` —
+  so `GetPlaceableHighlighters` holds **82**. Counted two ways: 82 `RegisterPlaceableHighlighter`
+  call sites under `Source`, and 82 distinct class names.
+  **Worth knowing for anyone re-counting:** one call site is written
+  `RegisterPlaceableHighlighter (TSynGWScriptSyn)`, with a space before the parenthesis, so a
+  regex anchored on `RegisterPlaceableHighlighter(` silently returns 81 and looks like
+  confirmation of a different wrong number.
+- **The identifier-range curiosity is in `SynHighlighterJava.pas`, not `SynHighlighterCpp.pas`,
+  and it is not executable** (2026-09-18). Both occurrences of `'L'..'Ö', 'Ø'..'ö', 'ø'..'ÿ'` sit
+  inside comments — a `(* … *)` block and a `//`-commented line. The live body is
+  `IsCharAlphaNumeric(AChar) or CharInSet(AChar, ['_','$'])`. It is still not to be "corrected",
+  but it is historical source data rather than a live range. The HTML entity tables **are** live
+  and generation-coupled (`HashKey` / `KeyIndices`), which is the case that matters.
+
 ### Reviewed and deliberately NOT taken from upstream, so they are not re-derived later
 
 - **Upstream swept 2026-09-18: `11Alexandria` and `multicursor` reviewed, nothing taken.**
