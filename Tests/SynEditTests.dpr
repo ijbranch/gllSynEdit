@@ -106,6 +106,7 @@ var
   Results: IRunResults;
   Logger: ITestLogger;
   NUnitLogger: ITestLogger;
+  XmlFile: string;
 
 begin
   try
@@ -117,11 +118,22 @@ begin
     Runner := TDUnitX.CreateRunner;
     // Fixtures are registered explicitly in each unit's initialization section,
     // so RTTI discovery would find them a second time and run everything twice.
-    Runner.UseRTTI := False;
+    // KEEP BOTH discovery mechanisms. The 'RTTI would run every test twice'
+    // justification is FALSE in our gllDUnitX fork, which dedupes a fixture
+    // registered both ways; turning this OFF is what silently deletes tests
+    // (measured 2026-09-18: 414 -> 380, exit 0). Count verified unchanged.
+    Runner.UseRTTI := True;
 
     Logger := TDUnitXConsoleLogger.Create(True);
     Runner.AddLogger(Logger);
-    NUnitLogger := TDUnitXXMLNUnitFileLogger.Create(TDUnitX.Options.XMLOutputFile);
+    // The estate runner looks for <exeDir>\<exeBaseName>-results.xml; DUnitX's
+    // default 'dunitx-results.xml' makes it report an all-zero ERROR, which
+    // reads like a broken suite. An explicit --xmloutput still wins.
+    XmlFile := TDUnitX.Options.XMLOutputFile;
+    if ( XmlFile = '' ) or SameText( ExtractFileName( XmlFile ),
+      'dunitx-results.xml' ) then
+      XmlFile := ChangeFileExt( ParamStr( 0 ), '' ) + '-results.xml';
+    NUnitLogger := TDUnitXXMLNUnitFileLogger.Create(XmlFile);
     Runner.AddLogger(NUnitLogger);
     Runner.FailsOnNoAsserts := False;
 
