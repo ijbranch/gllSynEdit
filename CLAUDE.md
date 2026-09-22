@@ -91,13 +91,20 @@ substitute for it.** `TestHighlighterContract` is data-driven over
 registered highlighters at once: `Next` advances or reaches end of line, `GetRange`
 round-trips through `SetRange`, and each highlighter scans its own `SampleSource`
 identically whether the range is restored per line or not. Run it for both
-platforms; it needs `D:\gllDUnitX\Source` on the unit path. 7/7 as of 2026-09-14.
+platforms; it needs `D:\gllDUnitX\Source` on the unit path. **12/12 as of 2026-09-23**
+(7 until `TestWordNavigation` pinned Ctrl+Left / Ctrl+Right, which had no coverage at
+all when upstream changed their character rule).
 It found a real non-advancing `Next` in `TSynXMLSyn` on its first run — that class
 of defect compiles perfectly and hangs the editor, so nothing else catches it.
 
-**Building `SynEditDD` rewrites `Packages/11AndAbove/Delphi/SynEditDD.res`** from
-4,812 bytes to 640, losing content. It is tracked on purpose, so revert it
-(`git checkout -- <path>`) before committing after a design-time build.
+**Building `SynEditDD` used to rewrite `Packages/11AndAbove/Delphi/SynEditDD.res`**
+from 4,812 bytes to 640, losing content, and this section said to revert it before
+committing. **That no longer fires** (measured 2026-09-23): the 640-byte form is what
+is tracked at HEAD, and a full eight-configuration package build leaves the file
+untouched - `git diff` on it is empty afterwards. The history is
+`2911904` 640 -> `292582d` 4,812 -> `95f6149` 640.
+Still worth a glance at `git status` after a design-time build, because the file IS
+tracked on purpose; just do not expect a revert to be needed.
 
 ## The `TSynNativeInt` trap
 

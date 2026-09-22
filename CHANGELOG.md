@@ -9,8 +9,64 @@ visible.
 
 ## [Unreleased]
 
+### Added
+
+- **Five tests pinning word navigation, which had none** (2026-09-23)
+  - `Tests/TestWordNavigation.pas` (new), `Tests/SynEditTests.dpr`
+  Suite 7 -> 12, all green. They exist because the `IsWordChar` change below is a
+  deliberate BEHAVIOUR CHANGE rather than a defect fix, and it arrived with nothing
+  pinning it - upstream cites no defect and the commit message says only "Used the new
+  method IsWordChar". It also lands exactly where this estate really uses SynEdit: the
+  one real consumer, `DBiReportsScanEdit`, sets **no highlighter**, which is the branch
+  these tests exercise.
+  Both halves are asserted on purpose. A widening that had gone too far - making every
+  character a word character - would pass a test that only checked the pound sign, so
+  `NextWordPos_BreakCharactersStillBreak` and `WhiteSpaceIsNeverAWordCharacter` pin the
+  other side.
+  **Mutation-proved:** putting `NextWordPosEx` back on `IsIdentChar` gives
+  `Expected [5] but got [2]` - the word stops dead at the pound sign.
+
+### Changed
+
+- **Word movement now uses `IsWordChar` instead of `IsIdentChar`** (2026-09-23)
+  - `Source/SynEdit.pas` (upstream `22d9ea0`, taken by merge)
+  Six call sites in `NextWordPosEx` and `PrevWordPosEx`, i.e. Ctrl+Left, Ctrl+Right and
+  the word-delete commands. With no highlighter assigned the two predicates differ:
+  `IsIdentChar` admits only letters, digits, `_` and AdditionalIdentChars, whereas
+  `IsWordChar` is "neither a word break nor white space". So a character that is none of
+  those AND absent from the break list - a currency sign, a copyright sign, an em dash, a
+  curly quote - used to end a word and now continues one.
+  **This is a behaviour change, not a repair**, and it is recorded as such: upstream
+  names no defect. It is taken because the wider rule is the better one for word
+  MOVEMENT - "word" and "identifier" are not the same question - and because diverging
+  from upstream in a file this fork merges is a cost with no benefit here. The new tests
+  above are the condition on which it was taken.
 
 ### Fixed
+
+- **The completion proposal handled navigation keys TWICE** (2026-09-23)
+  - `Source/SynCompletionProposal.pas` (upstream `8d6c146`, taken by merge)
+  `TSynCompletionProposal.EditorKeyDown` passed Up, Down, Return and Escape to the
+  proposal form and then left `AKey` untouched, so the editor acted on the same key as
+  well: the list moved two rows at a time, and Return both accepted the completion and
+  inserted a line break. The fix is `AKey := 0` after `Form.KeyDown`; the widened key set
+  (PageUp, PageDown, Home, End, gated on `DisplayType = ctCode`) and the moved
+  `not Form.CanFocus` guard ride along from the same commit.
+  Our copy was byte-identical to upstream's pre-fix text, so this is genuine new upstream
+  work rather than a hand-port this fork had already done.
+  **Why it is taken although nothing here uses it:** no project in this estate
+  instantiates `TSynCompletionProposal`, so the fix is inert today - but this is a merged
+  fork, and declining an upstream fix in an unmodified file buys nothing while costing a
+  permanent conflict on the next merge. The reach is recorded, not hidden.
+
+- **Doc correction: building `SynEditDD` no longer rewrites its `.res`** (2026-09-23)
+  - `CLAUDE.md`
+  That instruction was accurate when written - the file went 640 -> 4,812 -> 640 bytes
+  across `2911904`, `292582d` and `95f6149` - but the 640-byte version is what is now
+  tracked, and a full eight-configuration package build leaves it untouched
+  (`git diff` empty afterwards, measured 2026-09-23). Reverting it before committing is
+  now a no-op, so the instruction is recorded as historical rather than left standing as
+  a step that cannot fire.
 
 - **Registered with the estate test runner - 7 tests nothing was running** (2026-09-20)
   - `Tests/SynEditTests.dpr`

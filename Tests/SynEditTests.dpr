@@ -99,7 +99,8 @@ uses
   SynHighlighterXML in '..\Source\Highlighters\SynHighlighterXML.pas',
   SynHighlighterYAML in '..\Source\Highlighters\SynHighlighterYAML.pas',
   TestHighlighterContract in 'TestHighlighterContract.pas',
-  TestTextBuffer in 'TestTextBuffer.pas';
+  TestTextBuffer in 'TestTextBuffer.pas',
+  TestWordNavigation in 'TestWordNavigation.pas';
 
 var
   Runner: ITestRunner;
