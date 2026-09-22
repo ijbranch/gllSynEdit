@@ -728,6 +728,7 @@ type
     function IsIdentChar(AChar: WideChar): Boolean; virtual;
     function IsWhiteChar(AChar: WideChar): Boolean; virtual;
     function IsWordBreakChar(AChar: WideChar): Boolean; virtual;
+    function IsWordChar(AChar: WideChar): Boolean; virtual;
     // support procedure for ecDeletexxx commands
     function IsNonWhiteChar(AChar: WideChar): Boolean; virtual;
     procedure InvalidateGutter;
@@ -7290,8 +7291,8 @@ begin
       if CX = 0 then
         CX := 1;
       // valid char
-      if IsIdentChar(Line[CX]) then begin
-        while (CX <= LineLen) and IsIdentChar(Line[CX]) do
+      if IsWordChar(Line[CX]) then begin
+        while (CX <= LineLen) and IsWordChar(Line[CX]) do
           Inc(CX);
         while (CX <= LineLen) and IsWhiteChar(Line[CX]) do
           Inc(CX);
@@ -7386,16 +7387,16 @@ begin
     else
     begin
       // CX > 1 and <= LineLenght + 1
-      if IsIdentChar(Line[CX-1]) then begin
-        while (CX > 1) and IsIdentChar(Line[CX-1]) do
+      if IsWordChar(Line[CX-1]) then begin
+        while (CX > 1) and IsWordChar(Line[CX-1]) do
           Dec(CX);
       end else if IsWhiteChar(Line[CX-1]) then begin
         while (CX > 1) and IsWhiteChar(Line[CX-1]) do
           Dec(CX);
         if (CX > 1) then
         begin
-          if IsIdentChar(Line[CX-1]) then
-            while (CX > 1) and IsIdentChar(Line[CX-1]) do
+          if IsWordChar(Line[CX-1]) then
+            while (CX > 1) and IsWordChar(Line[CX-1]) do
               Dec(CX)
           else
             // breakchar and not whitechar
@@ -9720,6 +9721,11 @@ begin
     Result := Highlighter.IsWhiteChar(AChar)
   else
     Result := AChar.IsWhiteSpace and not IsIdentChar(AChar);
+end;
+
+function TCustomSynEdit.IsWordChar(AChar: WideChar): Boolean;
+begin
+  Result := (not IsWordBreakChar(AChar)) and (not IsWhiteChar(AChar));
 end;
 
 function TCustomSynEdit.IsWordBreakChar(AChar: WideChar): Boolean;
