@@ -44,6 +44,14 @@ visible.
 
 ### Fixed
 
+- **An in-IDE build re-saved the package `.dproj` without its Release output paths** (2026-10-07) —
+  `Packages/11AndAbove/Delphi/SynEditDD.dproj`, `Packages/11AndAbove/Delphi/SynEditDR.dproj`. The output standard was
+  two `Condition`-ed `DCC_BplOutput` / `DCC_DcpOutput` lines in the Base group, and the IDE keeps one value per
+  property per group when it re-saves the project on a build, so it wrote back only the active config's: a committed
+  re-save sent Release builds to the root `Bpl` / `Dcp` folders. Now one plain value per group, the form the IDE
+  writes itself: Base `$(BDSCOMMONDIR)\Bpl\$(Platform)\$(Config)` (and `Dcp`), overridden in the Release config group
+  by `$(BDSCOMMONDIR)\Bpl\$(Platform)`. Same output; built in all four modes with the `dcc` `-LE`/`-LN` paths checked
+  per mode.
 - **The completion proposal handled navigation keys TWICE** (2026-09-23)
   - `Source/SynCompletionProposal.pas` (upstream `8d6c146`, taken by merge)
   `TSynCompletionProposal.EditorKeyDown` passed Up, Down, Return and Escape to the

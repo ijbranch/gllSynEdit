@@ -66,10 +66,8 @@
         <!-- Release stays in the shared Bpl/Dcp folder because that folder is on PATH and is where
              dependent packages resolve their requires from; only Debug is diverted, which is enough
              to stop a Debug build replacing the installed Release package. -->
-        <DCC_BplOutput Condition="'$(Config)'=='Release'">$(BDSCOMMONDIR)\Bpl\$(Platform)</DCC_BplOutput>
-        <DCC_BplOutput Condition="'$(Config)'!='Release'">$(BDSCOMMONDIR)\Bpl\$(Platform)\$(Config)</DCC_BplOutput>
-        <DCC_DcpOutput Condition="'$(Config)'=='Release'">$(BDSCOMMONDIR)\Dcp\$(Platform)</DCC_DcpOutput>
-        <DCC_DcpOutput Condition="'$(Config)'!='Release'">$(BDSCOMMONDIR)\Dcp\$(Platform)\$(Config)</DCC_DcpOutput>
+        <DCC_BplOutput>$(BDSCOMMONDIR)\Bpl\$(Platform)\$(Config)</DCC_BplOutput>
+        <DCC_DcpOutput>$(BDSCOMMONDIR)\Dcp\$(Platform)\$(Config)</DCC_DcpOutput>
         <PostBuildEvent><![CDATA[xcopy /y /q "..\..\..\Source\*.dfm" "..\..\..\37.0\$(Platform)\$(Config)\" && xcopy /y /q "..\..\..\Source\*.res" "..\..\..\37.0\$(Platform)\$(Config)\"]]></PostBuildEvent>
         <DCC_Description>TurboPack SynEdit Delphi runtime package</DCC_Description>
         <DCC_EXPLICIT_STRING_CAST>true</DCC_EXPLICIT_STRING_CAST>
@@ -104,6 +102,8 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_BplOutput>$(BDSCOMMONDIR)\Bpl\$(Platform)</DCC_BplOutput>
+        <DCC_DcpOutput>$(BDSCOMMONDIR)\Dcp\$(Platform)</DCC_DcpOutput>
         <DCC_DebugInformation>0</DCC_DebugInformation>
         <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
