@@ -296,7 +296,7 @@ procedure TSynMarkdownViewer.SetMarkdown(Value: string);
       end;
 
       // Add empty line before if is header or first bullet
-      if (liHeader in CurrLI) or ((liBullet in CurrLI) and not (liBullet in PrevLI)) then
+      if (liHeader in CurrLI) or ((liBullet in CurrLI) and (liBullet not in PrevLI)) then
         AddEmptyLineBefore(LineNo);
 
       // Add empty line after if is header
@@ -493,8 +493,7 @@ procedure TSynMarkdownViewer.SetMarkdown(Value: string);
       for Tag in Tags do
         Indicators.Add(LineNo + 1, TSynIndicator.New(
           Tag.Guid, Tag.Start, Tag.Stop,
-          IfThen(Tag.Guid = TMarkdownIndicators.IdLink,
-          FLinks.Add(Tag.Link), 0)));
+          if Tag.Guid = TMarkdownIndicators.IdLink then FLinks.Add(Tag.Link) else 0));
     end;
   end;
 

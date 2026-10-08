@@ -916,7 +916,7 @@ procedure TSynCustomHighlighter.DefHighlightChange(Sender: TObject);
 begin
   if fUpdateCount > 0 then
     fUpdateChange := True
-  else if not(csLoading in ComponentState) then
+  else if csLoading not in ComponentState then
   begin
     fAttrChangeHooks.Sender := Sender;
     fAttrChangeHooks.Fire;

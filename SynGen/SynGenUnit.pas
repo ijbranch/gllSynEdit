@@ -569,13 +569,10 @@ begin
 
   OutFileCreate(OpenDialog.FileName);
   try
-    while not (Lex.RunId in [IdSensitive, IdIdentStart]) do
+    while Lex.RunId not in [IdSensitive, IdIdentStart] do
       Lex.Next;
 
-    if Lex.RunId = IdSensitive then
-      Sensitivity := True
-    else
-      Sensitivity := False;
+    Sensitivity := ( Lex.RunId = IdSensitive );
     Lex.Next;
 
     while Lex.RunId <> IDCharSet do
@@ -630,7 +627,7 @@ begin
   aTokenType := '';
   while Lex.RunId <> IdCRLF do
   begin
-    if not (Lex.RunId in [IdSpace, IdBraceOpen]) then
+    if Lex.RunId not in [IdSpace, IdBraceOpen] then
       aTokenType := aTokenType + Lex.RunToken;
     Lex.Next;
   end;
@@ -645,7 +642,7 @@ begin
     if Lex.RunId <> IdStop then
     begin
       aString := '';
-      while not (Lex.RunId in [IdSpace, IdBraceOpen, IdCRLF]) do
+      while Lex.RunId not in [IdSpace, IdBraceOpen, IdCRLF] do
       begin
         aString := aString + Lex.RunToken;
         Lex.Next;
@@ -690,7 +687,7 @@ begin
       sLine := '';
       while (Lex.RunId = IdSpace) do
         Lex.Next;
-      while not (Lex.RunId in [IdStop, IdCRLF]) do
+      while Lex.RunId not in [IdStop, IdCRLF] do
       begin { is there more data on this line? }
         sLine := sLine + Lex.RunToken;
         Lex.Next;
@@ -857,7 +854,7 @@ end;
 procedure TFrmMain.ParseEnclosedBy;
 begin
   Lex.Next;
-  while not (Lex.RunId in [IdStop, IdNull]) do
+  while Lex.RunId not in [IdStop, IdNull] do
     RetrieveEnclosedBy;
 end;
 
@@ -867,7 +864,7 @@ begin
   if (Lex.RunId = IdCRLF) then
     Lex.Next;
 
-  while not (Lex.RunId in [IdStop, IdNull]) do
+  while Lex.RunId not in [IdStop, IdNull] do
     RetrieveSampleSource;
 end;
 
@@ -899,7 +896,7 @@ var
   sLine: string;
 begin
   sLine := '';
-  while not (Lex.RunId in [IdCRLF, IdNull, IdStop]) do
+  while Lex.RunId not in [IdCRLF, IdNull, IdStop] do
   begin
     sLine := sLine + Lex.RunToken;
     Lex.Next;
@@ -920,7 +917,7 @@ begin
     Lex.Next;
 
   sLine := '';
-  while not (Lex.RunId in [IdCRLF, IdNull, IdStop]) do
+  while Lex.RunId not in [IdCRLF, IdNull, IdStop] do
   begin
     sLine := sLine + Lex.RunToken;
     Lex.Next;
@@ -1826,10 +1823,7 @@ end;
 
 procedure TFrmMain.CboLangNameChange(Sender: TObject);
 begin
-  if (CboLangName.Text <> '') and (CboFilter.Text <> '') then
-    BtnStart.Enabled := True
-  else
-    BtnStart.Enabled := False;
+  BtnStart.Enabled := (CboLangName.Text <> '') and (CboFilter.Text <> '');
 end;
 
 procedure TFrmMain.ListBoxFieldsClick(Sender: TObject);

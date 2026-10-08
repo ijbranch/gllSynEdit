@@ -264,7 +264,7 @@ end;
 function TSynDelphiSyn.GetTokenID: TtkTokenKind;
 begin
   if not fAsmStart and (fRange = rsAsm)
-    and not (fTokenId in [tkNull, tkComment, tkDirec, tkSpace]) then
+    and (fTokenId not in [tkNull, tkComment, tkDirec, tkSpace]) then
     Result := tkAsm
   else
     Result := fTokenId;

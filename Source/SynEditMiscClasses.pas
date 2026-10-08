@@ -1375,10 +1375,7 @@ begin
     FLineNumberStart := Value;
     if FLineNumberStart < 0 then
       FLineNumberStart := 0;
-    if FLineNumberStart = 0 then
-      FZeroStart := True
-    else
-      FZeroStart := False;
+    FZeroStart := ( FLineNumberStart = 0 );
     AutoSizeDigitCount;
     Changed;
   end;
@@ -2263,12 +2260,12 @@ end;
 function TSynGutterBand.IsVisibleStored: Boolean;
 begin
   Result := not FVisible and
-    not(FKind in [gbkLineNumbers, gbkFold, gbkTrackChanges]);
+    (FKind not in [gbkLineNumbers, gbkFold, gbkTrackChanges]);
 end;
 
 function TSynGutterBand.IsWidthStored: Boolean;
 begin
-  Result := not(FKind in [gbkLineNumbers, gbkFold, gbkTrackChanges]);
+  Result := (FKind not in [gbkLineNumbers, gbkFold, gbkTrackChanges]);
 end;
 
 procedure TSynGutterBand.PaintFoldShapes(RT: ID2D1RenderTarget; ClipR: TRect;
@@ -2448,7 +2445,7 @@ begin
       RT.DrawText(PChar(S), UINT(S.Length), TextFormat.IDW, LineRect,
         TSynDWrite.SolidBrush(FontColor),
         D2D1_DRAW_TEXT_OPTIONS_CLIP +
-        IfThen(TOSVersion.Check(6,3), D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT, 0),
+        if TOSVersion.Check(6,3) then D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT else 0,
         DWRITE_MEASURING_MODE_GDI_NATURAL);
     end;
   end;
@@ -2647,7 +2644,7 @@ begin
       // A margin of two pixels at the end
       gbkLineNumbers:
         Result := Gutter.FAutoSizeDigitCount *
-          IfThen(Gutter.UseFontStyle, Gutter.FCharWidth, TCustomSynEdit(Editor).CharWidth) +
+          ( if Gutter.UseFontStyle then Gutter.FCharWidth else TCustomSynEdit(Editor).CharWidth ) +
           MulDiv(MarginX, PPI, 96);
       gbkFold:
         Result := TCustomSynEdit(Editor).CodeFolding.ScaledGutterShapeSize(PPI)
@@ -2687,7 +2684,7 @@ end;
 
 procedure TSynGutterBand.SetWidth(const Value: TSynNativeInt);
 begin
-  if not(FKind in [gbkLineNumbers, gbkFold]) then
+  if FKind not in [gbkLineNumbers, gbkFold] then
   begin
     FWidth := Value;
     Changed(False);

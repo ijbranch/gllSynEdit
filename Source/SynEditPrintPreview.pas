@@ -555,7 +555,7 @@ end;
 procedure TSynEditPrintPreview.WMSize(var Msg: TWMSize);
 begin
   inherited;
-  if not (csDesigning in ComponentState) then SizeChanged;
+  if csDesigning not in ComponentState then SizeChanged;
 end;
 
 var
@@ -652,7 +652,7 @@ begin
     OnMouseWheel(Self, Shift, WheelDelta, MousePos, Result);
   if not Result then
   begin
-    if not (ssHorizontal in Shift) then
+    if ssHorizontal not in Shift then
     begin
       // Vertical Mouse Wheel
       Inc(FWheelVAccumulator, WheelDelta);

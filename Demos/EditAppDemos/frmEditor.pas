@@ -576,7 +576,7 @@ end;
 procedure TEditorForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
   // need to prevent this from happening more than once (e.g. with MDI childs)
-  if not (csDestroying in ComponentState) then
+  if csDestroying not in ComponentState then
     CanClose := DoAskSaveChanges;
 end;
 procedure TEditorForm.FormDestroy(Sender: TObject);

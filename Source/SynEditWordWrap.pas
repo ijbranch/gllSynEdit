@@ -284,7 +284,7 @@ var
 begin
   // Ensure minimum line length
   MinChars := 3;
-  if not (eoTabsToSpaces in FEditor.Options) then
+  if eoTabsToSpaces not in FEditor.Options then
     MinChars := Max(FEditor.TabWidth, MinChars);
 
   FMaxRowWidth := Max(FEditor.WrapAreaWidth, MinChars * FEditor.CharWidth);
@@ -417,7 +417,7 @@ begin
           HasRTL := HasRTL or IsRTLChar(P^);
           // Special case with space. Keep it on the row even if it does't fit.
           if (P > PStart) and FEditor.IsWordBreakChar(P^) then
-            PBreak := P + IfThen(P^ = #32, 1, 0);
+            PBreak := P + if P^ = #32 then 1 else 0;
           case P^ of
              #9: Inc(W, TW - W mod TW);
              #32..#126, #$00A0: Inc(W, CW);
@@ -428,7 +428,7 @@ begin
             Break;
           if (P > PStart) and FEditor.IsWordBreakChar(P^) then
             // Keep opening brackets with the next line
-            PBreak := P + IfThen(Word(P^) in [40, 91], 0, 1);
+            PBreak := P + if Word(P^) in [40, 91] then 0 else 1;
           Inc(P);
         end;
 

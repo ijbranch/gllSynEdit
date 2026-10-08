@@ -522,7 +522,7 @@ begin
           TSynLinePutUndoItem(LastItem).GroupWith(TSynLinePutUndoItem(Item));
     until not(FKeepGoing);
 
-    if not (Item is TSynCaretAndSelectionUndoItem) then
+    if Item is not TSynCaretAndSelectionUndoItem then
     begin
       (Editor as TCustomSynEdit).Selections.Clear;
       (Editor as TCustomSynEdit).CaretXY := Item.FCaret;  // removes selection
@@ -620,7 +620,7 @@ begin
           TSynLinePutUndoItem(Item).GroupWith(TSynLinePutUndoItem(LastItem));
     until not(FKeepGoing);
 
-    if not (LastItem is TSynCaretAndSelectionUndoItem) then
+    if LastItem is not TSynCaretAndSelectionUndoItem then
     begin
       (Editor as TCustomSynEdit).Selections.Clear;
       (Editor as TCustomSynEdit).SetCaretAndSelection(LastItem.FCaret, LastItem.FCaret,

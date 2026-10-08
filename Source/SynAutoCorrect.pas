@@ -620,7 +620,7 @@ begin
   if (Editor <> nil) and not (Editor.ReadOnly) then
   begin
     StartPos := CorrectItemStart(EditLine, Original, StartPos,
-      not (ascoIgnoreCase in FOptions), True);
+      (ascoIgnoreCase not in FOptions), True);
 
     while StartPos > -1 do
     begin
@@ -679,7 +679,7 @@ begin
           Copy(EditLine, StartPos + EndPos + 1, MaxInt);
         Inc(StartPos, EndPos);
         StartPos := CorrectItemStart(EditLine, Original, StartPos,
-          not (ascoIgnoreCase in FOptions), True);
+          (ascoIgnoreCase not in FOptions), True);
       end;
     end;
   end;       

@@ -402,9 +402,8 @@ begin
       if (RowCount = FMaxRowCount) and (I = iEndLine) then Break;
 
       PageLine := TPageLine.Create;
-      PageLine.FirstLine := IfThen(RowCount = FMaxRowCount, I + 1, I);
-      PageLine.FirstRow := IfThen(RowCount = FMaxRowCount, 1,
-         NativeInt(LayoutRowCount - RowCount + FMaxRowCount + 1));
+      PageLine.FirstLine := if RowCount = FMaxRowCount then I + 1 else I;
+      PageLine.FirstRow := if RowCount = FMaxRowCount then 1 else NativeInt(LayoutRowCount - RowCount + FMaxRowCount + 1);
       FPages.Add(PageLine);
       RowCount := RowCount - FMaxRowCount;
     end;

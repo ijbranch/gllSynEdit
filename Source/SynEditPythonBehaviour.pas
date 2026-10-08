@@ -71,11 +71,11 @@ procedure TSynEditPythonBehaviour.SetEditor(Value: TSynEdit);
 begin
   if FEditor <> Value then
   begin
-    if (Editor <> nil) and not (csDesigning in ComponentState) then
+    if (Editor <> nil) and (csDesigning not in ComponentState) then
       Editor.UnregisterCommandHandler(doProcessUserCommand);
     // Set the new editor
     FEditor := Value;
-    if (Editor <> nil) and not (csDesigning in ComponentState) then
+    if (Editor <> nil) and (csDesigning not in ComponentState) then
       Editor.RegisterCommandHandler(doProcessUserCommand, nil);
   end;
 end; 

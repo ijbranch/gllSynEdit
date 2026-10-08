@@ -549,7 +549,7 @@ begin
   // don't change encoding while streaming as this could corrupt output data
   if FStreaming then Exit;
 
-  if not (Value in SupportedEncodings) then
+  if Value not in SupportedEncodings then
     raise ESynEncoding.CreateFmt(SEncodingError, [EncodingStrs[Value],
       GetFormatName]);
 

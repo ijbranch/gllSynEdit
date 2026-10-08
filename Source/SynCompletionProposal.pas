@@ -805,7 +805,7 @@ var
               ['B', 'I', 'U', 'S']) then
           begin
             CommandType := fcStyle;
-            if not (fcStyle in StripCommands) then
+            if fcStyle not in StripCommands then
             begin
               Data := New(PFormatStyleData);
               PFormatStyleData(Data)^.Style := System.SysUtils.AnsiUpperCase(Parameter[2])[1];
@@ -823,7 +823,7 @@ var
         end else
           ErrorFound := True;
 
-        if (CommandType <> fcNoCommand) and (not (CommandType in StripCommands)) then
+        if (CommandType <> fcNoCommand) and (CommandType not in StripCommands) then
           AddCommandChunk(CommandType, Data);
 
         NextChar;
@@ -3526,7 +3526,7 @@ begin
           for J := 1 to Length(Token) do
             Editor.CommandProcessor(ecDeleteLastChar, ' ', nil);
           BeginningSpaceCount := Editor.DisplayX - 1;
-          if not(eoTabsToSpaces in Editor.Options) and
+          if (eoTabsToSpaces not in Editor.Options) and
             (BeginningSpaceCount >= Editor.TabWidth)
           then
             Spacing := StringOfChar(#9, BeginningSpaceCount div Editor.TabWidth)

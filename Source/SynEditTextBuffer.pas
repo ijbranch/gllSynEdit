@@ -870,7 +870,7 @@ begin
       while (P < Pmax) do
       begin
         Start := P;
-        while (P < Pmax) and not (Word(P^) in [10, 13]) and (P^ <> WideLineSeparator)
+        while (P < Pmax) and (Word(P^) not in [10, 13]) and (P^ <> WideLineSeparator)
         do
           Inc(P);
         if P <> Start then

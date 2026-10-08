@@ -344,9 +344,9 @@ begin
   // we're in the middle of parsing one.  rsComment is the only state here that
   // genuinely spans lines, and SynEdit calls SetRange before SetLine, so failing
   // to preserve it discards the range that was just restored.
-  if not (FRange in [rsComment, rsForEach, rsForEachVar, rsForEachIn, rsIfCondition,
+  if FRange not in [rsComment, rsForEach, rsForEachVar, rsForEachIn, rsIfCondition,
                       rsDirectiveFunction, rsSwitchExpression, rsCaseValue,
-                      rsImportFilename, rsImportAliases]) then
+                      rsImportFilename, rsImportAliases] then
   begin
     FRange := rsUnknown;
     FParenLevel := 0;

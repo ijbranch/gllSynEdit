@@ -914,8 +914,7 @@ begin
           begin
             PFoldRange := @fRanges.List[OpenFoldStack.List[I]];
             if (PFoldRange^.FoldType = LFI.FoldType) then begin
-              PFoldRange^.ToLine := IfThen(LFI.FoldOpenClose = focClose,
-                LFI.Line, LFI.Line - 1);
+              PFoldRange^.ToLine := if LFI.FoldOpenClose = focClose then LFI.Line else LFI.Line - 1;
               OpenFoldStack.Delete(I);
               Break;
             end;

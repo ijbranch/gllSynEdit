@@ -202,7 +202,7 @@ var
       Result := False;
       testRect := Rect(xpos,ypos,xpos+31,ypos+31);
       for I := 0 to form.ComponentCount-1 do begin
-        if (form.Components[I] <> self) and (not (form.Components[I] is TControl)) then begin
+        if (form.Components[I] <> self) and (form.Components[I] is not TControl) then begin
           compLeft := LongRec(form.Components[I].DesignInfo).Lo;
           compTop  := LongRec(form.Components[I].DesignInfo).Hi;
           compRect := Rect(compLeft,compTop,compLeft+31,compTop+31);

@@ -550,7 +550,7 @@ end;
 function TSynSTSyn.GetTokenID: TtkTokenKind;
 begin
   if not fAsmStart and (fRange = rsAsm)
-    and not (fTokenId in [tkNull, tkComment, tkSpace])
+    and (fTokenId not in [tkNull, tkComment, tkSpace])
   then
     Result := tkAsm
   else

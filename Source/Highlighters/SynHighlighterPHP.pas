@@ -631,7 +631,7 @@ begin
     // Deal first with Multiline comments (Fold Type 2)
     if TRangeState(GetLineRange(LinesToScan, Line)) in [rsComment, rsDocument] then
     begin
-      if not (TRangeState(GetLineRange(LinesToScan, Line - 1)) in [rsComment, rsDocument]) then
+      if TRangeState(GetLineRange(LinesToScan, Line - 1)) not in [rsComment, rsDocument] then
         FoldRanges.StartFoldRange(Line + 1, 2)
       else
         FoldRanges.NoFoldInfo(Line + 1);

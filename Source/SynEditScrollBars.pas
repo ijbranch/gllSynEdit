@@ -456,7 +456,7 @@ begin
     FMouseWheelVertAccumulator := 0;
     FOwner.Zoom(Sign(WheelDelta));
   end
-  else if ([ssShift, ssCtrl] * Shift <> [ssShift]) and not (ssHorizontal in Shift) then
+  else if ([ssShift, ssCtrl] * Shift <> [ssShift]) and (ssHorizontal not in Shift) then
   begin
     // Vertical wheel scrolling
     LinesToScroll := Mouse.WheelScrollLines;
@@ -554,7 +554,7 @@ begin
         end;
 
         with TCustomSynEdit(Control) do
-          BtnEnabled := not (eoDisableScrollArrows in ScrollOptions) or (LeftChar > 1);
+          BtnEnabled := (eoDisableScrollArrows not in ScrollOptions) or (LeftChar > 1);
         if (HorzSliderRect.Height > 0) and BtnEnabled then
           Details := LStyle.GetElementDetails(HorzUpState)
         else
@@ -634,7 +634,7 @@ begin
         end;
 
         with TCustomSynEdit(Control) do
-          BtnEnabled := not (eoDisableScrollArrows in ScrollOptions) or (TopLine > 1);
+          BtnEnabled := (eoDisableScrollArrows not in ScrollOptions) or (TopLine > 1);
 
         if (LVertSliderRect.Height <> 0) and BtnEnabled then
           Details := LStyle.GetElementDetails(VertUpState)
@@ -648,7 +648,7 @@ begin
             MaxScroll := DisplayRowCount
           else
             MaxScroll := DisplayRowCount - LinesInWindow + 1;
-          BtnEnabled := not (eoDisableScrollArrows in ScrollOptions) or (TopLine < MaxScroll);
+          BtnEnabled := (eoDisableScrollArrows not in ScrollOptions) or (TopLine < MaxScroll);
         end;
 
         if (LVertSliderRect.Height <> 0) and BtnEnabled then
@@ -769,7 +769,7 @@ end;
 
 procedure TSynScrollingStyleHook.WMMouseMove(var Msg: TWMMouse);
 begin
- if not (ssLeft in KeysToShiftState(ToWord(Msg.Keys))) then
+ if ssLeft not in KeysToShiftState(ToWord(Msg.Keys)) then
    SetLeftButtonDownToFalse;
  inherited;
 end;

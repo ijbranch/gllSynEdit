@@ -237,7 +237,7 @@ begin
     FInternalText := DelimitedText(IntClipFormatDelimiter);
   end;
 
-  if not (eoCopyPlainText in TCustomSynEdit(ASynEdit).Options) and
+  if (eoCopyPlainText not in TCustomSynEdit(ASynEdit).Options) and
     Assigned(TCustomSynEdit(ASynEdit).Highlighter) and (FText <> '')
   then
   begin
@@ -288,7 +288,7 @@ begin
   try
     HTMLExport.Font := Ed.Font;
     HTMLExport.CreateHTMLFragment := True;
-    HTMLExport.UseBackground := not (eoNoHTMLBackground in TCustomSynEdit(Editor).Options);
+    HTMLExport.UseBackground := (eoNoHTMLBackground not in TCustomSynEdit(Editor).Options);
     HTMLExport.Highlighter := Ed.Highlighter;
     SL := TStringList.Create;
     try

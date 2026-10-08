@@ -1888,7 +1888,7 @@ begin
     SymbolProc
   // Oracle uses the ':' character to indicate bind variables
   // Ingres II also uses the ':' character to indicate variables
-  else if not (SQLDialect in [sqlOracle, sqlIngres]) and (fLine[Run] = ':') then
+  else if (SQLDialect not in [sqlOracle, sqlIngres]) and (fLine[Run] = ':') then
     SymbolProc
   else
   begin

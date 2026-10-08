@@ -1429,7 +1429,7 @@ function TSynCppSyn.GetTokenID: TtkTokenKind;
 begin
   Result := fTokenId;
   if ((fRange = rsAsm) or (fRange = rsAsmBlock)) and not fAsmStart
-    and not (fTokenId in [tkComment, tkSpace, tkNull])
+    and (fTokenId not in [tkComment, tkSpace, tkNull])
   then
     Result := tkAsm;
 end;

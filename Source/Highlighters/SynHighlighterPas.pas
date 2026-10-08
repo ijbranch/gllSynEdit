@@ -1121,7 +1121,7 @@ end;
 function TSynPasSyn.GetTokenID: TtkTokenKind;
 begin
   if not fAsmStart and (fRange = rsAsm)
-    and not (fTokenId in [tkNull, tkComment, tkDirec, tkSpace])
+    and (fTokenId not in [tkNull, tkComment, tkDirec, tkSpace])
   then
     Result := tkAsm
   else
@@ -1541,7 +1541,7 @@ var
     Result := True;
     if TRangeState(GetLineRange(LinesToScan, Line)) in Ranges then
     begin
-      if Fold and not (TRangeState(GetLineRange(LinesToScan, Line - 1)) in Ranges) then
+      if Fold and (TRangeState(GetLineRange(LinesToScan, Line - 1)) not in Ranges) then
         FoldRanges.StartFoldRange(Line + 1, FoldType)
       else
         FoldRanges.NoFoldInfo(Line + 1);

@@ -295,7 +295,7 @@ procedure TSynURIOpener.SetEditor(const Value: TCustomSynEdit);
 begin
   if Editor <> Value then
   begin
-    if not(csDesigning in ComponentState) and Assigned(FEditor) then
+    if (csDesigning not in ComponentState) and Assigned(FEditor) then
     begin
       with FEditor do
       begin
@@ -309,7 +309,7 @@ begin
 
     FEditor := Value;
 
-    if not(csDesigning in ComponentState) and Assigned(FEditor) then
+    if (csDesigning not in ComponentState) and Assigned(FEditor) then
     begin
       with FEditor do
       begin
@@ -325,12 +325,12 @@ end;
 
 procedure TSynURIOpener.SetURIHighlighter(const Value: TSynURISyn);
 begin
-  if not(csDesigning in ComponentState) and Assigned(URIHighlighter) then
+  if (csDesigning not in ComponentState) and Assigned(URIHighlighter) then
     TAccessSynURISyn(FURIHighlighter).SetAlreadyVisitedURIFunc(nil);
 
   FURIHighlighter := Value;
 
-  if not(csDesigning in ComponentState) and  Assigned(URIHighlighter) then
+  if (csDesigning not in ComponentState) and  Assigned(URIHighlighter) then
     TAccessSynURISyn(FURIHighlighter).SetAlreadyVisitedURIFunc(VisitedURI);
 end;
 

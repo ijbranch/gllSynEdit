@@ -58,7 +58,7 @@ begin
       AHighlighters.Clear;
     for Comp in AOwner do
     begin
-      if not (Comp is TSynCustomHighlighter) then
+      if Comp is not TSynCustomHighlighter then
         Continue;
       Highlighter := TSynCustomHighlighter(Comp);
       // Only one highlighter for each language
@@ -86,7 +86,7 @@ begin
   Result := '';
   if Assigned(AHighlighters) then
     for I := 0 to AHighlighters.Count - 1 do begin
-      if not (AHighlighters.Objects[I] is TSynCustomHighlighter) then
+      if AHighlighters.Objects[I] is not TSynCustomHighlighter then
         Continue;
       Highlighter := TSynCustomHighlighter(AHighlighters.Objects[I]);
       if Highlighter.DefaultFilter = '' then
@@ -109,7 +109,7 @@ begin
   ExtLen := Length(Extension);
   if Assigned(AHighlighters) and (ExtLen > 0) then begin
     for I := 0 to AHighlighters.Count - 1 do begin
-      if not (AHighlighters.Objects[I] is TSynCustomHighlighter) then
+      if AHighlighters.Objects[I] is not TSynCustomHighlighter then
         Continue;
       Highlighter := TSynCustomHighlighter(AHighlighters.Objects[I]);
       Filter := LowerCase(Highlighter.DefaultFilter);

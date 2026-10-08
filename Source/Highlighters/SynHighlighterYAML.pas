@@ -263,7 +263,7 @@ begin
     end else
       LongRec(fRange).Hi := ToWord(Min(LongRec(fRange).Hi, NewIndent));
   end else begin
-    if not (LongRec(fRange).Lo in [rsString1, rsString2]) then
+    if LongRec(fRange).Lo not in [rsString1, rsString2] then
       LongRec(fRange).Lo := rsUnknown;
     LongRec(fRange).Hi := ToWord(NewIndent);
   end;

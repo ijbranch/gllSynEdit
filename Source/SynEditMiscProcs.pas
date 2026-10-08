@@ -476,7 +476,7 @@ function GetEOL(P: PChar): PWideChar;
 begin
   Result := P;
   if Assigned(Result) then
-    while (Word(Result^) > 13) or not (Word(Result^) in [0, 10, 13]) do
+    while (Word(Result^) > 13) or (Word(Result^) not in [0, 10, 13]) do
       Inc(Result);
 end;
 
@@ -492,7 +492,7 @@ begin
   begin
     //  We do it that way instead of checking for $0 as well
     //  so the we properly deal with strings containing #0  (who knows)
-    while (P < PEnd) and ((Word(P^) > 13) or not (Word(P^) in [10, 13])) do
+    while (P < PEnd) and ((Word(P^) > 13) or (Word(P^) not in [10, 13])) do
       Inc(P);
     Inc(Result);
     if P^ = #13 then Inc(P);
@@ -520,7 +520,7 @@ begin
     PStart := P;
     //  We do it that way instead of checking for $0 as well
     //  so the we properly deal with strings containing #0  (who knows)
-    while (P < PEnd) and ((Word(P^) > 13) or not (Word(P^) in [10, 13])) do
+    while (P < PEnd) and ((Word(P^) > 13) or (Word(P^) not in [10, 13])) do
       Inc(P);
     SetString(S, PStart, P - PStart);
     Result[Count] := S;
