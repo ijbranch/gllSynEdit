@@ -8,7 +8,7 @@
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <ProjectGuid>{AC917C2B-5870-48AD-981D-668AD3E4A533}</ProjectGuid>
         <ProjectName Condition="'$(ProjectName)'==''">SynEditDR</ProjectName>
-        <ProjectVersion>20.4</ProjectVersion>
+        <ProjectVersion>20.5</ProjectVersion>
         <TargetedPlatforms>3</TargetedPlatforms>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -283,6 +283,7 @@
         <DCCReference Include="..\..\..\Source\SynOmniSetupDialog.pas">
             <Form>SynOmniSynSetup</Form>
         </DCCReference>
+        <DCCReference Include="..\..\..\Source\SynPopupMenu.pas"/>
         <DCCReference Include="..\..\..\Source\SynSpellCheck.pas"/>
         <DCCReference Include="..\..\..\Source\SynUnicode.pas"/>
         <DCCReference Include="..\..\..\Source\SynURIOpener.pas"/>

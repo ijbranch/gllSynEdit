@@ -69,7 +69,7 @@ The only package set built here is `Packages/11AndAbove/Delphi`:
 `SynEditDR` (runtime) then `SynEditDD` (design-time). **Win32 + Win64 x Debug +
 Release, 8 of 8 pass.**
 
-Those two packages contain all 135 units under `Source`, so a package build is
+Those two packages contain all 136 units under `Source`, so a package build is
 already full coverage as a *compile* test — there is no separate compile harness to
 run, and no equivalent of glldzlib's AllUnits.
 

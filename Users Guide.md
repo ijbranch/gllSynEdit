@@ -532,6 +532,12 @@ Printer1.Print;                        // or PrintRange( 1, 3 )
   points render as `.`. You can set `BinaryMode` yourself.
 - **The editor is a VCL control on the main thread.** Scan or parse on a worker if you must, but touch
   `Lines`, `Selections` and `Indicators` from the main thread only.
+- **A ready-made context menu.** Drop a `TSynPopupMenu` (unit `SynPopupMenu`) and assign it to the
+  editor's `PopupMenu`. At run time it adds Undo, Redo, Cut, Copy, Paste, Delete and Select All as
+  standard edit actions with their usual shortcuts. `DefaultPopupMenu` puts them before your own
+  items (`dpmBefore`, the default), after them (`dpmAfter`) or nowhere (`dpmDisabled`), and
+  `DefaultItems[meCopy]` and its siblings hand you each item to hide or re-caption. Nothing is added
+  at design time, so the menu designer shows only your own items.
 - **Recorded macro files are not portable across the fix.** The `TSynPositionEvent` format changed
   from `SizeOf(TBufferCoord)` (8 bytes on Win32, 16 on Win64) to fixed-width `Int64` fields;
   `TSynDataEvent` no longer persists its pointer at all. Old macro files will not load correctly.

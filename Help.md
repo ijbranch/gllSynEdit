@@ -113,6 +113,7 @@ Two upstream branches were triaged on 2026-09-18 and **nothing was taken**:
 | `SynEditPrint`, `SynEditPrintPreview` | `TSynEditPrint`, `TSynEditPrintPreview` | printing with headers, footers and margins |
 | `SynExportHTML`, `SynExportRTF`, `SynExportTeX` | `TSynExporterHTML`, `TSynExporterRTF`, `TSynExporterTeX` | export highlighted text |
 | `SynURIOpener` | `TSynURIOpener` | Ctrl-click a URL in the text |
+| `SynPopupMenu` | `TSynPopupMenu` | a `TPopupMenu` that adds Undo, Redo, Cut, Copy, Paste, Delete and Select All itself |
 | `SynEditOptionsDialog` | `TSynEditOptionsDialog` | ready-made options dialog |
 | `SynEditPythonBehaviour` | `TSynEditPythonBehaviour` | Python indentation rules |
 | `SynEditPlugins` | `TAbstractSynPlugin` and friends | the plugin base classes |
