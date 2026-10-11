@@ -52,9 +52,8 @@ for %%P in (SynEditDR SynEditDD) do (
     )
   )
 )
-rem Building SynEditDD rewrites its tracked .res from 4,812 bytes to 640.
-rem Put it back so a build does not show up as a source change.
-git -C "%ROOT%." checkout -- "Packages/11AndAbove/Delphi/SynEditDD.res" 2>nul
+rem The package .res files carry the auto-incremented build number (2026-10-12), so a build
+rem changing them is expected and is committed - they are no longer reverted here.
 
 :after_packages
 if "%WHAT%"=="packages" goto :summary

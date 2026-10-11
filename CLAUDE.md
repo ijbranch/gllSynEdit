@@ -63,7 +63,14 @@ where the merge-never-rebase rule above will actually bite.
 **`build.cmd` at the repository root does all of the below in the order that works, and
 exits non-zero on any failure** - `build.cmd` (packages + demos + tests), `build.cmd
 packages`, `build.cmd tests`. Prefer it to driving MSBuild by hand; it encodes the package
-order and reverts the `SynEditDD.res` that MSBuild rewrites.
+order.
+
+**Build auto-increment is on in both packages (2026-10-12)**, so every build bumps
+`VerInfo_Build` in the `.dproj` and rewrites the package `.res`; commit both. Delphi writes the
+number only into a config-and-platform group (`Cfg_1_*` = Release, `Cfg_2_*` = Debug here), so
+do not delete those groups as empty-looking. The BPL's file version lags the `.dproj` counter by
+one build. These two `.dproj` files now diverge from upstream, so a future merge touching them
+may conflict: keep ours plus upstream's real change.
 
 The only package set built here is `Packages/11AndAbove/Delphi`:
 `SynEditDR` (runtime) then `SynEditDD` (design-time). **Win32 + Win64 x Debug +
