@@ -9,6 +9,7 @@ uses
   System.SysUtils,
   DUnitX.Loggers.Console,
   DUnitX.Loggers.Xml.NUnit,
+  DUnitX.Exceptions,
   DUnitX.TestFramework,
   // Every highlighter unit is linked explicitly: each registers itself from its
   // own initialization section, so a unit that is not linked is simply absent
@@ -110,6 +111,21 @@ var
   XmlFile: string;
 
 begin
+  // Honour DUnitX's own options, above all --run:<names>, so GITLAKMCP's test_run
+  // can run one fixture or test. An unknown option is the caller's error: exit 251
+  // rather than silently running the whole suite. A filter that matches nothing
+  // runs zero tests and exits 250 below.
+  try
+    TDUnitX.CheckCommandLine;
+  except
+    on E: ECommandLineError do
+    begin
+      System.Writeln('Command-line error: ' + E.Message);
+      System.ExitCode := 251;
+      Exit;
+    end;
+  end;
+
   try
     // Strict string comparison. DUnitX defaults Assert.AreEqual(string, string)
     // to IGNORE case, which would make any test whose subject is casing pass
@@ -140,7 +156,9 @@ begin
 
     Results := Runner.Execute;
 
-    if not Results.AllPassed then
+    if Results.TestCount = 0 then
+      System.ExitCode := 250 // an empty run must never read as success
+    else if not Results.AllPassed then
       System.ExitCode := 1;
 
 {$IFNDEF CI}
@@ -152,6 +170,10 @@ begin
 {$ENDIF}
   except
     on E: Exception do
+    begin
       System.Writeln(E.ClassName, ': ', E.Message);
+      // A crash outside the tests must not read as a green run ( it exited 0 ).
+      System.ExitCode := 2;
+    end;
   end;
 end.

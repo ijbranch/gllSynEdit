@@ -110,6 +110,8 @@ build.cmd tests      the test suite only, both platforms
 ```
 
 It exits non-zero if any build fails or any test fails, so it is usable as a pre-commit check.
+To run one fixture of the built suite: `SynEditTests.exe --run:TestWordNavigation.TWordNavigationTests`
+( DUnitX's own option; a filter that matches nothing exits 250, and a crash outside the tests exits 2 ).
 
 * **Packages** — `SynEditDR` (runtime) then `SynEditDD` (design-time), Win32 + Win64 x Debug +
   Release, 8 builds. The order matters: building the design-time package first fails `E2225`
