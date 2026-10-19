@@ -7,7 +7,9 @@ Scope: **Delphi 13+**, built for Win32 and Win64, installed into the 64-bit RAD 
 content is unmodified except where entries below say otherwise, so the fork delta stays
 visible.
 
-## [Unreleased]
+## [In-Service]
+
+> Changes below are live as soon as the project is Release-built and installed - there is no separate release step, so there is no `[Unreleased]` backlog (Ian, 2026-10-19: "As soon as these are Release built they are Released").
 
 ### Added
 
@@ -227,7 +229,6 @@ both to `Int64` on Win32 (`W1024`), so the branch is now `Integer( HTM.length + 
   snaps strokes to whole pixels anyway. A comment now says so. **This corrects the review, which
   had listed it as a defect.**
 
-
 - Documentation brought level with the D13 / Win32+Win64 / no-C++Builder / no-non-Windows
   state (2026-09-10) — `CLAUDE.md`, `New.md`, `readme.md`
   Stale supported-version ranges, per-IDE folder paths, C++Builder offers, non-Windows
@@ -284,8 +285,6 @@ both to `Int64` on Win32 (`W1024`), so the branch is now `Integer( HTM.length + 
   `SynEditTextBuffer.pas` and `SynEditWordWrap.pas`, and a later `s.index('initialization')`
   matched the literal inside the Delphi highlighter's keyword array and truncated 600 lines. Both
   were caught by a balance check and a line count, and both files were restored and redone by hand.
-
-
 
 - C++Builder content removed — 5 files (2026-09-10)
   `.cbproj` projects and their `.cpp`/`.h`/`.bpr` companions, the C++Builder project
@@ -534,7 +533,6 @@ whichever version is correct rather than assuming ours is the change.
 - `WeightEnumFontsProc` wrote 4 bytes through `PInteger` into an 8-byte result (2026-09-14) —
   `Source/SynEditMiscProcs.pas`, `Source/SynFunc.pas`. Correct only by accident of three unrelated
   facts. New `PSynNativeInt` in `SynFunc.pas`.
-
 
 - `TargetedPlatforms` brought into line with the `<Platforms>` block in 1 `.dproj` (2026-09-10)
   The earlier platform sweep removed the non-Windows `<Platform>` entries but left the
