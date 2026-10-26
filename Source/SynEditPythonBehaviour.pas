@@ -42,8 +42,8 @@ unit SynEditPythonBehaviour;
 interface
 
 uses
-  Windows, Messages, Graphics, Controls, Forms, Dialogs, SynEdit, SynEditKeyCmds,
-  SynUnicode, SysUtils, Classes, SynEditTypes;
+  Winapi.Windows, Winapi.Messages, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SynEdit, SynEditKeyCmds,
+  SynUnicode, System.SysUtils, System.Classes, SynEditTypes;
 
 type
   TSynEditPythonBehaviour = class(TComponent)

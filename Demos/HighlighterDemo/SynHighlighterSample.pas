@@ -33,12 +33,12 @@ unit SynHighlighterSample;
 interface
 
 uses
-  Graphics,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynUnicode,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 type
   TtkTokenKind = (

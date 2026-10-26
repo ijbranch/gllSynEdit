@@ -1,7 +1,7 @@
 program CompletionProposalDemo;
 
 uses
-  Forms,
+  Vcl.Forms,
   FormMain_ctCode in 'FormMain_ctCode.pas' {Form1};
 
 {$R *.RES}

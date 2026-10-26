@@ -34,8 +34,8 @@ unit frmMainMDI;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ActnList, Menus, uEditAppIntfs, StdActns, ComCtrls, System.Actions, EditAppMain;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  Vcl.ActnList, Vcl.Menus, uEditAppIntfs, Vcl.StdActns, Vcl.ComCtrls, System.Actions, EditAppMain;
 
 type
   TMDIMainForm = class(TMainForm)

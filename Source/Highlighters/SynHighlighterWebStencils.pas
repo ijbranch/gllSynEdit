@@ -3,7 +3,7 @@
 interface
 
 uses
-  System.SysUtils, System.Classes, Vcl.Graphics, Generics.Collections,
+  System.SysUtils, System.Classes, Vcl.Graphics, System.Generics.Collections,
   SynEditTypes, SynEditHighlighter, SynFunc, SynUnicode;
 
 type

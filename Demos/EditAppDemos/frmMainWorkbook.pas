@@ -34,8 +34,8 @@ unit frmMainWorkbook;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ComCtrls, ActnList, Menus, uEditAppIntfs, EditAppMain, System.Actions;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  Vcl.ComCtrls, Vcl.ActnList, Vcl.Menus, uEditAppIntfs, EditAppMain, System.Actions;
 
 type
   TWorkbookMainForm = class(TMainForm)

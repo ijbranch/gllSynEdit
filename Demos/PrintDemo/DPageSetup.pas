@@ -34,8 +34,8 @@ unit DPageSetup;
 interface
 
 uses
-  Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls,
-  Buttons, ExtCtrls, ComCtrls, ToolWin, ImgList, ActnList, Dialogs,
+  Winapi.Windows, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Forms, Vcl.Controls, Vcl.StdCtrls,
+  Vcl.Buttons, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.ToolWin, Vcl.ImgList, Vcl.ActnList, Vcl.Dialogs,
   SynEditPrintTypes, SynEditPrint, SynEditPrintMargins,
   SynEditPrintHeaderFooter, System.Actions, System.ImageList;
 
@@ -182,7 +182,7 @@ var
 implementation
 
 uses
-  RichEdit, ShellAPI, Messages, UITypes;
+  Winapi.RichEdit, Winapi.ShellAPI, Winapi.Messages, System.UITypes;
 
 {$R *.DFM}
 

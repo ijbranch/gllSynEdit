@@ -37,15 +37,15 @@ unit SynHighlighterST;
 interface
 
 uses
-  Windows,
-  Controls,
-  Graphics,
+  Winapi.Windows,
+  Vcl.Controls,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
   SynUnicode,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 type
   TtkTokenKind = (tkAsm, tkComment, tkIdentifier, tkKey, tkNull, tkNumber,

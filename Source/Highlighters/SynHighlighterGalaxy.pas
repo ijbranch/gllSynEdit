@@ -45,12 +45,12 @@ unit SynHighlighterGalaxy;
 interface
 
 uses
-  Windows,
-  Graphics,
+  Winapi.Windows,
+  Vcl.Graphics,
   SynEditHighlighter,
   SynFunc,
   SynUnicode,
-  SysUtils, Classes;
+  System.SysUtils, System.Classes;
 
 type
   TtkTokenKind = (tkComment, tkIdentifier, tkKey, tkNull, tkSpace, tkMessage,
@@ -118,7 +118,7 @@ type
 implementation
 
 uses
-  Registry,
+  System.Win.Registry,
   SynEditStrConst;
 
 function TSynGalaxySyn.IsIdentChar(AChar: WideChar): Boolean;
@@ -139,7 +139,7 @@ begin
   First := 0;
   Last := fKeywords.Count - 1;
   Result := False;
-  Token := SysUtils.AnsiUpperCase(AKeyword);
+  Token := System.SysUtils.AnsiUpperCase(AKeyword);
   while First <= Last do
   begin
     I := (First + Last) shr 1;
@@ -370,7 +370,7 @@ begin
     begin
       Value.BeginUpdate;
       for i := 0 to Value.Count - 1 do
-        Value.ItemsNative[i] := SysUtils.AnsiUpperCase(Value.ItemsNative[i]);
+        Value.ItemsNative[i] := System.SysUtils.AnsiUpperCase(Value.ItemsNative[i]);
       Value.EndUpdate;
     end;
   fKeyWords.Assign(Value);

@@ -45,14 +45,14 @@ unit SynHighlighterPHP;
 interface
 
 uses
-  Graphics,
+  Vcl.Graphics,
   System.Win.Registry,
   SynEditTypes,
   SynEditHighlighter,
-  SysUtils,
+  System.SysUtils,
   SynFunc,
   SynUnicode,
-  Classes,
+  System.Classes,
 //++ CodeFolding
   SynEditCodeFolding;
 //++ CodeFolding
@@ -184,7 +184,7 @@ implementation
 uses
   SynEditMiscProcs,
   SynEditStrConst,
-  Windows;
+  Winapi.Windows;
 
 const
 

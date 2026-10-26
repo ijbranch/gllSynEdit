@@ -43,12 +43,12 @@ unit SynHighlighterLDraw;
 interface
 
 uses
-  Windows, Controls, Graphics,
+  Winapi.Windows, Vcl.Controls, Vcl.Graphics,
   SynEditHighlighter, SynEditTypes,
   SynFunc,
   SynUnicode,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 type
   TtkTokenKind = (

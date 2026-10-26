@@ -3,7 +3,7 @@
 interface
 
 uses
-  Classes, SysUtils, System.UITypes, Vcl.Dialogs, Vcl.Graphics, System.Win.Registry,
+  System.Classes, System.SysUtils, System.UITypes, Vcl.Dialogs, Vcl.Graphics, System.Win.Registry,
   DesignIntf, DesignEditors, ToolsAPI,
   SynEdit, SynHighlighterDelphi, SynEditHighlighter, SynEditTypes;
 
@@ -27,7 +27,7 @@ procedure Register;
 implementation
 
 uses
-  Windows;
+  Winapi.Windows;
 
 // =============================================================================
 //   Helpers

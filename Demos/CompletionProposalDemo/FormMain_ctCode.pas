@@ -1,8 +1,8 @@
 unit FormMain_ctCode;
 interface
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  SynCompletionProposal, StdCtrls, SynEdit, ComCtrls, System.ImageList,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  SynCompletionProposal, Vcl.StdCtrls, SynEdit, Vcl.ComCtrls, System.ImageList,
   Vcl.ImgList, Vcl.VirtualImageList, Vcl.BaseImageCollection,
   Vcl.ImageCollection;
 const

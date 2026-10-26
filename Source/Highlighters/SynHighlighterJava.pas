@@ -43,14 +43,14 @@ unit SynHighlighterJava;
 interface
 
 uses
-  Graphics,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
-  Windows,
-  SysUtils,
+  Winapi.Windows,
+  System.SysUtils,
   SynUnicode,
-  Classes,
+  System.Classes,
 //++ CodeFolding
   SynEditCodeFolding;
 //++ CodeFolding

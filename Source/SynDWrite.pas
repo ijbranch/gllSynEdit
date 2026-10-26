@@ -31,7 +31,7 @@ uses
   Winapi.Wincodec,
   Winapi.ActiveX,
   Winapi.D2D1,
-  WinApi.DXGI,
+  Winapi.DXGI,
   Winapi.DxgiFormat,
   System.Types,
   System.UITypes,

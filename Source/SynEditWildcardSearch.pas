@@ -41,7 +41,7 @@ uses
   SynEditTypes,
   SynEditRegexSearch,
   SynFunc,
-  Classes;
+  System.Classes;
 
 type
   TSynEditWildcardSearch = class(TSynEditRegexSearch)
@@ -67,7 +67,7 @@ type
 implementation
 
 uses
-  Consts;
+  Vcl.Consts;
 
 { TSynEditWildcardSearch }
 

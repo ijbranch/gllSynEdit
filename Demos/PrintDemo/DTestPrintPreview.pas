@@ -34,9 +34,9 @@ unit DTestPrintPreview;
 interface
 
 uses
-  Windows, SysUtils, Classes, Graphics, Forms, Controls, StdCtrls,
-  Buttons, ExtCtrls, ComCtrls, ToolWin, ActnList, ImgList, Dialogs,
-  SynEditPrintPreview, Menus, AppEvnts, Printers, System.Actions,
+  Winapi.Windows, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Forms, Vcl.Controls, Vcl.StdCtrls,
+  Vcl.Buttons, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.ToolWin, Vcl.ActnList, Vcl.ImgList, Vcl.Dialogs,
+  SynEditPrintPreview, Vcl.Menus, Vcl.AppEvnts, Vcl.Printers, System.Actions,
   System.ImageList, Vcl.VirtualImageList, Vcl.BaseImageCollection,
   Vcl.ImageCollection;
 

@@ -40,7 +40,7 @@ interface
 uses
   Winapi.Windows,
   Vcl.Graphics,
-  RichEdit,
+  Winapi.RichEdit,
   SynEditExport,
   SynUnicode,
   System.Classes,

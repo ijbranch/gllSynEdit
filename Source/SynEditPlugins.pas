@@ -35,14 +35,14 @@ unit SynEditPlugins;
 interface
 
 uses
-  Windows,
-  Menus,
+  Winapi.Windows,
+  Vcl.Menus,
   SynEdit,
   SynEditTypes,
   SynEditKeyCmds,
   SynFunc,
   SynUnicode,
-  Classes;
+  System.Classes;
 
 type
   TAbstractSynPlugin = class(TComponent)
@@ -135,11 +135,11 @@ procedure ReleasePluginCommand(aCmd: TSynEditorCommand);
 implementation
 
 uses
-  Types,
-  Forms,
+  System.Types,
+  Vcl.Forms,
   SynEditMiscProcs,
   SynEditStrConst,
-  SysUtils;
+  System.SysUtils;
 
 const
   ecPluginBase = 64000;

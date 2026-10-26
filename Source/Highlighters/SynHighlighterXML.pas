@@ -51,13 +51,13 @@ interface
 {$I SynEdit.inc}
 
 uses
-  Windows, Messages, Controls, Graphics, Registry,
+  Winapi.Windows, Winapi.Messages, Vcl.Controls, Vcl.Graphics, System.Win.Registry,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
   SynUnicode,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 type
   TtkTokenKind = (tkAposAttrValue, tkAposEntityRef, tkAttribute, tkCDATA,

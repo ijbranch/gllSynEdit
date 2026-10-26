@@ -1,7 +1,7 @@
 program ParamCompletionDemo;
 
 uses
-  Forms,
+  Vcl.Forms,
   FormMain_ctParams in 'FormMain_ctParams.pas' {Form1};
 
 {$R *.RES}

@@ -279,7 +279,7 @@ implementation
 uses
   System.Win.Registry,
   System.TypInfo,
-  SyStem.IniFiles,
+  System.IniFiles,
   SynEditStrConst,
   SynEditMiscProcs,
   Vcl.Graphics;

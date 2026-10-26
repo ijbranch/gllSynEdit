@@ -51,8 +51,8 @@ unit SynGenUnit;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  StdCtrls, GenLex, ComCtrls, Menus, SynUnicode;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  Vcl.StdCtrls, GenLex, Vcl.ComCtrls, Vcl.Menus, SynUnicode;
 
 var
   mKeyHashTable: array[#0..#255] of Integer;
@@ -187,7 +187,7 @@ implementation
 {$R *.dfm}
 
 uses
-  UITypes, StrUtils, Registry, HashTableGen;
+  System.UITypes, System.StrUtils, System.Win.Registry, HashTableGen;
 
 const
   BoolStrs: array[Boolean] of string = ('False', 'True'); // Do not localize
@@ -232,9 +232,9 @@ end;
 
 function FirstLetterCap(S: string): string;
 begin
-  Result := SysUtils.AnsiLowerCase(S);
+  Result := System.SysUtils.AnsiLowerCase(S);
   if Length(Result) > 0 then
-    Result[1] := SysUtils.AnsiUpperCase(S[1])[1];
+    Result[1] := System.SysUtils.AnsiUpperCase(S[1])[1];
 end;
 
 {$IFNDEF SYN_COMPILER_6_UP}

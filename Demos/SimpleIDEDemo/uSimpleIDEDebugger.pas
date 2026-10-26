@@ -34,7 +34,7 @@ unit uSimpleIDEDebugger;
 interface
 
 uses
-  Windows, Classes;
+  Winapi.Windows, System.Classes;
 
 type
   TDebuggerState = (dsStopped, dsRunning, dsPaused);

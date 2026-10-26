@@ -30,7 +30,7 @@ of this file under either the MPL or the GPL.
 program EditAppMDI;
 
 uses
-  Forms,
+  Vcl.Forms,
   EditAppMain in 'EditAppMain.pas' {MainForm},
   frmMainMDI in 'frmMainMDI.pas' {MDIMainForm},
   uEditAppIntfs in 'uEditAppIntfs.pas',

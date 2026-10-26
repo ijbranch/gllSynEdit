@@ -36,8 +36,8 @@ unit dlgReplaceText;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  dlgSearchText, StdCtrls, ExtCtrls;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  dlgSearchText, Vcl.StdCtrls, Vcl.ExtCtrls;
 
 type
   TTextReplaceDialog = class(TTextSearchDialog)

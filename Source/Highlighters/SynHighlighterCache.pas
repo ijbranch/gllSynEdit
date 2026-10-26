@@ -44,13 +44,13 @@ unit SynHighlighterCache;
 interface
 
 uses
-  Graphics,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
   SynUnicode,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 type
   TtkTokenKind = (tkClass, tkComment, tkFunction, tkIdentifier, tkKey, tkNull,

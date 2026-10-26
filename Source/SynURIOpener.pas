@@ -47,14 +47,14 @@ unit SynURIOpener;
 interface
 
 uses
-  Windows,
-  Controls,
+  Winapi.Windows,
+  Vcl.Controls,
   SynEditTypes,
   SynEdit,
   SynFunc,
   SynHighlighterURI,
   SynUnicode,
-  Classes;
+  System.Classes;
 
 type
   /// <summary>Reports a link that could not be launched.</summary>
@@ -121,11 +121,11 @@ type
 implementation
 
 uses
-  ShellAPI,
-  Forms,
+  Winapi.ShellAPI,
+  Vcl.Forms,
   SynEditHighlighter,
   SynEditKeyConst,
-  SysUtils;
+  System.SysUtils;
 
 type
   TAccessCustomSynEdit = class(TCustomSynEdit);

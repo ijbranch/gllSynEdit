@@ -34,9 +34,9 @@ unit MTestPP;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  SynEditHighlighter, SynHighlighterPas, SynEdit, StdCtrls, SynEditPrint,
-  SynEditPrintTypes, ActnList, ToolWin, ComCtrls, ImgList, Menus,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  SynEditHighlighter, SynHighlighterPas, SynEdit, Vcl.StdCtrls, SynEditPrint,
+  SynEditPrintTypes, Vcl.ActnList, Vcl.ToolWin, Vcl.ComCtrls, Vcl.ImgList, Vcl.Menus,
   System.ImageList, System.Actions, SynEditCodeFolding, Vcl.VirtualImageList,
   Vcl.BaseImageCollection, Vcl.ImageCollection;
 
@@ -96,7 +96,7 @@ var
 
 implementation
 
-uses DTestPrintPreview, DPageSetup, Printers;
+uses DTestPrintPreview, DPageSetup, Vcl.Printers;
 
 {$R *.DFM}
 

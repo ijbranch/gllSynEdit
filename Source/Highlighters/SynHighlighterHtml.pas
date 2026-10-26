@@ -49,13 +49,13 @@ interface
 {$I SynEdit.inc}
 
 uses
-  Graphics,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
   SynUnicode,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 const
   MAX_ESCAPEAMPS = 249;

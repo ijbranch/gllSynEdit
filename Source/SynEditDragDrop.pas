@@ -29,7 +29,7 @@ unit SynEditDragDrop;
 interface
 
 Uses
-  Windows, ActiveX, SysUtils, Classes, Messages, Controls, Forms, ExtCtrls;
+  Winapi.Windows, Winapi.ActiveX, System.SysUtils, System.Classes, Winapi.Messages, Vcl.Controls, Vcl.Forms, Vcl.ExtCtrls;
 
 
 // Drop effects as Delphi style constants (originals in ActiveX)

@@ -41,15 +41,15 @@ unit SynHighlighterUnreal;
 interface
 
 uses
-  Graphics,
-  Registry,
-  Windows, // registry constants
+  Vcl.Graphics,
+  System.Win.Registry,
+  Winapi.Windows, // registry constants
   SynEditHighlighter,
   SynEditTypes,
   SynFunc,
   SynUnicode,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 type
   TtkTokenKind = (

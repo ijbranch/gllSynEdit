@@ -34,7 +34,7 @@ unit uEditAppIntfs;
 interface
 
 uses
-  Windows, Classes, Forms, ComCtrls;
+  Winapi.Windows, System.Classes, Vcl.Forms, Vcl.ComCtrls;
 
 type
   IEditor = interface

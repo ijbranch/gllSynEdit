@@ -3,8 +3,8 @@ unit FormMain_ctParams;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  SynCompletionProposal, StdCtrls, SynEdit;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  SynCompletionProposal, Vcl.StdCtrls, SynEdit;
 
 type
   TForm1 = class(TForm)

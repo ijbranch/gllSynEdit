@@ -30,7 +30,7 @@ of this file under either the MPL or the GPL.
 program EditAppWorkbook;
 
 uses
-  Forms,
+  Vcl.Forms,
   EditAppMain in 'EditAppMain.pas' {MainForm},
   frmMainWorkbook in 'frmMainWorkbook.pas' {WorkbookMainForm},
   uEditAppIntfs in 'uEditAppIntfs.pas',

@@ -31,17 +31,17 @@ unit LongIntList;
 interface
 
 uses
-  Windows, 
-  SysUtils, 
-  Messages, 
-  Classes, 
-  Graphics, 
-  Controls, 
-  Forms, 
-  Dialogs, 
-  Menus, 
-  StdCtrls, 
-  ExtCtrls;
+  Winapi.Windows, 
+  System.SysUtils, 
+  Winapi.Messages, 
+  System.Classes, 
+  Vcl.Graphics, 
+  Vcl.Controls, 
+  Vcl.Forms, 
+  Vcl.Dialogs, 
+  Vcl.Menus, 
+  Vcl.StdCtrls, 
+  Vcl.ExtCtrls;
 
 const
   MaxListSize = MaxInt div 16;

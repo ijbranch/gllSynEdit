@@ -34,8 +34,8 @@ unit dmWorkbookCommands;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ActnList, SynHighlighterSQL, SynHighlighterPas, SynEditHighlighter,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  Vcl.ActnList, SynHighlighterSQL, SynHighlighterPas, SynEditHighlighter,
   SynHighlighterCpp, SynEditCodeFolding, System.Actions;
 
 type

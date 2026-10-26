@@ -36,16 +36,16 @@ unit SynDBEdit;
 interface
 
 uses
-  Windows,
-  Messages,
-  Controls,
-  DbCtrls,
+  Winapi.Windows,
+  Winapi.Messages,
+  Vcl.Controls,
+  Vcl.DBCtrls,
   SynEdit,
   SynEditTypes,
   SynEditKeyCmds,
-  SysUtils,
-  Classes,
-  DB;
+  System.SysUtils,
+  System.Classes,
+  Data.DB;
 
 type
   TCustomDBSynEdit = class(TCustomSynEdit)

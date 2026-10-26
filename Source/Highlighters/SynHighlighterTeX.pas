@@ -34,12 +34,12 @@ unit SynHighlighterTeX;
 interface
 
 uses
-  Graphics,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
   SynUnicode,
-  Classes;
+  System.Classes;
 
 type
   TtkTokenKind = (tkBrace, tkBracket, tkNull, tkSpace, tkText, tkComment,

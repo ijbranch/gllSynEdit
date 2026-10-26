@@ -44,13 +44,13 @@ unit SynHighlighterCpp;
 interface
 
 uses
-  Graphics,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
-  SysUtils,
+  System.SysUtils,
   SynUnicode,
-  Classes,
+  System.Classes,
   SynEditCodeFolding;
 
 type
@@ -195,8 +195,8 @@ type
 implementation
 
 uses
-  Windows,
-  Registry,
+  Winapi.Windows,
+  System.Win.Registry,
   SynEditStrConst,
   SynEditMiscProcs;
 

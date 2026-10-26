@@ -35,19 +35,19 @@ unit SynMacroRecorder;
 interface
 
 uses
-  StdCtrls,
-  Controls,
-  Windows,
-  Messages,
-  Graphics,
-  Menus,
+  Vcl.StdCtrls,
+  Vcl.Controls,
+  Winapi.Windows,
+  Winapi.Messages,
+  Vcl.Graphics,
+  Vcl.Menus,
   SynEdit,
   SynEditKeyCmds,
   SynEditPlugins,
   SynEditTypes,
   SynFunc,
   SynUnicode,
-  Classes;
+  System.Classes;
 
 resourcestring
   sCannotRecord = 'Cannot record macro; already recording or playing';
@@ -253,10 +253,10 @@ type
 implementation
 
 uses
-  Forms,
+  Vcl.Forms,
   SynEditMiscProcs,
-  RTLConsts,
-  SysUtils;
+  System.RTLConsts,
+  System.SysUtils;
 
 { TSynDataEvent }
 
@@ -326,8 +326,8 @@ begin
   fMacroName := 'unnamed';
   fCommandIDs[mcRecord] := NewPluginCommand;
   fCommandIDs[mcPlayback] := NewPluginCommand;
-  fShortCuts[mcRecord] := Menus.ShortCut(Ord('R'), [ssCtrl, ssShift]);
-  fShortCuts[mcPlayback] := Menus.ShortCut(Ord('P'), [ssCtrl, ssShift]);
+  fShortCuts[mcRecord] := Vcl.Menus.ShortCut(Ord('R'), [ssCtrl, ssShift]);
+  fShortCuts[mcPlayback] := Vcl.Menus.ShortCut(Ord('P'), [ssCtrl, ssShift]);
 end;
 
 function TCustomSynMacroRecorder.CreateMacroEvent(aCmd: TSynEditorCommand): TSynMacroEvent;

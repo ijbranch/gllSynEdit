@@ -48,14 +48,14 @@ unit SynHighlighterCS;
 interface
 
 uses
-  Graphics,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynEditMiscClasses,
   SynFunc,
   SynUnicode,
-  SysUtils,
-  Classes,
+  System.SysUtils,
+  System.Classes,
   SynEditCodeFolding;
 
 type
@@ -265,8 +265,8 @@ type
 implementation
 
 uses
-  Windows,
-  Registry,
+  Winapi.Windows,
+  System.Win.Registry,
   SynEditStrConst,
   SynEditMiscProcs;
 

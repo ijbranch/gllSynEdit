@@ -30,7 +30,7 @@ of this file under either the MPL or the GPL.
 program TestPP;
 
 uses
-  Forms,
+  Vcl.Forms,
   MTestPP in 'MTestPP.pas' {Form1},
   DTestPrintPreview in 'DTestPrintPreview.pas' {TestPrintPreviewDlg},
   DPageSetup in 'DPageSetup.pas' {PageSetupDlg};

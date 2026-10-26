@@ -48,14 +48,14 @@ unit SynHighlighterPerl;
 interface
 
 uses
-  Graphics,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
-  Windows,                                                                      //Fiala
-  SysUtils,
+  Winapi.Windows,                                                                      //Fiala
+  System.SysUtils,
   SynFunc,
   SynUnicode,
-  Classes,
+  System.Classes,
 //++ CodeFolding
   SynEditCodeFolding;
 //++ CodeFolding

@@ -5,8 +5,8 @@ unit HashTableGen;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ComCtrls;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms,
+  Vcl.Dialogs, Vcl.StdCtrls, Vcl.ComCtrls;
 
 type
   TFrmHashTableGen = class(TForm)
@@ -57,7 +57,7 @@ implementation
 {$R *.dfm}
 
 uses
-  StrUtils,
+  System.StrUtils,
   SynGenUnit,
   SynUnicode;
 
@@ -156,7 +156,7 @@ begin
        KeyWords[i] := KeyWordsList[i]
     else
       for i := 0 to KeyWordsList.Count - 1 do
-        KeyWords[i] := SysUtils.AnsiLowerCase(KeyWordsList[i]);
+        KeyWords[i] := System.SysUtils.AnsiLowerCase(KeyWordsList[i]);
 
     FKeyList := KeyList;
   finally
@@ -189,7 +189,7 @@ begin
     for i := 0 to FKeyList.Count - 1 do
       with TLexKeys(FKeyList[i]) do
       begin
-        Key := FinalHashKey(SysUtils.AnsiLowerCase(KeyName));
+        Key := FinalHashKey(System.SysUtils.AnsiLowerCase(KeyName));
       end;
   end;
 end;

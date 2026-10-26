@@ -35,8 +35,8 @@ interface
 {$I SynEdit.inc}
 
 uses
-  Windows,  Messages, Graphics, Controls, Forms, Dialogs, ExtCtrls, StdCtrls,
-  Buttons, Registry, SynAutoCorrect, SynUnicode, SysUtils, Classes;
+  Winapi.Windows,  Winapi.Messages, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls,
+  Vcl.Buttons, System.Win.Registry, SynAutoCorrect, SynUnicode, System.SysUtils, System.Classes;
 
 type
   TfrmAutoCorrectEditor = class(TForm)
@@ -82,7 +82,7 @@ implementation
 {$R *.dfm}
 
 uses
-  Types;
+  System.Types;
 
 procedure TfrmAutoCorrectEditor.FormShow(Sender: TObject);
 begin

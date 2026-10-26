@@ -40,12 +40,12 @@ interface
 
 uses
   SynEditTypes,
-  RegularExpressions,
-  RegularExpressionsCore,
+  System.RegularExpressions,
+  System.RegularExpressionsCore,
   SynEditMiscClasses,
   SynFunc,
   SynUnicode,
-  Classes;
+  System.Classes;
 
 type
   TSynEditRegexSearch = class(TSynEditSearchCustom)
@@ -75,9 +75,9 @@ type
 implementation
 
 uses
-  RegularExpressionsAPI,
+  System.RegularExpressionsAPI,
   System.SysUtils,
-  Consts;
+  Vcl.Consts;
 
 {$IF (CompilerVersion <= 35) and not Declared(RTLVersion112)}
 type

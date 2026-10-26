@@ -45,14 +45,14 @@ unit SynHighlighterSml;
 interface
 
 uses
-  Graphics,
-  Registry,
+  Vcl.Graphics,
+  System.Win.Registry,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
   SynUnicode,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 Type
   TtkTokenKind = (tkCharacter, tkComment, tkIdentifier, tkKey, tkNull, tkNumber,

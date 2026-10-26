@@ -38,13 +38,13 @@ unit SynHighlighterGWS;
 interface
 
 uses
-  Graphics,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynUnicode,
   SynFunc,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 Type
   TtkTokenKind = (

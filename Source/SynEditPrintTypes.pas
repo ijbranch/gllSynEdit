@@ -43,7 +43,7 @@ unit SynEditPrintTypes;
 interface
 
 uses
-  SynUnicode, Classes, SysUtils;
+  SynUnicode, System.Classes, System.SysUtils;
 
 const
   DefLeft = 25; //Default left margin [mm]

@@ -43,14 +43,14 @@ unit SynHighlighterHP48;
 interface
 
 uses
-  Windows,
-  Registry,
-  Graphics,
+  Winapi.Windows,
+  System.Win.Registry,
+  Vcl.Graphics,
   SynEditHighlighter,
   SynFunc,
   SynUnicode,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 const
   NbSubList = 128;

@@ -33,16 +33,16 @@ unit SynUnicode;
 interface
 
 uses
-  Windows,
-  Messages,
-  Controls,
-  Forms,
-  Graphics,
-  Clipbrd,
-  Types,
-  Classes,
-  SysUtils,
-  TypInfo,
+  Winapi.Windows,
+  Winapi.Messages,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Vcl.Clipbrd,
+  System.Types,
+  System.Classes,
+  System.SysUtils,
+  System.TypInfo,
   SynEditTypes;
 
 const
@@ -106,9 +106,9 @@ implementation
 uses
   SynEditTextBuffer,
   SynFunc,
-  Math,
-  SysConst,
-  RTLConsts;
+  System.Math,
+  System.SysConst,
+  System.RTLConsts;
 
 // exchanges in each character of the given string the low order and high order
 // byte to go from LSB to MSB and vice versa.

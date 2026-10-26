@@ -30,7 +30,7 @@ of this file under either the MPL or the GPL.
 program SearchReplaceDemo;
 
 uses
-  Forms,
+  Vcl.Forms,
   SearchReplaceMain in 'SearchReplaceMain.pas' {SearchReplaceDemoForm},
   dlgSearchText in 'dlgSearchText.pas' {TextSearchDialog},
   dlgReplaceText in 'dlgReplaceText.pas' {TextReplaceDialog},

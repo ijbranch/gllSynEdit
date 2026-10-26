@@ -35,20 +35,20 @@ unit SynEditKeyCmdsEditor;
 interface
 
 uses
-  Windows,
-  Messages,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  ComCtrls,
-  Menus,
-  StdCtrls,
-  Buttons,
-  ExtCtrls,
+  Winapi.Windows,
+  Winapi.Messages,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.ComCtrls,
+  Vcl.Menus,
+  Vcl.StdCtrls,
+  Vcl.Buttons,
+  Vcl.ExtCtrls,
   SynEditKeyCmds,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 type
   TSynEditKeystrokesEditorForm = class(TForm)
@@ -94,8 +94,8 @@ implementation
 {$R *.dfm}
 
 uses
-  Types,
-  UITypes,
+  System.Types,
+  System.UITypes,
   SynEditKeyCmdEditor,
   SynEditStrConst;
 
@@ -140,10 +140,10 @@ begin
           SubItems.Add(SYNS_ShortCutNone)
         else
           if FKeystrokes[I].ShortCut2 = 0 then
-            SubItems.Add(Menus.ShortCutToText(FKeystrokes[I].ShortCut))
+            SubItems.Add(Vcl.Menus.ShortCutToText(FKeystrokes[I].ShortCut))
           else
-            SubItems.Add(Menus.ShortCutToText(FKeystrokes[I].ShortCut)+ ' '+
-              Menus.ShortCutToText(FKeystrokes[I].ShortCut2));
+            SubItems.Add(Vcl.Menus.ShortCutToText(FKeystrokes[I].ShortCut)+ ' '+
+              Vcl.Menus.ShortCutToText(FKeystrokes[I].ShortCut2));
       end;
     end;
   finally
@@ -215,7 +215,7 @@ var
             else TmpCommand := EditorCommandToCodeString(TSynEditKeyStrokes(NewStroke.Collection).Items[KeyLoc].Command);
 
             Result := MessageDlg(Format(SYNS_DuplicateShortcutMsg,
-              [Menus.ShortCutToText(AForm.Keystroke), TmpCommand]),
+              [Vcl.Menus.ShortCutToText(AForm.Keystroke), TmpCommand]),
               mtError, [mbOK, mbCancel], 0) = mrOK;
             NewStroke.Free;
 
@@ -248,10 +248,10 @@ begin
             SubItems.Add(SYNS_ShortcutNone)
           else
           if NewStroke.ShortCut2 = 0 then
-            SubItems.Add(Menus.ShortCutToText(NewStroke.ShortCut))
+            SubItems.Add(Vcl.Menus.ShortCutToText(NewStroke.ShortCut))
           else
-            SubItems.Add(Menus.ShortCutToText(NewStroke.ShortCut)+ ' '+
-              Menus.ShortCutToText(NewStroke.ShortCut2));
+            SubItems.Add(Vcl.Menus.ShortCutToText(NewStroke.ShortCut)+ ' '+
+              Vcl.Menus.ShortCutToText(NewStroke.ShortCut2));
         end;
       end;
     finally
@@ -297,7 +297,7 @@ var
             else TmpCommand := EditorCommandToCodeString(TSynEditKeyStrokes(FKeystrokes[SelItem.Index].Collection).Items[KeyLoc].Command);
 
             Result := MessageDlg(Format(SYNS_DuplicateShortcutMsg,
-              [Menus.ShortCutToText(AForm.Keystroke), TmpCommand]),
+              [Vcl.Menus.ShortCutToText(AForm.Keystroke), TmpCommand]),
               mtError, [mbOK, mbCancel], 0) = mrOK;
 
             FKeystrokes[SelItem.Index].ShortCut := OldShortCut;
@@ -354,10 +354,10 @@ begin
               SubItems[0] := SYNS_ShortcutNone
             else
               if FKeystrokes[Index].ShortCut2 = 0 then
-                SubItems[0] := Menus.ShortCutToText(FKeystrokes[Index].ShortCut)
+                SubItems[0] := Vcl.Menus.ShortCutToText(FKeystrokes[Index].ShortCut)
               else
-                SubItems[0] := Menus.ShortCutToText(FKeystrokes[Index].ShortCut)
-                  + ' ' + Menus.ShortCutToText(FKeystrokes[Index].ShortCut2);
+                SubItems[0] := Vcl.Menus.ShortCutToText(FKeystrokes[Index].ShortCut)
+                  + ' ' + Vcl.Menus.ShortCutToText(FKeystrokes[Index].ShortCut2);
           end;
         finally
           KeyCmdList.Items.EndUpdate;

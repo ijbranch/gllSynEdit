@@ -31,7 +31,7 @@ unit uHighlighterProcs;
 interface
 
 uses
-  Classes, SynEditHighlighter;
+  System.Classes, SynEditHighlighter;
 
 procedure GetHighlighters(AOwner: TComponent; AHighlighters: TStringList;
   AppendToList: Boolean);
@@ -42,7 +42,7 @@ function GetHighlighterFromFileExt(AHighlighters: TStringList;
 implementation
 
 uses
-  SysUtils;
+  System.SysUtils;
   
 procedure GetHighlighters(AOwner: TComponent; AHighlighters: TStringList;
   AppendToList: Boolean);

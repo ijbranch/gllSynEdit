@@ -30,7 +30,7 @@ of this file under either the MPL or the GPL.
 program HighlighterDemo;
 
 uses
-  Forms,
+  Vcl.Forms,
   uHighlighterMain in 'uHighlighterMain.pas' {Form1};
 
 begin

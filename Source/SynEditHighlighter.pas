@@ -31,7 +31,7 @@ uses
   System.Classes,
   System.Win.Registry,
   System.IniFiles,
-  Generics.Collections,
+  System.Generics.Collections,
   Vcl.Graphics,
   SynEditTypes,
   SynEditMiscClasses,

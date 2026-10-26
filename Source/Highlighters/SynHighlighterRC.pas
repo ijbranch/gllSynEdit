@@ -33,14 +33,14 @@ unit SynHighlighterRC;
 interface
 
 uses
-  Windows, Controls,
-  Graphics,
+  Winapi.Windows, Vcl.Controls,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
   SynUnicode,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 type
  TtkTokenKind = (tkComment, tkDirective, tkIdentifier, tkKey, tkNull,

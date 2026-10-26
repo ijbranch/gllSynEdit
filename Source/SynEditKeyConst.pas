@@ -38,7 +38,7 @@ unit SynEditKeyConst;
 interface
 
 uses
-  Windows;
+  Winapi.Windows;
 
 const
 

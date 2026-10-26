@@ -30,7 +30,7 @@ of this file under either the MPL or the GPL.
 program SimpleIDEDemo;
 
 uses
-  Forms,
+  Vcl.Forms,
   SimpleIdeMain in 'SimpleIdeMain.pas' {SimpleIDEMainForm},
   uSimpleIDEDebugger in 'uSimpleIDEDebugger.pas';
 

@@ -34,8 +34,8 @@ unit SynHighlighterJSON;
 interface
 
 uses
-  Graphics,
-  Registry,
+  Vcl.Graphics,
+  System.Win.Registry,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
@@ -43,8 +43,8 @@ uses
   //++ CodeFolding
   SynEditCodeFolding,
   //++ CodeFolding
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 type
   TtkTokenKind = (tkString, tkReserved, tkNull, tkNumber, tkSpace,

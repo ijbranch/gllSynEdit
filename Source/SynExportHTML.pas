@@ -35,13 +35,13 @@ unit SynExportHTML;
 interface
 
 uses
-  Windows,
-  Graphics,
+  Winapi.Windows,
+  Vcl.Graphics,
   SynEditExport,
   SynEditHighlighter,
   SynUnicode,
   System.Generics.Collections,
-  Classes;
+  System.Classes;
 
 type
   TSynExporterHTML = class(TSynCustomExporter)
@@ -111,7 +111,7 @@ uses
   SynEditMiscProcs,
   SynEditStrConst,
   SynHighlighterMulti,
-  SysUtils;
+  System.SysUtils;
 
 { TSynExporterHTML }
 

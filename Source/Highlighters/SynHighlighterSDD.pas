@@ -34,14 +34,14 @@ unit SynHighlighterSDD;
 interface
 
 uses
-  Windows,
-  Graphics,
+  Winapi.Windows,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
   SynUnicode,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 type
   TtkTokenKind = (

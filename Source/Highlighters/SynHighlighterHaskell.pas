@@ -49,13 +49,13 @@ unit SynHighlighterHaskell;
 interface
 
 uses
-  Graphics,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
   SynUnicode,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 type
   TtkTokenKind = (tkComment, tkIdentifier, tkKey, tkNull,
@@ -175,8 +175,8 @@ type
 implementation
 
 uses
-  Windows,
-  Registry,
+  Winapi.Windows,
+  System.Win.Registry,
   SynEditStrConst;
 
 const

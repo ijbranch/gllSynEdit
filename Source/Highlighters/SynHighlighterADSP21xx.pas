@@ -43,13 +43,13 @@ unit SynHighlighterADSP21xx;
 interface
 
 uses
-  Graphics,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
   SynUnicode,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 type
   TtkTokenKind = (tkComment, tkCondition, tkIdentifier, tkKey, tkNull, tkNumber,
@@ -321,8 +321,8 @@ type
 implementation
 
 uses
-  Windows,
-  Registry,
+  Winapi.Windows,
+  System.Win.Registry,
   SynEditStrConst;
 
 const

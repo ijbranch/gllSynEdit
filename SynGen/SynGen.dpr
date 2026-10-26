@@ -33,7 +33,7 @@ of this file under either the MPL or the GPL.
 program SynGen;
 
 uses
-  Forms,
+  Vcl.Forms,
   SynGenUnit in 'SynGenUnit.pas' {FrmMain},
   GenLex in 'GenLex.pas',
   HashTableGen in 'HashTableGen.pas' {FrmHashTableGen};

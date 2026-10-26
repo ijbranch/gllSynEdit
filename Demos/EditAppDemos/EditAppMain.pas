@@ -34,8 +34,8 @@ unit EditAppMain;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  Menus, ActnList, uEditAppIntfs, ComCtrls, System.Actions;
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
+  Vcl.Menus, Vcl.ActnList, uEditAppIntfs, Vcl.ComCtrls, System.Actions;
 
 type
   TMainForm = class(TForm)
@@ -111,7 +111,7 @@ implementation
 {$R *.DFM}
 
 uses
-  IniFiles, dmWorkbookCommands;
+  System.IniFiles, dmWorkbookCommands;
 
 { TMainForm }
 

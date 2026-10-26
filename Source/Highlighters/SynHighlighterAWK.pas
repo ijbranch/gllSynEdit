@@ -43,13 +43,13 @@ interface
 {$I SynEdit.inc}
 
 uses
-  Graphics,
+  Vcl.Graphics,
   SynEditTypes,
   SynEditHighlighter,
   SynUnicode,
   SynFunc,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 type
   TtkTokenKind = (tkComment, tkIdentifier, tkInterFunc, tkKey, tkNull,

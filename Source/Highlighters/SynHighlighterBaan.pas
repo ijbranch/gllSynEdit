@@ -44,12 +44,12 @@ unit SynHighlighterBaan;
 interface
 
 uses
-  Windows, Messages, Controls, Graphics, Registry,
+  Winapi.Windows, Winapi.Messages, Vcl.Controls, Vcl.Graphics, System.Win.Registry,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
   SynUnicode,
-  SysUtils, Classes;
+  System.SysUtils, System.Classes;
 
 type
   TtkTokenKind = (tkComment, tkDirective, tkIdentifier, tkKey, tkNull, tkNumber,

@@ -34,14 +34,14 @@ unit SynHighlighterModelica;
 interface
 
 uses
-  Graphics,
-  Registry,
+  Vcl.Graphics,
+  System.Win.Registry,
   SynEditTypes,
   SynEditHighlighter,
   SynFunc,
   SynUnicode,
-  SysUtils,
-  Classes;
+  System.SysUtils,
+  System.Classes;
 
 type
   TtkTokenKind = (tkComment, tkDirective, tkIdentifier, tkKey, tkNull, tkNumber,

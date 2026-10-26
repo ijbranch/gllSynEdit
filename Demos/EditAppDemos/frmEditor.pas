@@ -29,7 +29,7 @@ unit frmEditor;
 interface
 
 uses
-  Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Menus,
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Menus,
   uEditAppIntfs, SynEdit, SynEditTypes, SynEditMiscProcs,
   SynEditMiscClasses, SynEditSearch, SynUnicode;
 
@@ -143,7 +143,7 @@ implementation
 {$R *.DFM}
 
 uses
-  ComCtrls, dmWorkbookCommands, dlgSearchText, dlgReplaceText, dlgConfirmReplace,
+  Vcl.ComCtrls, dmWorkbookCommands, dlgSearchText, dlgReplaceText, dlgConfirmReplace,
   System.Types;
 
 const
