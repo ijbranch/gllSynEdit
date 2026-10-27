@@ -32,7 +32,7 @@ Upstream content is kept unmodified except where `CHANGELOG.md` — the sole
 record of the fork delta — says otherwise. Take upstream updates by fetching
 the `upstream` remote and merging (never rebasing).
 
-**Merged as far as `e106252` (2026-10-11), which is upstream's tip.** Where a
+**Merged as far as `e106252` (2026-10-11); reviewed to `09855c5` (2026-10-27), upstream's tip, on 2026-10-28.** Of the four commits after the merge point, `09855c5` (no thread pool in `GetMaxWidth` inside a DLL) was ported by hand, `7465563` was already fixed here on 2026-09-14, and `e468e85` (docs) with its merge `e98d153` was not taken, so `git rev-list HEAD..upstream/master` still lists them; see `CHANGELOG.md`. Where a
 commit has already been cherry-picked here, merge it anyway once it reaches a
 tip: the merge changes nothing, but without it `git rev-list HEAD..upstream/master`
 keeps reporting a backlog that does not exist, because patch comparison cannot

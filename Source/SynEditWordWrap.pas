@@ -331,10 +331,16 @@ begin
     Exit;
 
   SetLength(RowLengths, FEditor.Lines.CountNative);
-  TParallel.&For(0, FEditor.Lines.CountNative - 1, procedure(I: TSynNativeInt)
-  begin
-    WrapLine(I, RowLengths[I]);
-  end);
+  // TThreadPool.Default cannot be shut down cleanly on DLL unload (loader lock),
+  // as in TSynEditStringList.GetMaxWidth
+  if not IsLibrary then
+    TParallel.&For(0, FEditor.Lines.CountNative - 1, procedure(I: TSynNativeInt)
+    begin
+      WrapLine(I, RowLengths[I]);
+    end)
+  else
+    for cLine := 0 to FEditor.Lines.CountNative - 1 do
+      WrapLine(cLine, RowLengths[cLine]);
 
   for cLine := 0 to FEditor.Lines.CountNative - 1 do
   begin

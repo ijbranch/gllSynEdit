@@ -98,7 +98,7 @@ substitute for it.** `TestHighlighterContract` is data-driven over
 registered highlighters at once: `Next` advances or reaches end of line, `GetRange`
 round-trips through `SetRange`, and each highlighter scans its own `SampleSource`
 identically whether the range is restored per line or not. Run it for both
-platforms; it needs `D:\gllDUnitX\Source` on the unit path. **12/12 as of 2026-09-23**
+platforms; it needs `D:\gllDUnitX\Source` on the unit path. **15/15 as of 2026-10-28** (12 as of 2026-09-23; 15 since `TestTextBuffer` pinned `MaxWidth` inside a DLL and after a failed measure)
 (7 until `TestWordNavigation` pinned Ctrl+Left / Ctrl+Right, which had no coverage at
 all when upstream changed their character rule).
 It found a real non-advancing `Next` in `TSynXMLSyn` on its first run — that class

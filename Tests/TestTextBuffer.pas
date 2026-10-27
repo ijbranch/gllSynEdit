@@ -22,7 +22,23 @@ type
   [TestFixture]
   TSynEditStringListTests = class
   private
+    /// <summary>The list under test; typed TObject so the interface needs no SynEdit unit.</summary>
     FLines: TObject;
+    /// <summary>Thread that ran the test, against which MeasureLength classifies its callers.</summary>
+    FTestThreadId: TThreadID;
+    /// <summary>Number of MeasureLength calls made on any other thread (updated atomically).</summary>
+    FOffThreadCalls: Integer;
+    /// <summary>When True, MeasureLength raises on the Poison line instead of measuring it.</summary>
+    FRaiseOnPoison: Boolean;
+    /// <summary>Text-width function for the MaxWidth tests: the string's length, noting off-thread calls.</summary>
+    /// <param name="S">Line text to measure.</param>
+    /// <returns>Length of S.</returns>
+    function MeasureLength(const S: string): NativeInt;
+    /// <summary>Builds a list measured by MeasureLength whose longest line is the given index.</summary>
+    /// <param name="ALines">Number of lines to add.</param>
+    /// <param name="ALongest">Index of the one line made longer than the rest.</param>
+    /// <returns>A new list, owned by the caller.</returns>
+    function NewMeasuredList(ALines, ALongest: Integer): TObject;
   public
     [Setup]
     procedure Setup;
@@ -45,6 +61,28 @@ type
     /// </summary>
     [Test]
     procedure CapacityBelowCountRaises;
+    /// <summary>
+    ///   MaxWidth finds the longest line in an ordinary process, and (on more than one
+    ///   core) proves the TParallel.For path really ran by seeing a pool thread measure.
+    /// </summary>
+    [Test]
+    procedure MaxWidthFindsTheLongestLine;
+    /// <summary>
+    ///   Inside a DLL (IsLibrary) MaxWidth must measure every line on the calling thread:
+    ///   TThreadPool.Default cannot be shut down cleanly on DLL unload under the loader
+    ///   lock, so starting its workers from a DLL hangs or crashes the unload (upstream
+    ///   09855c5).  Proves both the result and that no worker thread measured a line.
+    /// </summary>
+    [Test]
+    procedure MaxWidthInALibraryStaysOnTheCallingThread;
+    /// <summary>
+    ///   A width function that raises part-way must not leave the partial maximum
+    ///   cached: the FMaxWidth &gt; 0 shortcut would return it from then on, so the
+    ///   editor's horizontal extent would stay short of the longest line.  Run in
+    ///   library mode, whose sequential order makes the partial maximum certain.
+    /// </summary>
+    [Test]
+    procedure MaxWidthIsNotCachedAfterAMeasureRaises;
   end;
 
 implementation
@@ -52,6 +90,7 @@ implementation
 uses
   System.SysUtils,
   System.Classes,
+  System.SyncObjs,
   SynEditTextBuffer,
   SynFunc;
 
@@ -150,6 +189,109 @@ begin
   // The guard must also have left the list intact.
   Assert.AreEqual(5, Integer(Lines.CountNative), 'the list was modified anyway');
   Assert.AreEqual(Marker + '3', Lines[3], 'item 3 is no longer readable');
+end;
+
+const
+  // Enough lines that TParallel.For hands work to pool threads on any multi-core machine.
+  MeasuredLines = 20000;
+  MeasuredLongest = 12345;
+  // The line on which MeasureLength raises while FRaiseOnPoison is set (index 100,
+  // well before MeasuredLongest), and the exception it raises.
+  PoisonLine = 100;
+  PoisonMessage = 'width function failed';
+
+function TSynEditStringListTests.MeasureLength(const S: string): NativeInt;
+begin
+  if TThread.CurrentThread.ThreadID <> FTestThreadId then
+    TInterlocked.Increment(FOffThreadCalls);
+  if FRaiseOnPoison and (S = 'poison') then
+    raise Exception.Create(PoisonMessage);
+  Result := Length(S);
+end;
+
+function TSynEditStringListTests.NewMeasuredList(ALines, ALongest: Integer): TObject;
+var
+  Lines: TSynEditStringList;
+  I: Integer;
+begin
+  Lines := TSynEditStringList.Create(MeasureLength);
+  try
+    Lines.BeginUpdate;
+    for I := 0 to ALines - 1 do
+      if I = ALongest then
+        Lines.Add(Marker + Marker)
+      else
+        Lines.Add(Marker);
+    Lines.EndUpdate;
+  except
+    Lines.Free;
+    raise;
+  end;
+  FTestThreadId := TThread.CurrentThread.ThreadID;
+  FOffThreadCalls := 0;
+  Result := Lines;
+end;
+
+procedure TSynEditStringListTests.MaxWidthFindsTheLongestLine;
+var
+  Lines: TSynEditStringList;
+begin
+  Lines := TSynEditStringList(NewMeasuredList(MeasuredLines, MeasuredLongest));
+  try
+    Assert.AreEqual(NativeInt(2 * Length(Marker)), Lines.MaxWidth, 'MaxWidth is not the longest line');
+    // proves this ran the TParallel.For path; one core gives the pool nothing to add
+    if TThread.ProcessorCount > 1 then
+      Assert.IsTrue(FOffThreadCalls > 0, 'no line was measured on a pool thread: the parallel path did not run');
+  finally
+    Lines.Free;
+  end;
+end;
+
+procedure TSynEditStringListTests.MaxWidthIsNotCachedAfterAMeasureRaises;
+var
+  Lines: TSynEditStringList;
+  WasLibrary: Boolean;
+  Raised: Boolean;
+begin
+  Lines := TSynEditStringList(NewMeasuredList(MeasuredLines, MeasuredLongest));
+  WasLibrary := IsLibrary;
+  try
+    IsLibrary := True;   // sequential: lines 0..99 are measured, then line 100 raises
+    Lines[PoisonLine] := 'poison';
+    FRaiseOnPoison := True;
+    Raised := False;
+    try
+      Assert.Fail('MaxWidth returned ' + IntToStr(Lines.MaxWidth) + ' instead of raising');
+    except
+      on E: Exception do
+        Raised := E.Message = PoisonMessage;
+    end;
+    Assert.IsTrue(Raised, 'the width function''s exception did not reach the caller');
+    FRaiseOnPoison := False;
+    Assert.AreEqual(NativeInt(2 * Length(Marker)), Lines.MaxWidth,
+      'MaxWidth returned the partial maximum cached before the exception');
+  finally
+    FRaiseOnPoison := False;
+    IsLibrary := WasLibrary;
+    Lines.Free;
+  end;
+end;
+
+procedure TSynEditStringListTests.MaxWidthInALibraryStaysOnTheCallingThread;
+var
+  Lines: TSynEditStringList;
+  WasLibrary: Boolean;
+begin
+  Lines := TSynEditStringList(NewMeasuredList(MeasuredLines, MeasuredLongest));
+  WasLibrary := IsLibrary;
+  try
+    IsLibrary := True;   // what System sets when this code runs inside a DLL
+    Assert.AreEqual(NativeInt(2 * Length(Marker)), Lines.MaxWidth, 'MaxWidth is not the longest line');
+    Assert.AreEqual(0, FOffThreadCalls, 'lines were measured on thread-pool threads inside a library');
+  finally
+    IsLibrary := WasLibrary;
+    Lines.Free;
+  end;
 end;
 
 initialization

@@ -109,6 +109,10 @@ type
     FOnInserted: TStringListChangeEvent;
     FOnPut: TStringListPutEvent;
     FOnInfoLoss: TSynInfoLossEvent;
+    /// <summary>Measures one line if its width is unknown and raises FMaxWidth to it, atomically.</summary>
+    /// <param name="ALine">Zero-based index of the line to measure.</param>
+    /// <remarks>Safe to call concurrently for different lines: GetMaxWidth runs it from TParallel.For.</remarks>
+    procedure CalcLine(const ALine: TSynNativeInt);
     function GetCapacityNative: TSynNativeInt;
     function GetTextWidth(Index: TSynNativeInt): TSynNativeInt;
     function GetMaxWidth: TSynNativeInt;
@@ -238,6 +242,26 @@ begin
   inherited Destroy;
   FCount := 0;
   SetCapacityNative(0);
+end;
+
+procedure TSynEditStringList.CalcLine(const ALine: TSynNativeInt);
+var
+  lMaxW: TSynNativeInt;
+  lRec: PSynEditStringRec;
+begin
+  lRec := @FList[ALine];
+
+  if sfTextWidthUnknown in lRec^.FFlags then
+  begin
+    lRec^.FTextWidth := FTextWidthFunc(lRec^.FString);
+    Exclude(lRec^.FFlags, sfTextWidthUnknown);
+  end;
+
+  repeat
+    lMaxW := FMaxWidth;
+    if lRec^.FTextWidth <= lMaxW then
+      Break;
+  until AtomicCmpExchange(FMaxWidth, lRec^.FTextWidth, lMaxW) = lMaxW;
 end;
 
 procedure TSynEditStringList.Changed;
@@ -444,6 +468,8 @@ begin
 end;
 
 function TSynEditStringList.GetMaxWidth: TSynNativeInt;
+var
+  lCount: TSynNativeInt;
 begin
   if FMaxWidth > 0 then
     Result := FMaxWidth
@@ -451,23 +477,22 @@ begin
     Result := 0
   else
   begin
-    TParallel.&For(0, FCount - 1, procedure(I: TSynNativeInt)
-    var
-      LMaxW: TSynNativeInt;
-      PRec: PSynEditStringRec;
-    begin
-      PRec := @FList[I];
-      if sfTextWidthUnknown in PRec^.FFlags then
-      begin
-        PRec^.FTextWidth := FTextWidthFunc(PRec^.FString);
-        Exclude(PRec^.FFlags, sfTextWidthUnknown);
-      end;
-      repeat
-        LMaxW := FMaxWidth;
-        if PRec^.FTextWidth <= LMaxW then
-          Break;
-      until AtomicCmpExchange(FMaxWidth, PRec^.FTextWidth, LMaxW) = LMaxW;
-    end);
+    try
+      // TThreadPool.Default cannot be shut down cleanly on DLL unload (loader lock)
+      if not IsLibrary then
+        TParallel.&For(0, FCount - 1, procedure(AValue: TSynNativeInt)
+          begin
+            CalcLine(AValue);
+          end)
+      else
+        for lCount := 0 to FCount - 1 do
+          CalcLine(lCount);
+    except
+      // a width function that raised part-way leaves a partial maximum, which
+      // the FMaxWidth > 0 shortcut above would otherwise return as the answer
+      FMaxWidth := -1;
+      raise;
+    end;
     Result := Max(FMaxWidth, 0);
   end;
 end;
