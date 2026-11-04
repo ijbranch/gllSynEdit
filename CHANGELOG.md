@@ -17,68 +17,6 @@ visible.
 
 - (2026-10-12) **`TSynPopupMenu`, upstream's ready-made editor context menu** - `Source/SynPopupMenu.pas` (new), `Packages/11AndAbove/Delphi/SynEditDR.dpk`, `Packages/11AndAbove/Delphi/SynEditDR.dproj`, `Source/SynEditReg.pas` (upstream `e106252`, taken by merge). A `TPopupMenu` descendant that adds Undo/Redo/Cut/Copy/Paste/Delete/Select All actions before or after any items of its own (`DefaultPopupMenu`); registered on the SynEdit palette page. Upstream bytes kept as shipped (pure ASCII, CRLF, no BOM - like 90 of the other `Source` units). **The design package needs reinstalling** from `bin64\bds.exe` (and into the 32-bit IDE) before the component appears.
 
-### Changed
-
-- (2026-10-28) **Upstream reviewed to `09855c5` (2026-10-27), `upstream/master`'s tip; not merged** — `readme.md`.  Four commits since `e106252`: `09855c5` is under Fixed (logic ported by hand); `7465563` ("fix from the user mul0095", clearing the vacated tail after `Delete`/`DeleteLines`) is already present, fixed here on 2026-09-14 (see that Fixed entry), so its source hunk adds nothing and its separate `TestSynEditStringList` suite duplicates `Tests/TestTextBuffer.pas`; `e468e85` (a `What's New.md` wording change) and its merge `e98d153` were not taken.  **Why not merged:** a merge would bring in `7465563`'s second test project and the documentation change, so `git rev-list HEAD..upstream/master` will keep listing these four until a later merge resolves them.
-- (2026-10-26) **Unit-scope names in every `uses` clause** — `Demos/CompletionProposalDemo/CompletionProposalDemo.dpr`, `Demos/CompletionProposalDemo/FormMain_ctCode.pas`, `Demos/CompletionProposalDemo/FormMain_ctParams.pas`, `Demos/CompletionProposalDemo/ParamCompletionDemo.dpr`, `Demos/EditAppDemos/dmWorkbookCommands.pas`, `Demos/EditAppDemos/EditAppMain.pas`, `Demos/EditAppDemos/EditAppMDI.dpr`, `Demos/EditAppDemos/EditAppSDI.dpr`, `Demos/EditAppDemos/EditAppWorkbook.dpr`, `Demos/EditAppDemos/frmEditor.pas`, `Demos/EditAppDemos/frmMainMDI.pas`, `Demos/EditAppDemos/frmMainSDI.pas`, `Demos/EditAppDemos/frmMainWorkbook.pas`, `Demos/EditAppDemos/uEditAppIntfs.pas`, `Demos/Folding/uHighlighterProcs.pas`, `Demos/HighlighterDemo/HighlighterDemo.dpr`, `Demos/HighlighterDemo/SynHighlighterSample.pas`, `Demos/HighlighterDemo/uHighlighterMain.pas`, `Demos/PrintDemo/DPageSetup.pas`, `Demos/PrintDemo/DTestPrintPreview.pas`, `Demos/PrintDemo/MTestPP.pas`, `Demos/PrintDemo/TestPP.dpr`, `Demos/SearchReplaceDemo/dlgConfirmReplace.pas`, `Demos/SearchReplaceDemo/dlgReplaceText.pas`, `Demos/SearchReplaceDemo/dlgSearchText.pas`, `Demos/SearchReplaceDemo/SearchReplaceDemo.dpr`, `Demos/SearchReplaceDemo/SearchReplaceMain.pas`, `Demos/SimpleIDEDemo/SimpleIDEDemo.dpr`, `Demos/SimpleIDEDemo/uSimpleIDEDebugger.pas`, `Source/DesignTimeEditors/SynDelphiIDEImporter.pas`, `Source/Highlighters/SynHighlighterADSP21xx.pas`, `Source/Highlighters/SynHighlighterAWK.pas`, `Source/Highlighters/SynHighlighterBaan.pas`, `Source/Highlighters/SynHighlighterBat.pas`, `Source/Highlighters/SynHighlighterCAC.pas`, `Source/Highlighters/SynHighlighterCache.pas`, `Source/Highlighters/SynHighlighterCPM.pas`, `Source/Highlighters/SynHighlighterCpp.pas`, `Source/Highlighters/SynHighlighterCS.pas`, `Source/Highlighters/SynHighlighterDelphi.pas`, `Source/Highlighters/SynHighlighterDfm.pas`, `Source/Highlighters/SynHighlighterDml.pas`, `Source/Highlighters/SynHighlighterDOT.pas`, `Source/Highlighters/SynHighlighterEiffel.pas`, `Source/Highlighters/SynHighlighterFortran.pas`, `Source/Highlighters/SynHighlighterGalaxy.pas`, `Source/Highlighters/SynHighlighterGeneral.pas`, `Source/Highlighters/SynHighlighterGWS.pas`, `Source/Highlighters/SynHighlighterHaskell.pas`, `Source/Highlighters/SynHighlighterHP48.pas`, `Source/Highlighters/SynHighlighterHtml.pas`, `Source/Highlighters/SynHighlighterIDL.pas`, `Source/Highlighters/SynHighlighterJava.pas`, `Source/Highlighters/SynHighlighterJScript.pas`, `Source/Highlighters/SynHighlighterJSON.pas`, `Source/Highlighters/SynHighlighterKix.pas`, `Source/Highlighters/SynHighlighterLDraw.pas`, `Source/Highlighters/SynHighlighterLLVM.pas`, `Source/Highlighters/SynHighlighterManager.pas`, `Source/Highlighters/SynHighlighterModelica.pas`, `Source/Highlighters/SynHighlighterMsg.pas`, `Source/Highlighters/SynHighlighterOmni.pas`, `Source/Highlighters/SynHighlighterPerl.pas`, `Source/Highlighters/SynHighlighterPHP.pas`, `Source/Highlighters/SynHighlighterRC.pas`, `Source/Highlighters/SynHighlighterRexx.pas`, `Source/Highlighters/SynHighlighterRuby.pas`, `Source/Highlighters/SynHighlighterSDD.pas`, `Source/Highlighters/SynHighlighterSml.pas`, `Source/Highlighters/SynHighlighterST.pas`, `Source/Highlighters/SynHighlighterTclTk.pas`, `Source/Highlighters/SynHighlighterTeX.pas`, `Source/Highlighters/SynHighlighterUNIXShellScript.pas`, `Source/Highlighters/SynHighlighterUnreal.pas`, `Source/Highlighters/SynHighlighterURI.pas`, `Source/Highlighters/SynHighlighterWebIDL.pas`, `Source/Highlighters/SynHighlighterWebStencils.pas`, `Source/Highlighters/SynHighlighterXML.pas`, `Source/SynAutoCorrect.pas`, `Source/SynAutoCorrectEditor.pas`, `Source/SynDBEdit.pas`, `Source/SynDWrite.pas`, `Source/SynEditDragDrop.pas`, `Source/SynEditExport.pas`, `Source/SynEditHighlighter.pas`, `Source/SynEditKbdHandler.pas`, `Source/SynEditKeyCmdEditor.pas`, `Source/SynEditKeyCmdsEditor.pas`, `Source/SynEditKeyConst.pas`, `Source/SynEditPlugins.pas`, `Source/SynEditPrinterInfo.pas`, `Source/SynEditPrintMarginsDialog.pas`, `Source/SynEditPrintTypes.pas`, `Source/SynEditPythonBehaviour.pas`, `Source/SynEditRegexSearch.pas`, `Source/SynEditSearch.pas`, `Source/SynEditWildcardSearch.pas`, `Source/SynExportHTML.pas`, `Source/SynExportRTF.pas`, `Source/SynExportTeX.pas`, `Source/SynMacroRecorder.pas`, `Source/SynPopupMenu.pas`, `Source/SynUnicode.pas`, `Source/SynURIOpener.pas`, `SynGen/HashTableGen.pas`, `SynGen/LongIntList.pas`, `SynGen/SynGen.dpr`, `SynGen/SynGenUnit.pas`.  588 bare RTL/VCL unit names in `uses` clauses given their unit-scope names, 2 partly-scoped names (`Generics.Collections`) completed, 64 code qualifiers written in full, 2 scoped names respelt as the unit declares itself; generated code is byte-identical in every mode built.  Merge cost: gllSynEdit takes upstream by real git merge (161 merge commits to date), so the next upstream merge conflicts on every converted `uses` line upstream has touched since; across 108 files that is the dominant cost of this change, accepted under Ian's rule.  **Why:** Ian, 2026-10-26: "all the gll* forks are our own code because they have all been modified to suite our needs/preferences/standards".
-- (2026-10-12) **Build auto-increment turned on in both packages** - `Packages/11AndAbove/Delphi/SynEditDR.dproj`, `Packages/11AndAbove/Delphi/SynEditDD.dproj`, `Packages/11AndAbove/Delphi/SynEditDD.res`, `build.cmd`, `CLAUDE.md`. `VerInfo_AutoIncVersion` in each Base group; `SynEditDD` also gained the `Cfg_2_Win64` (Debug Win64) groups it lacked, because Delphi writes `VerInfo_Build` only into a config-and-platform group. All eight package builds clean (zero hints, zero warnings); the number moved in every group, and a second build moved it again and stamped the BPL `1.0.0.1`. **`build.cmd` no longer reverts `SynEditDD.res`:** that `.res` now carries the build number, so reverting it would have discarded every bump. **Cost:** both `.dproj` files diverge from upstream, so a future upstream `.dproj` change may conflict.
-- (2026-10-12) **Merged `upstream/master` to `e106252` (2026-10-11), upstream's tip** - `Packages/11AndAbove/Delphi/SynEditDD.dproj`, `Packages/11AndAbove/Delphi/SynEditDR.dproj`, `readme.md`. Four commits: `612c794` and `e106252` are under Fixed and Added; `a0e98d3` ("Saved with 13.2") is taken as `ProjectVersion` 20.4 -> 20.5 only - no platform, `<Deployment>` or output-path change came with it. **`fef1edd` ("Removed warnings") REFUSED:** it silences the narrowings this fork fixed on 2026-09-14 (the `W1072` entry under the earlier Changed) the opposite way, truncating `TSynNativeInt` values with `ToInt32(...)` casts where this fork widened the receiving declarations; the seven conflicting highlighters (AutoIt, Dockerfile, Kotlin, Lua, Rust, Swift, TOML) were resolved to ours. **Hazard reverted:** `SynHighlighterMatlab.pas` auto-merged cleanly but brought `RestIsBlank(ToInt32(Run + 2))` and `RestIsBlank(ToInt32(P + 2))` into calls whose parameter is already `TSynNativeInt` here - restored to ours. ENV, Erlang, HCL, PowerShell and Registry merged with no net change. The `Berlin`/`Rio`/`Sydney`/`Tokyo` `SynEditDR` delete/modify conflicts were resolved by `git rm`, as `CLAUDE.md` prescribes. **Why record the refusal:** anyone comparing against upstream will see the casts missing here, and the widening is the reason.
-- (2026-10-08) **D13 language features adopted** - `Demos/EditAppDemos/frmEditor.pas`, `Demos/Folding/uHighlighterProcs.pas`, `Demos/MarkdownViewer/SynMarkdownViewer.pas`, `Demos/uHighlighterProcs.pas`, `Source/Highlighters/SynHighlighterCS.pas`, `Source/Highlighters/SynHighlighterCpp.pas`, `Source/Highlighters/SynHighlighterDWS.pas`, `Source/Highlighters/SynHighlighterDelphi.pas`, `Source/Highlighters/SynHighlighterJava.pas`, `Source/Highlighters/SynHighlighterManager.pas`, `Source/Highlighters/SynHighlighterPHP.pas`, `Source/Highlighters/SynHighlighterPas.pas`, `Source/Highlighters/SynHighlighterSQL.pas`, `Source/Highlighters/SynHighlighterST.pas`, `Source/Highlighters/SynHighlighterWebStencils.pas`, `Source/Highlighters/SynHighlighterXML.pas`, `Source/Highlighters/SynHighlighterYAML.pas`, `Source/SynAutoCorrect.pas`, `Source/SynCompletionProposal.pas`, `Source/SynEdit.pas`, `Source/SynEditCodeFolding.pas`, `Source/SynEditDataObject.pas`, `Source/SynEditExport.pas`, `Source/SynEditHighlighter.pas`, `Source/SynEditMiscClasses.pas`, `Source/SynEditMiscProcs.pas`, `Source/SynEditPrint.pas`, `Source/SynEditPrintPreview.pas`, `Source/SynEditPythonBehaviour.pas`, `Source/SynEditScrollBars.pas`, `Source/SynEditTextBuffer.pas`, `Source/SynEditUndo.pas`, `Source/SynEditWordWrap.pas`, `Source/SynURIOpener.pas`, `SynGen/SynGenUnit.pas`. 111 `not ( X in S )` / `not ( X is T )` rewritten as `X not in S` / `X is not T` (generated code byte-identical: every project that built before was rebuilt and compared); 15 `IfThen(...)` calls replaced by the `if ... then ... else` expression, which evaluates only the branch it picks; 4 `if C then X := True else X := False` statements reduced to `X := C` (or its negation). One conversion needed a cast:
-in `TCustomSynEdit`'s DirectWrite hit test (`SynEdit.pas`, `Inc( P, ToSynNativeInt( HTM.textPosition ) + ... )`) the
-branches were `HTM.length + 1` (`UINT32`) and `1`; `IfThen` took them as `Integer`, but the `if` expression widened
-both to `Int64` on Win32 (`W1024`), so the branch is now `Integer( HTM.length + 1 )`, the type `IfThen` used. **Divergence accepted:** upstream was reviewed first (nothing pending was lost), and Ian's ruling for the gll* forks is that they "are our forks now", to be made "as correct as possible/practical"; these lines will need re-applying or resolving in any later upstream port.
-- (2026-09-23) **Word movement now uses `IsWordChar` instead of `IsIdentChar`**
-  - `Source/SynEdit.pas` (upstream `22d9ea0`, taken by merge)
-  Six call sites in `NextWordPosEx` and `PrevWordPosEx`, i.e. Ctrl+Left, Ctrl+Right and
-  the word-delete commands. With no highlighter assigned the two predicates differ:
-  `IsIdentChar` admits only letters, digits, `_` and AdditionalIdentChars, whereas
-  `IsWordChar` is "neither a word break nor white space". So a character that is none of
-  those AND absent from the break list - a currency sign, a copyright sign, an em dash, a
-  curly quote - used to end a word and now continues one.
-  **This is a behaviour change, not a repair**, and it is recorded as such: upstream
-  names no defect. It is taken because the wider rule is the better one for word
-  MOVEMENT - "word" and "identifier" are not the same question - and because diverging
-  from upstream in a file this fork merges is a cost with no benefit here. The new tests
-  above are the condition on which it was taken.
-
-### Fixed
-
-- (2026-10-28) **`TSynEditStringList.GetMaxWidth` and `TSynWordWrapPlugin.WrapLines` started `TThreadPool.Default` workers even inside a DLL, whose pool cannot be shut down cleanly on DLL unload (loader lock)** — `Source/SynEditTextBuffer.pas`, `Source/SynEditWordWrap.pas`, `Tests/TestTextBuffer.pas`, `readme.md`, `CLAUDE.md` (upstream `09855c5`, 2026-10-27, "fix from stbie"; logic taken by hand, not by merge).  The loop body moves into the new private `CalcLine`; `GetMaxWidth` runs it through `TParallel.For` only when `not IsLibrary`, and otherwise in a plain loop on the calling thread.  **Beyond upstream:** the same guard and sequential fallback in `WrapLines`, the other `TParallel.For` in `Source` (upstream still has it unguarded), so a word-wrapped editor in a DLL no longer starts the pool either; and if the width function raises part-way, `GetMaxWidth` now resets `FMaxWidth` to -1 before re-raising, where it used to keep the partial maximum and return it from then on through the `FMaxWidth > 0` shortcut.  The exception a caller sees still differs by path: the parallel path wraps it in `EAggregateException`, the library path raises the original class; that is inherent to `TParallel` and left alone.  Upstream's `{$IF (COMPILERVERSION > 29) OR (NOT DEFINED(PACKAGE))}` wrapper was not taken: it is constant-true on Delphi 13, the floor here.  Three tests: `MaxWidthFindsTheLongestLine` checks the result and that a pool thread measured lines (the parallel path ran), `MaxWidthInALibraryStaysOnTheCallingThread` sets `IsLibrary` and proves no line of 20,000 is measured off the calling thread, and `MaxWidthIsNotCachedAfterAMeasureRaises` proves the partial maximum is not kept; each was mutation-checked (guard removed: 20,000 off-thread; guard inverted: all three fail; reset removed: 54 returned instead of 108).  `WrapLines` has no test: its lines are measured through the editor's DirectWrite layout, which offers no hook to observe the measuring thread.  **Merge cost:** a later `git merge upstream/master` will conflict in `GetMaxWidth` (upstream keeps the `{$IF}`); resolve to ours.
-- (2026-10-12) **`TSynPasSyn.UseUserSettings` leaked four attribute objects** - `Source/Highlighters/SynHighlighterPas.pas` (upstream `612c794`, taken by merge). Its cleanup freed the other temporaries but not `tmpDirecAttri`, `tmpCharAttri`, `tmpFloatAttri` and `tmpHexAttri`. No test added: `Tests/SynEditTests` has no FastMM leak gate, so no test there could fail on the leak.
-- (2026-10-07) **An in-IDE build re-saved the package `.dproj` without its Release output paths** —
-  `Packages/11AndAbove/Delphi/SynEditDD.dproj`, `Packages/11AndAbove/Delphi/SynEditDR.dproj`. The output standard was
-  two `Condition`-ed `DCC_BplOutput` / `DCC_DcpOutput` lines in the Base group, and the IDE keeps one value per
-  property per group when it re-saves the project on a build, so it wrote back only the active config's: a committed
-  re-save sent Release builds to the root `Bpl` / `Dcp` folders. Now one plain value per group, the form the IDE
-  writes itself: Base `$(BDSCOMMONDIR)\Bpl\$(Platform)\$(Config)` (and `Dcp`), overridden in the Release config group
-  by `$(BDSCOMMONDIR)\Bpl\$(Platform)`. Same output; built in all four modes with the `dcc` `-LE`/`-LN` paths checked
-  per mode.
-- (2026-09-23) **The completion proposal handled navigation keys TWICE**
-  - `Source/SynCompletionProposal.pas` (upstream `8d6c146`, taken by merge)
-  `TSynCompletionProposal.EditorKeyDown` passed Up, Down, Return and Escape to the
-  proposal form and then left `AKey` untouched, so the editor acted on the same key as
-  well: the list moved two rows at a time, and Return both accepted the completion and
-  inserted a line break. The fix is `AKey := 0` after `Form.KeyDown`; the widened key set
-  (PageUp, PageDown, Home, End, gated on `DisplayType = ctCode`) and the moved
-  `not Form.CanFocus` guard ride along from the same commit.
-  Our copy was byte-identical to upstream's pre-fix text, so this is genuine new upstream
-  work rather than a hand-port this fork had already done.
-  **Why it is taken although nothing here uses it:** no project in this estate
-  instantiates `TSynCompletionProposal`, so the fix is inert today - but this is a merged
-  fork, and declining an upstream fix in an unmodified file buys nothing while costing a
-  permanent conflict on the next merge. The reach is recorded, not hidden.
-
-- (2026-09-23) **Doc correction: building `SynEditDD` no longer rewrites its `.res`**
-  - `CLAUDE.md`
-  That instruction was accurate when written - the file went 640 -> 4,812 -> 640 bytes
-  across `2911904`, `292582d` and `95f6149` - but the 640-byte version is what is now
-  tracked, and a full eight-configuration package build leaves it untouched
-  (`git diff` empty afterwards, measured 2026-09-23). Reverting it before committing is
-  now a no-op, so the instruction is recorded as historical rather than left standing as
-  a step that cannot fire.
-
-### Added
-
 - (2026-09-18) **`Help.md` and `Users Guide.md`, to the estate documentation standard** —
   `Help.md`, `Users Guide.md`, `readme.md`.
   `Help.md` carries both flavours, because 135 units and 84 highlighter units cannot be navigated
@@ -95,50 +33,6 @@ both to `Int64` on Win32 (`W1024`), so the branch is now `Integer( HTM.length + 
   so everything links statically and a fix here needs an application rebuild. The real consumer is
   `DBiReportsScanEdit`; `DBiMiniTimeSync` and `DBiTimeSync` carry `SynEditDR` in `DCC_UsePackage`
   only, which is inert IDE boilerplate — neither uses the editor.
-
-### Fixed
-
-- (2026-09-18) **"all 83 registered highlighters" is off by one — it is 82** — `readme.md`,
-  `CLAUDE.md`, `CHANGELOG.md`; the new documents say 82 throughout.
-  `SynEditTests.dpr` links **83 highlighter units**, and the figure appears to have been taken
-  from that. But `SynHighlighterMulti` registers no placeable highlighter — it is `TSynMultiSyn` —
-  so `GetPlaceableHighlighters` holds **82**. Counted two ways: 82 `RegisterPlaceableHighlighter`
-  call sites under `Source`, and 82 distinct class names.
-  **Worth knowing for anyone re-counting:** one call site is written
-  `RegisterPlaceableHighlighter (TSynGWScriptSyn)`, with a space before the parenthesis, so a
-  regex anchored on `RegisterPlaceableHighlighter(` silently returns 81 and looks like
-  confirmation of a different wrong number.
-- (2026-09-18) **The identifier-range curiosity is in `SynHighlighterJava.pas`, not `SynHighlighterCpp.pas`,
-  and it is not executable**. Both occurrences of `'L'..'Ö', 'Ø'..'ö', 'ø'..'ÿ'` sit
-  inside comments — a `(* … *)` block and a `//`-commented line. The live body is
-  `IsCharAlphaNumeric(AChar) or CharInSet(AChar, ['_','$'])`. It is still not to be "corrected",
-  but it is historical source data rather than a live range. The HTML entity tables **are** live
-  and generation-coupled (`HashKey` / `KeyIndices`), which is the case that matters.
-
-### Reviewed and deliberately NOT taken from upstream, so they are not re-derived later
-
-- (2026-10-28) **`upstream/master` reviewed to `09855c5`: two commits not taken.**
-  - `7465563` ("fix from the user mul0095") - ALREADY PRESENT: its `FillChar` of the vacated tail in
-    `DeleteNative`/`DeleteLines` is the fix made here on 2026-09-14, and its new `Tests/TestSynEditStringList.pas`
-    suite (with its own `.dproj`) repeats what `Tests/TestTextBuffer.pas` already proves.
-  - `e468e85` (and its merge `e98d153`) - DECLINED: a wording change to `What's New.md` only.
-- (2026-09-18) **Upstream swept 2026-09-18: `11Alexandria` and `multicursor` reviewed, nothing taken.**
-  Neither branch had a prior record here.
-  - `30cd5cc` (`11Alexandria`) - DECLINED by its own text: the commit edits that branch's README
-    to say it "is for legacy 11Alexandria support only and doesn't have the latest updates". One
-    commit since a 2023 merge-base, so "1 behind" is a dead branch, not a backlog.
-  - `fb9e365` (`multicursor`) - DECLINED, superseded. A 2020 experimental spike
-    (`Source/SynEditMultiCaret.pas`, 1,180 new lines) on a single-commit branch, abandoned
-    upstream and replaced by the `TSynSelection`/`TSynSelections` design **this fork already
-    carries** (`ExecuteMultiCaretCommand`, `CommandInfo.StoreMultiCaret`, plus
-    `Doc/Multi-caret.md`). It rewrites 430 lines of `SynEdit.pas` from a 2020 base, so it could
-    not merge cleanly and would not build - it would drop a dead parallel implementation into a
-    fork that has the finished one.
-  **Condition to reopen:** only if upstream revives either branch with post-2023 work. This
-  triage covered those two branches only; `master`, `pyscripter`, `DelphiFeatures` and `GDI` are
-  worth checking on a future sweep.
-
-### Added
 
 - (2026-09-14) **`build.cmd` — one command that builds and tests everything, in the order that works**
   . `build.cmd` runs the eight package builds, the 24 demo builds and the test suite
@@ -171,7 +65,39 @@ both to `Int64` on Win32 (`W1024`), so the branch is now `Integer( HTM.length + 
   one. Measured on this tree, the drop is 1 with the fix and 2 without. That is a deterministic
   observable and needs no debug memory manager.
 
+- (2026-08-06) `SynHighlighterWebStencils.pas` was on disk but wired into neither package — added to the
+  runtime package (contains clause + DCC reference), matching the `SynHighlighterWebIDL`
+  precedent: no `SynEditReg` palette registration, the unit self-registers as a placeable
+  highlighter in its initialization section. The unit did not compile against the current
+  `TSynCustomHighlighter` API (likely why upstream never packaged it) and needed aligning:
+  `GetTokenKind`/`SetLine` signatures `Integer` → `TSynNativeInt`, `SynFunc` added to the
+  uses clause, and `IsKeyword` marked `override` (it silently hid the base virtual, W1010).
+  — `Packages/11AndAbove/Delphi/SynEditDR.dpk`,
+  `Packages/11AndAbove/Delphi/SynEditDR.dproj`, `Source/Highlighters/SynHighlighterWebStencils.pas`
+
 ### Changed
+
+- (2026-10-28) **Upstream reviewed to `09855c5` (2026-10-27), `upstream/master`'s tip; not merged** — `readme.md`.  Four commits since `e106252`: `09855c5` is under Fixed (logic ported by hand); `7465563` ("fix from the user mul0095", clearing the vacated tail after `Delete`/`DeleteLines`) is already present, fixed here on 2026-09-14 (see that Fixed entry), so its source hunk adds nothing and its separate `TestSynEditStringList` suite duplicates `Tests/TestTextBuffer.pas`; `e468e85` (a `What's New.md` wording change) and its merge `e98d153` were not taken.  **Why not merged:** a merge would bring in `7465563`'s second test project and the documentation change, so `git rev-list HEAD..upstream/master` will keep listing these four until a later merge resolves them.
+- (2026-10-26) **Unit-scope names in every `uses` clause** — `Demos/CompletionProposalDemo/CompletionProposalDemo.dpr`, `Demos/CompletionProposalDemo/FormMain_ctCode.pas`, `Demos/CompletionProposalDemo/FormMain_ctParams.pas`, `Demos/CompletionProposalDemo/ParamCompletionDemo.dpr`, `Demos/EditAppDemos/dmWorkbookCommands.pas`, `Demos/EditAppDemos/EditAppMain.pas`, `Demos/EditAppDemos/EditAppMDI.dpr`, `Demos/EditAppDemos/EditAppSDI.dpr`, `Demos/EditAppDemos/EditAppWorkbook.dpr`, `Demos/EditAppDemos/frmEditor.pas`, `Demos/EditAppDemos/frmMainMDI.pas`, `Demos/EditAppDemos/frmMainSDI.pas`, `Demos/EditAppDemos/frmMainWorkbook.pas`, `Demos/EditAppDemos/uEditAppIntfs.pas`, `Demos/Folding/uHighlighterProcs.pas`, `Demos/HighlighterDemo/HighlighterDemo.dpr`, `Demos/HighlighterDemo/SynHighlighterSample.pas`, `Demos/HighlighterDemo/uHighlighterMain.pas`, `Demos/PrintDemo/DPageSetup.pas`, `Demos/PrintDemo/DTestPrintPreview.pas`, `Demos/PrintDemo/MTestPP.pas`, `Demos/PrintDemo/TestPP.dpr`, `Demos/SearchReplaceDemo/dlgConfirmReplace.pas`, `Demos/SearchReplaceDemo/dlgReplaceText.pas`, `Demos/SearchReplaceDemo/dlgSearchText.pas`, `Demos/SearchReplaceDemo/SearchReplaceDemo.dpr`, `Demos/SearchReplaceDemo/SearchReplaceMain.pas`, `Demos/SimpleIDEDemo/SimpleIDEDemo.dpr`, `Demos/SimpleIDEDemo/uSimpleIDEDebugger.pas`, `Source/DesignTimeEditors/SynDelphiIDEImporter.pas`, `Source/Highlighters/SynHighlighterADSP21xx.pas`, `Source/Highlighters/SynHighlighterAWK.pas`, `Source/Highlighters/SynHighlighterBaan.pas`, `Source/Highlighters/SynHighlighterBat.pas`, `Source/Highlighters/SynHighlighterCAC.pas`, `Source/Highlighters/SynHighlighterCache.pas`, `Source/Highlighters/SynHighlighterCPM.pas`, `Source/Highlighters/SynHighlighterCpp.pas`, `Source/Highlighters/SynHighlighterCS.pas`, `Source/Highlighters/SynHighlighterDelphi.pas`, `Source/Highlighters/SynHighlighterDfm.pas`, `Source/Highlighters/SynHighlighterDml.pas`, `Source/Highlighters/SynHighlighterDOT.pas`, `Source/Highlighters/SynHighlighterEiffel.pas`, `Source/Highlighters/SynHighlighterFortran.pas`, `Source/Highlighters/SynHighlighterGalaxy.pas`, `Source/Highlighters/SynHighlighterGeneral.pas`, `Source/Highlighters/SynHighlighterGWS.pas`, `Source/Highlighters/SynHighlighterHaskell.pas`, `Source/Highlighters/SynHighlighterHP48.pas`, `Source/Highlighters/SynHighlighterHtml.pas`, `Source/Highlighters/SynHighlighterIDL.pas`, `Source/Highlighters/SynHighlighterJava.pas`, `Source/Highlighters/SynHighlighterJScript.pas`, `Source/Highlighters/SynHighlighterJSON.pas`, `Source/Highlighters/SynHighlighterKix.pas`, `Source/Highlighters/SynHighlighterLDraw.pas`, `Source/Highlighters/SynHighlighterLLVM.pas`, `Source/Highlighters/SynHighlighterManager.pas`, `Source/Highlighters/SynHighlighterModelica.pas`, `Source/Highlighters/SynHighlighterMsg.pas`, `Source/Highlighters/SynHighlighterOmni.pas`, `Source/Highlighters/SynHighlighterPerl.pas`, `Source/Highlighters/SynHighlighterPHP.pas`, `Source/Highlighters/SynHighlighterRC.pas`, `Source/Highlighters/SynHighlighterRexx.pas`, `Source/Highlighters/SynHighlighterRuby.pas`, `Source/Highlighters/SynHighlighterSDD.pas`, `Source/Highlighters/SynHighlighterSml.pas`, `Source/Highlighters/SynHighlighterST.pas`, `Source/Highlighters/SynHighlighterTclTk.pas`, `Source/Highlighters/SynHighlighterTeX.pas`, `Source/Highlighters/SynHighlighterUNIXShellScript.pas`, `Source/Highlighters/SynHighlighterUnreal.pas`, `Source/Highlighters/SynHighlighterURI.pas`, `Source/Highlighters/SynHighlighterWebIDL.pas`, `Source/Highlighters/SynHighlighterWebStencils.pas`, `Source/Highlighters/SynHighlighterXML.pas`, `Source/SynAutoCorrect.pas`, `Source/SynAutoCorrectEditor.pas`, `Source/SynDBEdit.pas`, `Source/SynDWrite.pas`, `Source/SynEditDragDrop.pas`, `Source/SynEditExport.pas`, `Source/SynEditHighlighter.pas`, `Source/SynEditKbdHandler.pas`, `Source/SynEditKeyCmdEditor.pas`, `Source/SynEditKeyCmdsEditor.pas`, `Source/SynEditKeyConst.pas`, `Source/SynEditPlugins.pas`, `Source/SynEditPrinterInfo.pas`, `Source/SynEditPrintMarginsDialog.pas`, `Source/SynEditPrintTypes.pas`, `Source/SynEditPythonBehaviour.pas`, `Source/SynEditRegexSearch.pas`, `Source/SynEditSearch.pas`, `Source/SynEditWildcardSearch.pas`, `Source/SynExportHTML.pas`, `Source/SynExportRTF.pas`, `Source/SynExportTeX.pas`, `Source/SynMacroRecorder.pas`, `Source/SynPopupMenu.pas`, `Source/SynUnicode.pas`, `Source/SynURIOpener.pas`, `SynGen/HashTableGen.pas`, `SynGen/LongIntList.pas`, `SynGen/SynGen.dpr`, `SynGen/SynGenUnit.pas`.  588 bare RTL/VCL unit names in `uses` clauses given their unit-scope names, 2 partly-scoped names (`Generics.Collections`) completed, 64 code qualifiers written in full, 2 scoped names respelt as the unit declares itself; generated code is byte-identical in every mode built.  Merge cost: gllSynEdit takes upstream by real git merge (161 merge commits to date), so the next upstream merge conflicts on every converted `uses` line upstream has touched since; across 108 files that is the dominant cost of this change, accepted under Ian's rule.  **Why:** Ian, 2026-10-26: "all the gll* forks are our own code because they have all been modified to suite our needs/preferences/standards".
+- (2026-10-12) **Build auto-increment turned on in both packages** - `Packages/11AndAbove/Delphi/SynEditDR.dproj`, `Packages/11AndAbove/Delphi/SynEditDD.dproj`, `Packages/11AndAbove/Delphi/SynEditDD.res`, `build.cmd`, `CLAUDE.md`. `VerInfo_AutoIncVersion` in each Base group; `SynEditDD` also gained the `Cfg_2_Win64` (Debug Win64) groups it lacked, because Delphi writes `VerInfo_Build` only into a config-and-platform group. All eight package builds clean (zero hints, zero warnings); the number moved in every group, and a second build moved it again and stamped the BPL `1.0.0.1`. **`build.cmd` no longer reverts `SynEditDD.res`:** that `.res` now carries the build number, so reverting it would have discarded every bump. **Cost:** both `.dproj` files diverge from upstream, so a future upstream `.dproj` change may conflict.
+- (2026-10-12) **Merged `upstream/master` to `e106252` (2026-10-11), upstream's tip** - `Packages/11AndAbove/Delphi/SynEditDD.dproj`, `Packages/11AndAbove/Delphi/SynEditDR.dproj`, `readme.md`. Four commits: `612c794` and `e106252` are under Fixed and Added; `a0e98d3` ("Saved with 13.2") is taken as `ProjectVersion` 20.4 -> 20.5 only - no platform, `<Deployment>` or output-path change came with it. **`fef1edd` ("Removed warnings") REFUSED:** it silences the narrowings this fork fixed on 2026-09-14 (the `W1072` entry under the earlier Changed) the opposite way, truncating `TSynNativeInt` values with `ToInt32(...)` casts where this fork widened the receiving declarations; the seven conflicting highlighters (AutoIt, Dockerfile, Kotlin, Lua, Rust, Swift, TOML) were resolved to ours. **Hazard reverted:** `SynHighlighterMatlab.pas` auto-merged cleanly but brought `RestIsBlank(ToInt32(Run + 2))` and `RestIsBlank(ToInt32(P + 2))` into calls whose parameter is already `TSynNativeInt` here - restored to ours. ENV, Erlang, HCL, PowerShell and Registry merged with no net change. The `Berlin`/`Rio`/`Sydney`/`Tokyo` `SynEditDR` delete/modify conflicts were resolved by `git rm`, as `CLAUDE.md` prescribes. **Why record the refusal:** anyone comparing against upstream will see the casts missing here, and the widening is the reason.
+- (2026-10-08) **D13 language features adopted** - `Demos/EditAppDemos/frmEditor.pas`, `Demos/Folding/uHighlighterProcs.pas`, `Demos/MarkdownViewer/SynMarkdownViewer.pas`, `Demos/uHighlighterProcs.pas`, `Source/Highlighters/SynHighlighterCS.pas`, `Source/Highlighters/SynHighlighterCpp.pas`, `Source/Highlighters/SynHighlighterDWS.pas`, `Source/Highlighters/SynHighlighterDelphi.pas`, `Source/Highlighters/SynHighlighterJava.pas`, `Source/Highlighters/SynHighlighterManager.pas`, `Source/Highlighters/SynHighlighterPHP.pas`, `Source/Highlighters/SynHighlighterPas.pas`, `Source/Highlighters/SynHighlighterSQL.pas`, `Source/Highlighters/SynHighlighterST.pas`, `Source/Highlighters/SynHighlighterWebStencils.pas`, `Source/Highlighters/SynHighlighterXML.pas`, `Source/Highlighters/SynHighlighterYAML.pas`, `Source/SynAutoCorrect.pas`, `Source/SynCompletionProposal.pas`, `Source/SynEdit.pas`, `Source/SynEditCodeFolding.pas`, `Source/SynEditDataObject.pas`, `Source/SynEditExport.pas`, `Source/SynEditHighlighter.pas`, `Source/SynEditMiscClasses.pas`, `Source/SynEditMiscProcs.pas`, `Source/SynEditPrint.pas`, `Source/SynEditPrintPreview.pas`, `Source/SynEditPythonBehaviour.pas`, `Source/SynEditScrollBars.pas`, `Source/SynEditTextBuffer.pas`, `Source/SynEditUndo.pas`, `Source/SynEditWordWrap.pas`, `Source/SynURIOpener.pas`, `SynGen/SynGenUnit.pas`. 111 `not ( X in S )` / `not ( X is T )` rewritten as `X not in S` / `X is not T` (generated code byte-identical: every project that built before was rebuilt and compared); 15 `IfThen(...)` calls replaced by the `if ... then ... else` expression, which evaluates only the branch it picks; 4 `if C then X := True else X := False` statements reduced to `X := C` (or its negation). One conversion needed a cast:
+in `TCustomSynEdit`'s DirectWrite hit test (`SynEdit.pas`, `Inc( P, ToSynNativeInt( HTM.textPosition ) + ... )`) the
+branches were `HTM.length + 1` (`UINT32`) and `1`; `IfThen` took them as `Integer`, but the `if` expression widened
+both to `Int64` on Win32 (`W1024`), so the branch is now `Integer( HTM.length + 1 )`, the type `IfThen` used. **Divergence accepted:** upstream was reviewed first (nothing pending was lost), and Ian's ruling for the gll* forks is that they "are our forks now", to be made "as correct as possible/practical"; these lines will need re-applying or resolving in any later upstream port.
+- (2026-09-23) **Word movement now uses `IsWordChar` instead of `IsIdentChar`**
+  - `Source/SynEdit.pas` (upstream `22d9ea0`, taken by merge)
+  Six call sites in `NextWordPosEx` and `PrevWordPosEx`, i.e. Ctrl+Left, Ctrl+Right and
+  the word-delete commands. With no highlighter assigned the two predicates differ:
+  `IsIdentChar` admits only letters, digits, `_` and AdditionalIdentChars, whereas
+  `IsWordChar` is "neither a word break nor white space". So a character that is none of
+  those AND absent from the break list - a currency sign, a copyright sign, an em dash, a
+  curly quote - used to end a word and now continues one.
+  **This is a behaviour change, not a repair**, and it is recorded as such: upstream
+  names no defect. It is taken because the wider rule is the better one for word
+  MOVEMENT - "word" and "identifier" are not the same question - and because diverging
+  from upstream in a file this fork merges is a cost with no benefit here. The new tests
+  above are the condition on which it was taken.
 
 - (2026-09-14) **All 34 `W1072` narrowing warnings, all 7 `H2269` visibility hints and the one `W1050`
   eliminated** — 20 files. The runtime package now compiles **clean under
@@ -238,6 +164,39 @@ both to `Int64` on Win32 (`W1024`), so the branch is now `Integer( HTM.length + 
 - (2026-09-03) Repository moved to the `GITLAK-forks` Codeberg organisation: `origin` is now `https://codeberg.org/GITLAK-forks/gllSynEdit.git`. **Why:** the `GITLAK` account had reached Codeberg's hard limit of 100 repositories, and an organisation carries its own allowance
   **Superseded 2026-09-05:** Codeberg is no longer used; see the entry above.
 
+- (2026-08-28) **The pre-D13 package folders were removed** — `Packages/Berlin`, `Packages/Rio`, `Packages/Sydney`, `Packages/Tokyo`, 60 files.
+  They are pre-D13 and built nothing here, so under the Delphi 13+ rule they carried no weight.
+  Upstream still ships all four and last touched them on 2026-06-05, so a future merge that changes any of those files will raise a delete/modify conflict. **Resolve it by keeping the deletion** — `git rm` the path. That cost was accepted knowingly; `CLAUDE.md` records it so the conflict is recognised rather than reverted.
+  (An intermediate commit restored these folders in error before the intent was confirmed; `dda0d72` restored them and this removes them again deliberately.)
+
+- (2026-08-28) **`CLAUDE.md` added** — `CLAUDE.md`. The fork's rules lived only in `readme.md` and `CHANGELOG.md`, so the things most likely to bite were not written down anywhere a reader would look first.
+  It records the scope (Delphi 13+, Win32 + Win64, never Win64x, C++Builder never in scope), the merge-never-rebase rule and why mass edits are far costlier here than in `glldzlib` — this fork has real git ancestry with upstream, so every edit to an upstream file is a future conflict, whereas `glldzlib` is an SVN snapshot.
+  It also records the `TSynNativeInt` trap in full, since that is the one thing about this codebase that a Win32-only build will never reveal, and — at that point — a decision **not** to delete the pre-D13 `Packages/Berlin|Tokyo|Rio|Sydney` folders. **That decision was reversed the same day**: they were removed because they are not needed for D13+, see the entry above. What survives from it is the merge consequence, which is real either way: upstream still ships all four and last touched them on 2026-06-05, so a merge touching them raises a delete/modify conflict that must be resolved by keeping the deletion.
+
+- (2026-08-27) `upstream/master` is merged as far as `ee3c6ba`. Its three commits were cherry-picked on 2026-08-22 (the accidental "Import IDE Settings" guard), so the merge changes no file - `git diff` against the pre-merge tree is empty and there was nothing to conflict. It exists because this fork takes upstream by merging, and an unrecorded merge leaves `git rev-list` reporting a backlog that is not there. `README.md` now carries the merged-through marker beside the merge-never-rebase rule, so the position is readable without running git.
+
+- (2026-08-13) Converted to the suite's Lib-DCU model — `Packages\11AndAbove\Delphi\SynEditDR.dproj`,
+  `Packages\11AndAbove\Delphi\SynEditDD.dproj`. DCU output moved from `.\$(Platform)\$(Config)`
+  (inside the Packages folder) to the house convention `37.0\$(Platform)\$(Config)` at the repo
+  root, and a post-build event on the runtime package copies `Source\*.dfm`/`*.res` beside the
+  DCUs (`{$R}` resources bind at link time). The IDE Library Path now serves
+  `37.0\Win64\Release` (Debug DCUs on the Debug DCU Path; `Source` + `Source\Highlighters`
+  on the Browsing Path) instead of compiling SynEdit from source into every consuming project.
+
+- (2026-08-06) Replaced the readme's stale "Fork Reason" section (a leftover note from the upstream
+  WebStencils contributor's fork, which misdescribed this repository) with the gllSynEdit
+  fork identity: D13+/Win64-only scope, CHANGELOG-as-fork-delta, merge-from-upstream policy.
+  — `readme.md`
+
+- (2026-08-06) Default platform Win32 → Win64 in the Delphi 13 package projects. The packages remain
+  `$(Auto)`-suffixed, producing `SynEditDR370.bpl` / `SynEditDD370.bpl`. Both verified
+  building clean Win64 Debug + Release (Release last — shared BPL output); the 29 W1072
+  warnings in upstream's `Source\Highlighters` units are upstream's and are left alone.
+  — `Packages/11AndAbove/Delphi/SynEditDR.dproj`,
+  `Packages/11AndAbove/Delphi/SynEditDD.dproj`
+  **Why:** the suite is Win64-only and the design package must load in the 64-bit IDE;
+  Win32 output would land in the root `Bpl`/`Dcp` folders where it shadows other trees.
+
 ### Removed
 
 - (2026-09-14) **`Source/SynEditJedi.inc` deleted — 2,160 lines** — `Source/SynEdit.inc`.
@@ -273,7 +232,67 @@ both to `Int64` on Win32 (`W1024`), so the branch is now `Integer( HTM.length + 
   Kept deliberately: `Demos/Folding/demo.cpp` is syntax-highlighting SAMPLE DATA beside
   `demo.js` and `demo.py`, not C++Builder code.
 
+- (2026-08-06) Stale XE6-era `SynEdit_RXE6` package reference from the designtime project's Win32
+  `DCC_UsePackage` (dead package name; would break any future Win32 build). —
+  `Packages/11AndAbove/Delphi/SynEditDD.dproj`
+
+- (2026-08-06) Fork established from a fresh upstream clone at `95da62f` (2026-07-23), replacing the
+  year-old `D:\SynEdit` working copy whose 217-commits-behind state and uncommitted local
+  package edits made a clean upgrade impossible. This tree supersedes both that copy and the
+  dead `pyscripter/SynEdit-2` clone (upstream abandoned 2020, superseded by TurboPack).
+
 ### Fixed
+
+- (2026-10-28) **`TSynEditStringList.GetMaxWidth` and `TSynWordWrapPlugin.WrapLines` started `TThreadPool.Default` workers even inside a DLL, whose pool cannot be shut down cleanly on DLL unload (loader lock)** — `Source/SynEditTextBuffer.pas`, `Source/SynEditWordWrap.pas`, `Tests/TestTextBuffer.pas`, `readme.md`, `CLAUDE.md` (upstream `09855c5`, 2026-10-27, "fix from stbie"; logic taken by hand, not by merge).  The loop body moves into the new private `CalcLine`; `GetMaxWidth` runs it through `TParallel.For` only when `not IsLibrary`, and otherwise in a plain loop on the calling thread.  **Beyond upstream:** the same guard and sequential fallback in `WrapLines`, the other `TParallel.For` in `Source` (upstream still has it unguarded), so a word-wrapped editor in a DLL no longer starts the pool either; and if the width function raises part-way, `GetMaxWidth` now resets `FMaxWidth` to -1 before re-raising, where it used to keep the partial maximum and return it from then on through the `FMaxWidth > 0` shortcut.  The exception a caller sees still differs by path: the parallel path wraps it in `EAggregateException`, the library path raises the original class; that is inherent to `TParallel` and left alone.  Upstream's `{$IF (COMPILERVERSION > 29) OR (NOT DEFINED(PACKAGE))}` wrapper was not taken: it is constant-true on Delphi 13, the floor here.  Three tests: `MaxWidthFindsTheLongestLine` checks the result and that a pool thread measured lines (the parallel path ran), `MaxWidthInALibraryStaysOnTheCallingThread` sets `IsLibrary` and proves no line of 20,000 is measured off the calling thread, and `MaxWidthIsNotCachedAfterAMeasureRaises` proves the partial maximum is not kept; each was mutation-checked (guard removed: 20,000 off-thread; guard inverted: all three fail; reset removed: 54 returned instead of 108).  `WrapLines` has no test: its lines are measured through the editor's DirectWrite layout, which offers no hook to observe the measuring thread.  **Merge cost:** a later `git merge upstream/master` will conflict in `GetMaxWidth` (upstream keeps the `{$IF}`); resolve to ours.
+- (2026-10-12) **`TSynPasSyn.UseUserSettings` leaked four attribute objects** - `Source/Highlighters/SynHighlighterPas.pas` (upstream `612c794`, taken by merge). Its cleanup freed the other temporaries but not `tmpDirecAttri`, `tmpCharAttri`, `tmpFloatAttri` and `tmpHexAttri`. No test added: `Tests/SynEditTests` has no FastMM leak gate, so no test there could fail on the leak.
+- (2026-10-07) **An in-IDE build re-saved the package `.dproj` without its Release output paths** —
+  `Packages/11AndAbove/Delphi/SynEditDD.dproj`, `Packages/11AndAbove/Delphi/SynEditDR.dproj`. The output standard was
+  two `Condition`-ed `DCC_BplOutput` / `DCC_DcpOutput` lines in the Base group, and the IDE keeps one value per
+  property per group when it re-saves the project on a build, so it wrote back only the active config's: a committed
+  re-save sent Release builds to the root `Bpl` / `Dcp` folders. Now one plain value per group, the form the IDE
+  writes itself: Base `$(BDSCOMMONDIR)\Bpl\$(Platform)\$(Config)` (and `Dcp`), overridden in the Release config group
+  by `$(BDSCOMMONDIR)\Bpl\$(Platform)`. Same output; built in all four modes with the `dcc` `-LE`/`-LN` paths checked
+  per mode.
+- (2026-09-23) **The completion proposal handled navigation keys TWICE**
+  - `Source/SynCompletionProposal.pas` (upstream `8d6c146`, taken by merge)
+  `TSynCompletionProposal.EditorKeyDown` passed Up, Down, Return and Escape to the
+  proposal form and then left `AKey` untouched, so the editor acted on the same key as
+  well: the list moved two rows at a time, and Return both accepted the completion and
+  inserted a line break. The fix is `AKey := 0` after `Form.KeyDown`; the widened key set
+  (PageUp, PageDown, Home, End, gated on `DisplayType = ctCode`) and the moved
+  `not Form.CanFocus` guard ride along from the same commit.
+  Our copy was byte-identical to upstream's pre-fix text, so this is genuine new upstream
+  work rather than a hand-port this fork had already done.
+  **Why it is taken although nothing here uses it:** no project in this estate
+  instantiates `TSynCompletionProposal`, so the fix is inert today - but this is a merged
+  fork, and declining an upstream fix in an unmodified file buys nothing while costing a
+  permanent conflict on the next merge. The reach is recorded, not hidden.
+
+- (2026-09-23) **Doc correction: building `SynEditDD` no longer rewrites its `.res`**
+  - `CLAUDE.md`
+  That instruction was accurate when written - the file went 640 -> 4,812 -> 640 bytes
+  across `2911904`, `292582d` and `95f6149` - but the 640-byte version is what is now
+  tracked, and a full eight-configuration package build leaves it untouched
+  (`git diff` empty afterwards, measured 2026-09-23). Reverting it before committing is
+  now a no-op, so the instruction is recorded as historical rather than left standing as
+  a step that cannot fire.
+
+- (2026-09-18) **"all 83 registered highlighters" is off by one — it is 82** — `readme.md`,
+  `CLAUDE.md`, `CHANGELOG.md`; the new documents say 82 throughout.
+  `SynEditTests.dpr` links **83 highlighter units**, and the figure appears to have been taken
+  from that. But `SynHighlighterMulti` registers no placeable highlighter — it is `TSynMultiSyn` —
+  so `GetPlaceableHighlighters` holds **82**. Counted two ways: 82 `RegisterPlaceableHighlighter`
+  call sites under `Source`, and 82 distinct class names.
+  **Worth knowing for anyone re-counting:** one call site is written
+  `RegisterPlaceableHighlighter (TSynGWScriptSyn)`, with a space before the parenthesis, so a
+  regex anchored on `RegisterPlaceableHighlighter(` silently returns 81 and looks like
+  confirmation of a different wrong number.
+- (2026-09-18) **The identifier-range curiosity is in `SynHighlighterJava.pas`, not `SynHighlighterCpp.pas`,
+  and it is not executable**. Both occurrences of `'L'..'Ö', 'Ø'..'ö', 'ø'..'ÿ'` sit
+  inside comments — a `(* … *)` block and a `//`-commented line. The live body is
+  `IsCharAlphaNumeric(AChar) or CharInSet(AChar, ['_','$'])`. It is still not to be "corrected",
+  but it is historical source data rather than a live range. The HTML entity tables **are** live
+  and generation-coupled (`HashKey` / `KeyIndices`), which is the case that matters.
 
 Upstream defects, found by review and fixed here. **The full write-up was submitted to
 TurboPack on 2026-09-14**, so some of these may return through a future
@@ -521,25 +540,6 @@ whichever version is correct rather than assuming ours is the change.
   **Why:** the mask is what the IDE reads for the Project Manager's platform list, so a
   stale one puts dead platforms back in front of the reader.
 
-## [In-Service]
-
-> Libraries and packages are continuously deployed: changes below are live as soon as the package is rebuilt and installed - there is no separate release step, so no `[Unreleased]` backlog. Tagged version snapshots are listed beneath.
-
-### Changed
-
-- (2026-08-28) **The pre-D13 package folders were removed** — `Packages/Berlin`, `Packages/Rio`, `Packages/Sydney`, `Packages/Tokyo`, 60 files.
-  They are pre-D13 and built nothing here, so under the Delphi 13+ rule they carried no weight.
-  Upstream still ships all four and last touched them on 2026-06-05, so a future merge that changes any of those files will raise a delete/modify conflict. **Resolve it by keeping the deletion** — `git rm` the path. That cost was accepted knowingly; `CLAUDE.md` records it so the conflict is recognised rather than reverted.
-  (An intermediate commit restored these folders in error before the intent was confirmed; `dda0d72` restored them and this removes them again deliberately.)
-
-- (2026-08-28) **`CLAUDE.md` added** — `CLAUDE.md`. The fork's rules lived only in `readme.md` and `CHANGELOG.md`, so the things most likely to bite were not written down anywhere a reader would look first.
-  It records the scope (Delphi 13+, Win32 + Win64, never Win64x, C++Builder never in scope), the merge-never-rebase rule and why mass edits are far costlier here than in `glldzlib` — this fork has real git ancestry with upstream, so every edit to an upstream file is a future conflict, whereas `glldzlib` is an SVN snapshot.
-  It also records the `TSynNativeInt` trap in full, since that is the one thing about this codebase that a Win32-only build will never reveal, and — at that point — a decision **not** to delete the pre-D13 `Packages/Berlin|Tokyo|Rio|Sydney` folders. **That decision was reversed the same day**: they were removed because they are not needed for D13+, see the entry above. What survives from it is the merge consequence, which is real either way: upstream still ships all four and last touched them on 2026-06-05, so a merge touching them raises a delete/modify conflict that must be resolved by keeping the deletion.
-
-- (2026-08-27) `upstream/master` is merged as far as `ee3c6ba`. Its three commits were cherry-picked on 2026-08-22 (the accidental "Import IDE Settings" guard), so the merge changes no file - `git diff` against the pre-merge tree is empty and there was nothing to conflict. It exists because this fork takes upstream by merging, and an unrecorded merge leaves `git rev-list` reporting a backlog that is not there. `README.md` now carries the merged-through marker beside the merge-never-rebase rule, so the position is readable without running git.
-
-### Fixed
-
 - (2026-08-28) **Two `.gitignore` rules pointed at a folder that no longer exists** — `.gitignore`.
   `Packages/Sydney/CBuilder/Win64/` and `Packages/Sydney/cpp/` were left behind when the pre-D13 package folders were removed. The generic `Packages/*/cpp/` rule added the same day still covers the one remaining case, `11AndAbove`. Checked afterwards that no tracked file became ignored and that `37.0/` and `Packages/11AndAbove/cpp/` are still excluded by this repository's own file rather than a global one.
 
@@ -580,30 +580,6 @@ whichever version is correct rather than assuming ours is the change.
   clause for `MessageDlg`'s result and button constants. The unit ships in `SynEditDD.dpk`, so this
   fork was exposed. `SynEditDD` builds clean in Win64 Debug and Release.
 
-### Changed
-
-- (2026-08-13) Converted to the suite's Lib-DCU model — `Packages\11AndAbove\Delphi\SynEditDR.dproj`,
-  `Packages\11AndAbove\Delphi\SynEditDD.dproj`. DCU output moved from `.\$(Platform)\$(Config)`
-  (inside the Packages folder) to the house convention `37.0\$(Platform)\$(Config)` at the repo
-  root, and a post-build event on the runtime package copies `Source\*.dfm`/`*.res` beside the
-  DCUs (`{$R}` resources bind at link time). The IDE Library Path now serves
-  `37.0\Win64\Release` (Debug DCUs on the Debug DCU Path; `Source` + `Source\Highlighters`
-  on the Browsing Path) instead of compiling SynEdit from source into every consuming project.
-
-### Added
-
-- (2026-08-06) `SynHighlighterWebStencils.pas` was on disk but wired into neither package — added to the
-  runtime package (contains clause + DCC reference), matching the `SynHighlighterWebIDL`
-  precedent: no `SynEditReg` palette registration, the unit self-registers as a placeable
-  highlighter in its initialization section. The unit did not compile against the current
-  `TSynCustomHighlighter` API (likely why upstream never packaged it) and needed aligning:
-  `GetTokenKind`/`SetLine` signatures `Integer` → `TSynNativeInt`, `SynFunc` added to the
-  uses clause, and `IsKeyword` marked `override` (it silently hid the base virtual, W1010).
-  — `Packages/11AndAbove/Delphi/SynEditDR.dpk`,
-  `Packages/11AndAbove/Delphi/SynEditDR.dproj`, `Source/Highlighters/SynHighlighterWebStencils.pas`
-
-### Fixed
-
 - (2026-08-06) On Win64 the Progress highlighter's `GetRange` returned 4 bytes of uninitialised stack in
   the upper half of the range pointer (stack-local variant record with only the low dword's
   Word fields written), defeating `ScanFrom`'s range-equality early-exit so edits could
@@ -627,31 +603,25 @@ whichever version is correct rather than assuming ours is the change.
   pattern now tracks them. — `.gitignore`,
   `Packages/11AndAbove/Delphi/SynEditDR.res`, `Packages/11AndAbove/Delphi/SynEditDD.res`
 
-### Changed
+### Reviewed and deliberately NOT taken from upstream, so they are not re-derived later
 
-- (2026-08-06) Replaced the readme's stale "Fork Reason" section (a leftover note from the upstream
-  WebStencils contributor's fork, which misdescribed this repository) with the gllSynEdit
-  fork identity: D13+/Win64-only scope, CHANGELOG-as-fork-delta, merge-from-upstream policy.
-  — `readme.md`
-
-### Removed
-
-- (2026-08-06) Stale XE6-era `SynEdit_RXE6` package reference from the designtime project's Win32
-  `DCC_UsePackage` (dead package name; would break any future Win32 build). —
-  `Packages/11AndAbove/Delphi/SynEditDD.dproj`
-
-- (2026-08-06) Fork established from a fresh upstream clone at `95da62f` (2026-07-23), replacing the
-  year-old `D:\SynEdit` working copy whose 217-commits-behind state and uncommitted local
-  package edits made a clean upgrade impossible. This tree supersedes both that copy and the
-  dead `pyscripter/SynEdit-2` clone (upstream abandoned 2020, superseded by TurboPack).
-
-### Changed
-
-- (2026-08-06) Default platform Win32 → Win64 in the Delphi 13 package projects. The packages remain
-  `$(Auto)`-suffixed, producing `SynEditDR370.bpl` / `SynEditDD370.bpl`. Both verified
-  building clean Win64 Debug + Release (Release last — shared BPL output); the 29 W1072
-  warnings in upstream's `Source\Highlighters` units are upstream's and are left alone.
-  — `Packages/11AndAbove/Delphi/SynEditDR.dproj`,
-  `Packages/11AndAbove/Delphi/SynEditDD.dproj`
-  **Why:** the suite is Win64-only and the design package must load in the 64-bit IDE;
-  Win32 output would land in the root `Bpl`/`Dcp` folders where it shadows other trees.
+- (2026-10-28) **`upstream/master` reviewed to `09855c5`: two commits not taken.**
+  - `7465563` ("fix from the user mul0095") - ALREADY PRESENT: its `FillChar` of the vacated tail in
+    `DeleteNative`/`DeleteLines` is the fix made here on 2026-09-14, and its new `Tests/TestSynEditStringList.pas`
+    suite (with its own `.dproj`) repeats what `Tests/TestTextBuffer.pas` already proves.
+  - `e468e85` (and its merge `e98d153`) - DECLINED: a wording change to `What's New.md` only.
+- (2026-09-18) **Upstream swept 2026-09-18: `11Alexandria` and `multicursor` reviewed, nothing taken.**
+  Neither branch had a prior record here.
+  - `30cd5cc` (`11Alexandria`) - DECLINED by its own text: the commit edits that branch's README
+    to say it "is for legacy 11Alexandria support only and doesn't have the latest updates". One
+    commit since a 2023 merge-base, so "1 behind" is a dead branch, not a backlog.
+  - `fb9e365` (`multicursor`) - DECLINED, superseded. A 2020 experimental spike
+    (`Source/SynEditMultiCaret.pas`, 1,180 new lines) on a single-commit branch, abandoned
+    upstream and replaced by the `TSynSelection`/`TSynSelections` design **this fork already
+    carries** (`ExecuteMultiCaretCommand`, `CommandInfo.StoreMultiCaret`, plus
+    `Doc/Multi-caret.md`). It rewrites 430 lines of `SynEdit.pas` from a 2020 base, so it could
+    not merge cleanly and would not build - it would drop a dead parallel implementation into a
+    fork that has the finished one.
+  **Condition to reopen:** only if upstream revives either branch with post-2023 work. This
+  triage covered those two branches only; `master`, `pyscripter`, `DelphiFeatures` and `GDI` are
+  worth checking on a future sweep.
