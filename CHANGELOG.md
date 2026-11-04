@@ -78,6 +78,12 @@ visible.
 ### Changed
 
 - (2026-10-28) **Upstream reviewed to `09855c5` (2026-10-27), `upstream/master`'s tip; not merged** — `readme.md`.  Four commits since `e106252`: `09855c5` is under Fixed (logic ported by hand); `7465563` ("fix from the user mul0095", clearing the vacated tail after `Delete`/`DeleteLines`) is already present, fixed here on 2026-09-14 (see that Fixed entry), so its source hunk adds nothing and its separate `TestSynEditStringList` suite duplicates `Tests/TestTextBuffer.pas`; `e468e85` (a `What's New.md` wording change) and its merge `e98d153` were not taken.  **Why not merged:** a merge would bring in `7465563`'s second test project and the documentation change, so `git rev-list HEAD..upstream/master` will keep listing these four until a later merge resolves them.
+
+- (2026-10-28) **`upstream/master` reviewed to `09855c5`: two commits not taken.**
+  - `7465563` ("fix from the user mul0095") - ALREADY PRESENT: its `FillChar` of the vacated tail in
+    `DeleteNative`/`DeleteLines` is the fix made here on 2026-09-14, and its new `Tests/TestSynEditStringList.pas`
+    suite (with its own `.dproj`) repeats what `Tests/TestTextBuffer.pas` already proves.
+  - `e468e85` (and its merge `e98d153`) - DECLINED: a wording change to `What's New.md` only.
 - (2026-10-26) **Unit-scope names in every `uses` clause** — `Demos/CompletionProposalDemo/CompletionProposalDemo.dpr`, `Demos/CompletionProposalDemo/FormMain_ctCode.pas`, `Demos/CompletionProposalDemo/FormMain_ctParams.pas`, `Demos/CompletionProposalDemo/ParamCompletionDemo.dpr`, `Demos/EditAppDemos/dmWorkbookCommands.pas`, `Demos/EditAppDemos/EditAppMain.pas`, `Demos/EditAppDemos/EditAppMDI.dpr`, `Demos/EditAppDemos/EditAppSDI.dpr`, `Demos/EditAppDemos/EditAppWorkbook.dpr`, `Demos/EditAppDemos/frmEditor.pas`, `Demos/EditAppDemos/frmMainMDI.pas`, `Demos/EditAppDemos/frmMainSDI.pas`, `Demos/EditAppDemos/frmMainWorkbook.pas`, `Demos/EditAppDemos/uEditAppIntfs.pas`, `Demos/Folding/uHighlighterProcs.pas`, `Demos/HighlighterDemo/HighlighterDemo.dpr`, `Demos/HighlighterDemo/SynHighlighterSample.pas`, `Demos/HighlighterDemo/uHighlighterMain.pas`, `Demos/PrintDemo/DPageSetup.pas`, `Demos/PrintDemo/DTestPrintPreview.pas`, `Demos/PrintDemo/MTestPP.pas`, `Demos/PrintDemo/TestPP.dpr`, `Demos/SearchReplaceDemo/dlgConfirmReplace.pas`, `Demos/SearchReplaceDemo/dlgReplaceText.pas`, `Demos/SearchReplaceDemo/dlgSearchText.pas`, `Demos/SearchReplaceDemo/SearchReplaceDemo.dpr`, `Demos/SearchReplaceDemo/SearchReplaceMain.pas`, `Demos/SimpleIDEDemo/SimpleIDEDemo.dpr`, `Demos/SimpleIDEDemo/uSimpleIDEDebugger.pas`, `Source/DesignTimeEditors/SynDelphiIDEImporter.pas`, `Source/Highlighters/SynHighlighterADSP21xx.pas`, `Source/Highlighters/SynHighlighterAWK.pas`, `Source/Highlighters/SynHighlighterBaan.pas`, `Source/Highlighters/SynHighlighterBat.pas`, `Source/Highlighters/SynHighlighterCAC.pas`, `Source/Highlighters/SynHighlighterCache.pas`, `Source/Highlighters/SynHighlighterCPM.pas`, `Source/Highlighters/SynHighlighterCpp.pas`, `Source/Highlighters/SynHighlighterCS.pas`, `Source/Highlighters/SynHighlighterDelphi.pas`, `Source/Highlighters/SynHighlighterDfm.pas`, `Source/Highlighters/SynHighlighterDml.pas`, `Source/Highlighters/SynHighlighterDOT.pas`, `Source/Highlighters/SynHighlighterEiffel.pas`, `Source/Highlighters/SynHighlighterFortran.pas`, `Source/Highlighters/SynHighlighterGalaxy.pas`, `Source/Highlighters/SynHighlighterGeneral.pas`, `Source/Highlighters/SynHighlighterGWS.pas`, `Source/Highlighters/SynHighlighterHaskell.pas`, `Source/Highlighters/SynHighlighterHP48.pas`, `Source/Highlighters/SynHighlighterHtml.pas`, `Source/Highlighters/SynHighlighterIDL.pas`, `Source/Highlighters/SynHighlighterJava.pas`, `Source/Highlighters/SynHighlighterJScript.pas`, `Source/Highlighters/SynHighlighterJSON.pas`, `Source/Highlighters/SynHighlighterKix.pas`, `Source/Highlighters/SynHighlighterLDraw.pas`, `Source/Highlighters/SynHighlighterLLVM.pas`, `Source/Highlighters/SynHighlighterManager.pas`, `Source/Highlighters/SynHighlighterModelica.pas`, `Source/Highlighters/SynHighlighterMsg.pas`, `Source/Highlighters/SynHighlighterOmni.pas`, `Source/Highlighters/SynHighlighterPerl.pas`, `Source/Highlighters/SynHighlighterPHP.pas`, `Source/Highlighters/SynHighlighterRC.pas`, `Source/Highlighters/SynHighlighterRexx.pas`, `Source/Highlighters/SynHighlighterRuby.pas`, `Source/Highlighters/SynHighlighterSDD.pas`, `Source/Highlighters/SynHighlighterSml.pas`, `Source/Highlighters/SynHighlighterST.pas`, `Source/Highlighters/SynHighlighterTclTk.pas`, `Source/Highlighters/SynHighlighterTeX.pas`, `Source/Highlighters/SynHighlighterUNIXShellScript.pas`, `Source/Highlighters/SynHighlighterUnreal.pas`, `Source/Highlighters/SynHighlighterURI.pas`, `Source/Highlighters/SynHighlighterWebIDL.pas`, `Source/Highlighters/SynHighlighterWebStencils.pas`, `Source/Highlighters/SynHighlighterXML.pas`, `Source/SynAutoCorrect.pas`, `Source/SynAutoCorrectEditor.pas`, `Source/SynDBEdit.pas`, `Source/SynDWrite.pas`, `Source/SynEditDragDrop.pas`, `Source/SynEditExport.pas`, `Source/SynEditHighlighter.pas`, `Source/SynEditKbdHandler.pas`, `Source/SynEditKeyCmdEditor.pas`, `Source/SynEditKeyCmdsEditor.pas`, `Source/SynEditKeyConst.pas`, `Source/SynEditPlugins.pas`, `Source/SynEditPrinterInfo.pas`, `Source/SynEditPrintMarginsDialog.pas`, `Source/SynEditPrintTypes.pas`, `Source/SynEditPythonBehaviour.pas`, `Source/SynEditRegexSearch.pas`, `Source/SynEditSearch.pas`, `Source/SynEditWildcardSearch.pas`, `Source/SynExportHTML.pas`, `Source/SynExportRTF.pas`, `Source/SynExportTeX.pas`, `Source/SynMacroRecorder.pas`, `Source/SynPopupMenu.pas`, `Source/SynUnicode.pas`, `Source/SynURIOpener.pas`, `SynGen/HashTableGen.pas`, `SynGen/LongIntList.pas`, `SynGen/SynGen.dpr`, `SynGen/SynGenUnit.pas`.  588 bare RTL/VCL unit names in `uses` clauses given their unit-scope names, 2 partly-scoped names (`Generics.Collections`) completed, 64 code qualifiers written in full, 2 scoped names respelt as the unit declares itself; generated code is byte-identical in every mode built.  Merge cost: gllSynEdit takes upstream by real git merge (161 merge commits to date), so the next upstream merge conflicts on every converted `uses` line upstream has touched since; across 108 files that is the dominant cost of this change, accepted under Ian's rule.  **Why:** Ian, 2026-10-26: "all the gll* forks are our own code because they have all been modified to suite our needs/preferences/standards".
 - (2026-10-12) **Build auto-increment turned on in both packages** - `Packages/11AndAbove/Delphi/SynEditDR.dproj`, `Packages/11AndAbove/Delphi/SynEditDD.dproj`, `Packages/11AndAbove/Delphi/SynEditDD.res`, `build.cmd`, `CLAUDE.md`. `VerInfo_AutoIncVersion` in each Base group; `SynEditDD` also gained the `Cfg_2_Win64` (Debug Win64) groups it lacked, because Delphi writes `VerInfo_Build` only into a config-and-platform group. All eight package builds clean (zero hints, zero warnings); the number moved in every group, and a second build moved it again and stamped the BPL `1.0.0.1`. **`build.cmd` no longer reverts `SynEditDD.res`:** that `.res` now carries the build number, so reverting it would have discarded every bump. **Cost:** both `.dproj` files diverge from upstream, so a future upstream `.dproj` change may conflict.
 - (2026-10-12) **Merged `upstream/master` to `e106252` (2026-10-11), upstream's tip** - `Packages/11AndAbove/Delphi/SynEditDD.dproj`, `Packages/11AndAbove/Delphi/SynEditDR.dproj`, `readme.md`. Four commits: `612c794` and `e106252` are under Fixed and Added; `a0e98d3` ("Saved with 13.2") is taken as `ProjectVersion` 20.4 -> 20.5 only - no platform, `<Deployment>` or output-path change came with it. **`fef1edd` ("Removed warnings") REFUSED:** it silences the narrowings this fork fixed on 2026-09-14 (the `W1072` entry under the earlier Changed) the opposite way, truncating `TSynNativeInt` values with `ToInt32(...)` casts where this fork widened the receiving declarations; the seven conflicting highlighters (AutoIt, Dockerfile, Kotlin, Lua, Rust, Swift, TOML) were resolved to ours. **Hazard reverted:** `SynHighlighterMatlab.pas` auto-merged cleanly but brought `RestIsBlank(ToInt32(Run + 2))` and `RestIsBlank(ToInt32(P + 2))` into calls whose parameter is already `TSynNativeInt` here - restored to ours. ENV, Erlang, HCL, PowerShell and Registry merged with no net change. The `Berlin`/`Rio`/`Sydney`/`Tokyo` `SynEditDR` delete/modify conflicts were resolved by `git rm`, as `CLAUDE.md` prescribes. **Why record the refusal:** anyone comparing against upstream will see the casts missing here, and the widening is the reason.
@@ -98,6 +104,22 @@ both to `Int64` on Win32 (`W1024`), so the branch is now `Integer( HTM.length + 
   MOVEMENT - "word" and "identifier" are not the same question - and because diverging
   from upstream in a file this fork merges is a cost with no benefit here. The new tests
   above are the condition on which it was taken.
+
+- (2026-09-18) **Upstream swept 2026-09-18: `11Alexandria` and `multicursor` reviewed, nothing taken.**
+  Neither branch had a prior record here.
+  - `30cd5cc` (`11Alexandria`) - DECLINED by its own text: the commit edits that branch's README
+    to say it "is for legacy 11Alexandria support only and doesn't have the latest updates". One
+    commit since a 2023 merge-base, so "1 behind" is a dead branch, not a backlog.
+  - `fb9e365` (`multicursor`) - DECLINED, superseded. A 2020 experimental spike
+    (`Source/SynEditMultiCaret.pas`, 1,180 new lines) on a single-commit branch, abandoned
+    upstream and replaced by the `TSynSelection`/`TSynSelections` design **this fork already
+    carries** (`ExecuteMultiCaretCommand`, `CommandInfo.StoreMultiCaret`, plus
+    `Doc/Multi-caret.md`). It rewrites 430 lines of `SynEdit.pas` from a 2020 base, so it could
+    not merge cleanly and would not build - it would drop a dead parallel implementation into a
+    fork that has the finished one.
+  **Condition to reopen:** only if upstream revives either branch with post-2023 work. This
+  triage covered those two branches only; `master`, `pyscripter`, `DelphiFeatures` and `GDI` are
+  worth checking on a future sweep.
 
 - (2026-09-14) **All 34 `W1072` narrowing warnings, all 7 `H2269` visibility hints and the one `W1050`
   eliminated** — 20 files. The runtime package now compiles **clean under
@@ -602,26 +624,3 @@ whichever version is correct rather than assuming ours is the change.
   ignore rule, so a fresh clone could not build the packages as committed; a negation
   pattern now tracks them. — `.gitignore`,
   `Packages/11AndAbove/Delphi/SynEditDR.res`, `Packages/11AndAbove/Delphi/SynEditDD.res`
-
-### Reviewed and deliberately NOT taken from upstream, so they are not re-derived later
-
-- (2026-10-28) **`upstream/master` reviewed to `09855c5`: two commits not taken.**
-  - `7465563` ("fix from the user mul0095") - ALREADY PRESENT: its `FillChar` of the vacated tail in
-    `DeleteNative`/`DeleteLines` is the fix made here on 2026-09-14, and its new `Tests/TestSynEditStringList.pas`
-    suite (with its own `.dproj`) repeats what `Tests/TestTextBuffer.pas` already proves.
-  - `e468e85` (and its merge `e98d153`) - DECLINED: a wording change to `What's New.md` only.
-- (2026-09-18) **Upstream swept 2026-09-18: `11Alexandria` and `multicursor` reviewed, nothing taken.**
-  Neither branch had a prior record here.
-  - `30cd5cc` (`11Alexandria`) - DECLINED by its own text: the commit edits that branch's README
-    to say it "is for legacy 11Alexandria support only and doesn't have the latest updates". One
-    commit since a 2023 merge-base, so "1 behind" is a dead branch, not a backlog.
-  - `fb9e365` (`multicursor`) - DECLINED, superseded. A 2020 experimental spike
-    (`Source/SynEditMultiCaret.pas`, 1,180 new lines) on a single-commit branch, abandoned
-    upstream and replaced by the `TSynSelection`/`TSynSelections` design **this fork already
-    carries** (`ExecuteMultiCaretCommand`, `CommandInfo.StoreMultiCaret`, plus
-    `Doc/Multi-caret.md`). It rewrites 430 lines of `SynEdit.pas` from a 2020 base, so it could
-    not merge cleanly and would not build - it would drop a dead parallel implementation into a
-    fork that has the finished one.
-  **Condition to reopen:** only if upstream revives either branch with post-2023 work. This
-  triage covered those two branches only; `master`, `pyscripter`, `DelphiFeatures` and `GDI` are
-  worth checking on a future sweep.
