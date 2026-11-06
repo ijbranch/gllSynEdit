@@ -19,6 +19,7 @@ uses
   SynHighlighterADSP21xx in '..\Source\Highlighters\SynHighlighterADSP21xx.pas',
   SynHighlighterAWK in '..\Source\Highlighters\SynHighlighterAWK.pas',
   SynHighlighterAsm in '..\Source\Highlighters\SynHighlighterAsm.pas',
+  SynHighlighterAsmX86_64 in '..\Source\Highlighters\SynHighlighterAsmX86_64.pas',
   SynHighlighterAutoIt in '..\Source\Highlighters\SynHighlighterAutoIt.pas',
   SynHighlighterBaan in '..\Source\Highlighters\SynHighlighterBaan.pas',
   SynHighlighterBat in '..\Source\Highlighters\SynHighlighterBat.pas',
@@ -99,6 +100,8 @@ uses
   SynHighlighterWebStencils in '..\Source\Highlighters\SynHighlighterWebStencils.pas',
   SynHighlighterXML in '..\Source\Highlighters\SynHighlighterXML.pas',
   SynHighlighterYAML in '..\Source\Highlighters\SynHighlighterYAML.pas',
+  TestAsmX86_64 in 'TestAsmX86_64.pas',
+  TestEditorColours in 'TestEditorColours.pas',
   TestHighlighterContract in 'TestHighlighterContract.pas',
   TestTextBuffer in 'TestTextBuffer.pas',
   TestWordNavigation in 'TestWordNavigation.pas';

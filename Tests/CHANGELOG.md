@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+- (2026-11-07) **Upstream intake to `3d03c98`: 8 tests, and `TSynAsmX86_64` linked into the contract tests** — `TestAsmX86_64.pas` (new), `TestEditorColours.pas` (new), `SynEditTests.dpr`, `SynEditTests.dproj`, `README.md`.  Suite 15 -> 23 (22 pass, 1 ignored off an interactive station).  `TestEditorColours` paints an editor on a never-shown form into a bitmap and asserts what `OnSpecialLineColors` receives (unstyled; the styled case needs visual styles and ignores itself via `GllDUnitX.Station.RequireInteractiveStation`, hence `D:\gllDUnitX\Source\Gll` on the unit path) and the gutter `DigitCount` range; `TestAsmX86_64` checks token classes on x86-64 and AVX lines.  Red first: linking the new highlighter turned three contract tests and three new tests into access violations, and the keyword tests failed on the missing commas; both mutation proofs and the fixes are in `..\CHANGELOG.md`.  `README.md` (new) lists the ignored-by-design test; `SynEditTests.dproj` is now CRLF throughout (it was LF-only, unflagged because the file is `-text` to git).  Upstream's `TestSynEditStringList.pas` was not taken (duplicate of `TestTextBuffer`).
 - (2026-10-25) **This change log** — `CHANGELOG.md`.  The suite's own record, per the estate rule that every test
   suite has one; test-only history moved in from `..\CHANGELOG.md` ( 4 entries ).
 - (2026-09-23) **Five tests pinning word navigation, which had none**

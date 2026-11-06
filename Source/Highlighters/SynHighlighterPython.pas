@@ -187,7 +187,7 @@ const
   // No need to localise keywords!
 
   // List of keywords
-  KEYWORDCOUNT = 31;
+  KEYWORDCOUNT = 32;
   KEYWORDS: array [1..KEYWORDCOUNT] of string =
     (
     'and',
@@ -212,6 +212,7 @@ const
     'is',
     'lambda',
     'match',
+    'nonlocal',
     'not',
     'or',
     'pass',

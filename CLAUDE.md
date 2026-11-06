@@ -76,7 +76,7 @@ The only package set built here is `Packages/11AndAbove/Delphi`:
 `SynEditDR` (runtime) then `SynEditDD` (design-time). **Win32 + Win64 x Debug +
 Release, 8 of 8 pass.**
 
-Those two packages contain all 136 units under `Source`, so a package build is
+Those two packages contain all 137 units under `Source`, so a package build is
 already full coverage as a *compile* test — there is no separate compile harness to
 run, and no equivalent of glldzlib's AllUnits.
 
@@ -94,11 +94,11 @@ repository and they caught a real problem once already.
 
 **`Tests/SynEditTests.dproj` is the behavioural gate, and a package build does not
 substitute for it.** `TestHighlighterContract` is data-driven over
-`GetPlaceableHighlighters`, so it asserts the scanning contract against all 83
+`GetPlaceableHighlighters`, so it asserts the scanning contract against all 84
 registered highlighters at once: `Next` advances or reaches end of line, `GetRange`
 round-trips through `SetRange`, and each highlighter scans its own `SampleSource`
 identically whether the range is restored per line or not. Run it for both
-platforms; it needs `D:\gllDUnitX\Source` on the unit path. **15/15 as of 2026-10-28** (12 as of 2026-09-23; 15 since `TestTextBuffer` pinned `MaxWidth` inside a DLL and after a failed measure)
+platforms; it needs `D:\gllDUnitX\Source` on the unit path. **22 pass + 1 ignored (23) as of 2026-11-07** (the styled `OnSpecialLineColors` test needs an interactive station; 15/15 as of 2026-10-28) (12 as of 2026-09-23; 15 since `TestTextBuffer` pinned `MaxWidth` inside a DLL and after a failed measure)
 (7 until `TestWordNavigation` pinned Ctrl+Left / Ctrl+Right, which had no coverage at
 all when upstream changed their character rule).
 It found a real non-advancing `Next` in `TSynXMLSyn` on its first run — that class

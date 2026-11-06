@@ -224,10 +224,14 @@ const
     'write', 'writeln', 'zIndex'
   );
 
-  // IMPORTANT!!! Cause JavaScript is case sensitive, list must be sorted by ASCII values
-  KeyWords: array[0..61] of string = (
-    'NaN', 'abstract', 'boolean', 'break', 'byte', 'callee', 'case',
-    'catch', 'char', 'const', 'constructor', 'continue',
+  // IsKeyword searches this array with a binary search over CompareStr, which
+  // is ordinal: upper case sorts before lower case. 'NaN' therefore has to come
+  // before 'abstract'. While it sat between 'long' and 'native' the search
+  // never reached it, so it was the one keyword that could not be highlighted.
+  KeyWords: array[0..62] of string = (
+    'NaN',
+    'abstract', 'boolean', 'break', 'byte', 'callee', 'case',
+    'catch', 'char', 'class', 'const', 'constructor', 'continue',
     'debugger', 'default', 'delete', 'do', 'double', 'else',
     'enum', 'export', 'extends', 'false', 'final', 'finally',
     'float', 'for', 'function', 'goto', 'if', 'implements',
