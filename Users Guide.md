@@ -32,7 +32,8 @@ a package error but `Error Reading Form: Class TSynEdit not found` when the desi
 
 Two palette pages appear: **SynEdit** (the editor, the exporters, the search engines, printing,
 completion, macro recorder, spell check, auto-correct, options dialog, URI opener) and **SynEdit
-Highlighters** (the highlighters that are registered on the palette).
+Highlighters** (the highlighters that are registered on the palette: since 2026-11-09 every highlighter
+the runtime package compiles, Go, Rust, Lua, TOML, PowerShell and WebStencils among them).
 
 ### b) Point your project at the compiled units
 

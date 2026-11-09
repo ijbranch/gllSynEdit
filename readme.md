@@ -32,7 +32,7 @@ Upstream content is kept unmodified except where `CHANGELOG.md` — the sole
 record of the fork delta — says otherwise. Take upstream updates by fetching
 the `upstream` remote and merging (never rebasing).
 
-**Merged as far as `3d03c98` (2026-11-06), upstream's tip, on 2026-11-07.** The merge resolves the four commits earlier only reviewed (`09855c5` kept as ported by hand, `7465563` kept as already fixed here, its `TestSynEditStringList` duplicate removed, `e468e85` taken with the merge) and takes `6e003a4`, `fe0545e`, `ee7397c`, `9981b7b` + `dc94afa` (the new `SynHighlighterAsmX86_64`) and `3d03c98`, so `git rev-list HEAD..upstream/master` is empty after it; see `CHANGELOG.md`. Where a
+**Merged as far as `7d98a78` (2026-11-08), upstream's tip, on 2026-11-09,** by `git merge -s ours`: of its seven commits `a9bb3a3` (the remaining highlighters on the palette) was taken by hand and the other six were already fixed here, so the merge changes no file; see `CHANGELOG.md`.  **Before that, merged as far as `3d03c98` (2026-11-06) on 2026-11-07.** The merge resolves the four commits earlier only reviewed (`09855c5` kept as ported by hand, `7465563` kept as already fixed here, its `TestSynEditStringList` duplicate removed, `e468e85` taken with the merge) and takes `6e003a4`, `fe0545e`, `ee7397c`, `9981b7b` + `dc94afa` (the new `SynHighlighterAsmX86_64`) and `3d03c98`, so `git rev-list HEAD..upstream/master` is empty after it; see `CHANGELOG.md`. Where a
 commit has already been cherry-picked here, merge it anyway once it reaches a
 tip: the merge changes nothing, but without it `git rev-list HEAD..upstream/master`
 keeps reporting a backlog that does not exist, because patch comparison cannot
