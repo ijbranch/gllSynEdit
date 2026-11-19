@@ -1,16 +1,14 @@
 ﻿program SynEditTests;
 
-{$IFNDEF TESTINSIGHT}
 {$APPTYPE CONSOLE}
-{$ENDIF}
 {$STRONGLINKTYPES ON}
 
 uses
+  // FastMM5 FIRST, as the memory manager the per-test leak check measures ( GllDUnitX.SuiteRunner )
+  FastMM5,
   System.SysUtils,
-  DUnitX.Loggers.Console,
-  DUnitX.Loggers.Xml.NUnit,
-  DUnitX.Exceptions,
   DUnitX.TestFramework,
+  GllDUnitX.SuiteRunner,
   // Every highlighter unit is linked explicitly: each registers itself from its
   // own initialization section, so a unit that is not linked is simply absent
   // from GetPlaceableHighlighters and would be silently skipped by the tests.
@@ -106,77 +104,40 @@ uses
   TestTextBuffer in 'TestTextBuffer.pas',
   TestWordNavigation in 'TestWordNavigation.pas';
 
-var
-  Runner: ITestRunner;
-  Results: IRunResults;
-  Logger: ITestLogger;
-  NUnitLogger: ITestLogger;
-  XmlFile: string;
-
 begin
-  // Honour DUnitX's own options, above all --run:<names>, so GITLAKMCP's test_run
-  // can run one fixture or test. An unknown option is the caller's error: exit 251
-  // rather than silently running the whole suite. A filter that matches nothing
-  // runs zero tests and exits 250 below.
-  try
-    TDUnitX.CheckCommandLine;
-  except
-    on E: ECommandLineError do
-    begin
-      System.Writeln('Command-line error: ' + E.Message);
-      System.ExitCode := 251;
-      Exit;
-    end;
-  end;
 
+  // Every test is checked for memory leaks by GllDUnitX.SuiteRunner: a warm-up pass, the measured pass under FastMM5,
+  // then a re-run of each flagged test; only a leak that repeats counts.
   try
-    // Strict string comparison. DUnitX defaults Assert.AreEqual(string, string)
-    // to IGNORE case, which would make any test whose subject is casing pass
-    // against a product that gets the casing wrong.
+    // Our gllDUnitX fork defaults Assert.IgnoreCaseDefault to True, so a two-argument Assert.AreEqual on strings
+    // IGNORES CASE and nothing at the call site says so.  This suite is strict by construction; a test that genuinely
+    // does not care about case must pass True explicitly.
     Assert.IgnoreCaseDefault := False;
 
-    Runner := TDUnitX.CreateRunner;
-    // Fixtures are registered explicitly in each unit's initialization section,
-    // so RTTI discovery would find them a second time and run everything twice.
-    // KEEP BOTH discovery mechanisms. The 'RTTI would run every test twice'
-    // justification is FALSE in our gllDUnitX fork, which dedupes a fixture
-    // registered both ways; turning this OFF is what silently deletes tests
-    // (measured 2026-09-18: 414 -> 380, exit 0). Count verified unchanged.
-    Runner.UseRTTI := True;
+    var oOptions := TGllSuiteOptions.Defaults;
+    // The old runner turned FailsOnNoAsserts off: kept.
+    oOptions.FailsOnNoAsserts := False;
 
-    Logger := TDUnitXConsoleLogger.Create(True);
-    Runner.AddLogger(Logger);
-    // The estate runner looks for <exeDir>\<exeBaseName>-results.xml; DUnitX's
-    // default 'dunitx-results.xml' makes it report an all-zero ERROR, which
-    // reads like a broken suite. An explicit --xmloutput still wins.
-    XmlFile := TDUnitX.Options.XMLOutputFile;
-    if ( XmlFile = '' ) or SameText( ExtractFileName( XmlFile ),
-      'dunitx-results.xml' ) then
-      XmlFile := ChangeFileExt( ParamStr( 0 ), '' ) + '-results.xml';
-    NUnitLogger := TDUnitXXMLNUnitFileLogger.Create(XmlFile);
-    Runner.AddLogger(NUnitLogger);
-    Runner.FailsOnNoAsserts := False;
+    // DUnitX's command line ( an unknown option exits 251 ), RTTI discovery as well as each unit's explicit
+    // registration ( the fork dedupes a fixture registered both ways ), the console and NUnit XML loggers
+    // ( <exeDir>\<exeBaseName>-results.xml unless --xml names a folder ), and the GITLAK exit code: 0 all passed;
+    // n = failures + errors ( warm-up failures and confirmed leaks included ), clamped to 249; 250 no tests found ( an empty run must never read as success );
+    // 251 the runner itself raised.
+    RunGllSuite( oOptions );
 
-    Results := Runner.Execute;
-
-    if Results.TestCount = 0 then
-      System.ExitCode := 250 // an empty run must never read as success
-    else if not Results.AllPassed then
-      System.ExitCode := 1;
-
-{$IFNDEF CI}
+    {$IFNDEF CI}
     if TDUnitX.Options.ExitBehavior = TDUnitXExitBehavior.Pause then
     begin
-      System.Write('Done.. press <Enter> key to quit.');
+      System.Write( 'Done.. press <Enter> key to quit.' );
       System.Readln;
     end;
-{$ENDIF}
+    {$ENDIF}
   except
     on E: Exception do
     begin
-      System.Writeln(E.ClassName, ': ', E.Message);
-      // A crash outside the tests must not read as a green run ( it exited 0 ).
-      System.ExitCode := 2;
+      System.Writeln( 'Runner error  : ', E.ClassName, ': ', E.Message );
+      System.ExitCode := 251;
     end;
   end;
+
 end.
