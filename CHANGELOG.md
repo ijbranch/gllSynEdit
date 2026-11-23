@@ -80,6 +80,7 @@ visible.
   `Packages/11AndAbove/Delphi/SynEditDR.dproj`, `Source/Highlighters/SynHighlighterWebStencils.pas`
 
 ### Changed
+- (2026-11-24) **Upstream branch `FMX` moved to `dae24bf` (2026-11-23): NOT taken** — `CHANGELOG.md`.  `dae24bf` only merges `master` into `FMX`; the `master` commits it brings (to `4f9aaa3`) are already reviewed here.  `upstream/master` unchanged at `4f9aaa3`.
 - (2026-11-22) **Upstream branch `FMX` moved to `3ee5755` (3 commits, 2026-11-22): NOT taken** — `CHANGELOG.md`.  `5025f2f` makes the VCL demos compile (`.dproj` updates, two demo `.pas` lines) and regenerates the package `.dproj` files on the FMX branch, `182d5bf` renames the VCL demo group, `3ee5755` adds an FMX demo group.  Demos and FMX are outside what this fork builds, and the package `.dproj` changes are the FMX branch's own layout.  `upstream/master` unchanged at `4f9aaa3`.
 
 - (2026-11-20) **Upstream `4f9aaa3` (2026-11-19, "Registered TSynHotKey.") evaluated: NOT taken, so `upstream/master` is reviewed to `4f9aaa3`** — `CHANGELOG.md`.  It adds one `RegisterComponents` line for `TSynHotKey` (`Source/SynEditReg.pas`), which puts the component on the palette; the class itself is already here (`SynEditMiscClasses.pas`).  Design-time only, and nothing of ours uses `TSynHotKey`, so there is no benefit to prove.  Left unmerged: a later `git merge -s ours` folds it in.
