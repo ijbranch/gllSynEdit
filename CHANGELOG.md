@@ -80,6 +80,7 @@ visible.
   `Packages/11AndAbove/Delphi/SynEditDR.dproj`, `Source/Highlighters/SynHighlighterWebStencils.pas`
 
 ### Changed
+- (2026-11-25) **Upstream branch `FMX` moved to `7b7a94f` (3 commits, 2026-11-24): NOT taken** — `CHANGELOG.md`.  `79c4ee0` renames `SynPopupMenu` to `Vcl.SynPopupMenu`, `b1a2bc6` makes the FMX branch compile and `7b7a94f` moves the AsmX86_64 highlighter to the shared package: the FMX branch's restructuring toward shared VCL/FMX code, no defect fix.  Whatever of it reaches `master` will be reviewed there.  `upstream/master` unchanged at `4f9aaa3`.
 - (2026-11-24) **Upstream branch `FMX` moved to `dae24bf` (2026-11-23): NOT taken** — `CHANGELOG.md`.  `dae24bf` only merges `master` into `FMX`; the `master` commits it brings (to `4f9aaa3`) are already reviewed here.  `upstream/master` unchanged at `4f9aaa3`.
 - (2026-11-22) **Upstream branch `FMX` moved to `3ee5755` (3 commits, 2026-11-22): NOT taken** — `CHANGELOG.md`.  `5025f2f` makes the VCL demos compile (`.dproj` updates, two demo `.pas` lines) and regenerates the package `.dproj` files on the FMX branch, `182d5bf` renames the VCL demo group, `3ee5755` adds an FMX demo group.  Demos and FMX are outside what this fork builds, and the package `.dproj` changes are the FMX branch's own layout.  `upstream/master` unchanged at `4f9aaa3`.
 
