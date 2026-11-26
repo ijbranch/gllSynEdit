@@ -811,7 +811,7 @@ object SynOmniSynSetup: TSynOmniSynSetup
       Font.Charset = EASTEUROPE_CHARSET
       Font.Color = clWindowText
       Font.Height = -11
-      Font.Name = 'Tahoma'
+      Font.Name = 'Courier New'
       Font.Style = [fsBold]
       ParentFont = False
       TabOrder = 2

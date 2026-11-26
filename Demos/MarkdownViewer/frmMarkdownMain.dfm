@@ -91,7 +91,7 @@ object Form1: TForm1
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
     Font.Height = -23
-    Font.Name = 'Tahoma'
+    Font.Name = 'Consolas'
     Font.Style = []
     Lines.Strings = (
       '# Demo of the Markdown Viewer component'

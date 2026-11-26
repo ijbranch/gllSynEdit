@@ -415,7 +415,7 @@ object Form1: TForm1
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -17
-        Font.Name = 'Tahoma'
+        Font.Name = 'Courier New'
         Font.Style = []
         Lines.Strings = (
           'mmoInsert')
@@ -435,7 +435,7 @@ object Form1: TForm1
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -17
-        Font.Name = 'Tahoma'
+        Font.Name = 'Courier New'
         Font.Style = []
         Lines.Strings = (
           'mmoItem')
