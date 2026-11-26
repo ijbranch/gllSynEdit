@@ -13,7 +13,7 @@ object PageSetupDlg: TPageSetupDlg
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -18
-  Font.Name = 'Segoe UI'
+  Font.Name = 'Tahoma'
   Font.Style = []
   Position = poScreenCenter
   OnCreate = FormCreate
@@ -1464,7 +1464,7 @@ object PageSetupDlg: TPageSetupDlg
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
           Font.Height = -18
-          Font.Name = 'Segoe UI'
+          Font.Name = 'Tahoma'
           Font.Style = []
           ParentFont = False
           ScrollBars = ssBoth
@@ -1486,7 +1486,7 @@ object PageSetupDlg: TPageSetupDlg
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
           Font.Height = -18
-          Font.Name = 'Segoe UI'
+          Font.Name = 'Tahoma'
           Font.Style = []
           ParentFont = False
           ScrollBars = ssBoth
@@ -1508,7 +1508,7 @@ object PageSetupDlg: TPageSetupDlg
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
           Font.Height = -18
-          Font.Name = 'Segoe UI'
+          Font.Name = 'Tahoma'
           Font.Style = []
           ParentFont = False
           ScrollBars = ssBoth
@@ -1685,7 +1685,7 @@ object PageSetupDlg: TPageSetupDlg
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
           Font.Height = -18
-          Font.Name = 'Segoe UI'
+          Font.Name = 'Tahoma'
           Font.Style = []
           ParentFont = False
           ScrollBars = ssBoth
@@ -1707,7 +1707,7 @@ object PageSetupDlg: TPageSetupDlg
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
           Font.Height = -18
-          Font.Name = 'Segoe UI'
+          Font.Name = 'Tahoma'
           Font.Style = []
           ParentFont = False
           ScrollBars = ssBoth
@@ -1729,7 +1729,7 @@ object PageSetupDlg: TPageSetupDlg
           Font.Charset = ANSI_CHARSET
           Font.Color = clWindowText
           Font.Height = -18
-          Font.Name = 'Segoe UI'
+          Font.Name = 'Tahoma'
           Font.Style = []
           ParentFont = False
           ScrollBars = ssBoth

@@ -162,7 +162,7 @@ object Form1: TForm1
     GripperFont.Charset = DEFAULT_CHARSET
     GripperFont.Color = clBtnText
     GripperFont.Height = -12
-    GripperFont.Name = 'Segoe UI'
+    GripperFont.Name = 'Tahoma'
     GripperFont.Style = []
     Columns = <>
     OnExecute = scpParamsExecute

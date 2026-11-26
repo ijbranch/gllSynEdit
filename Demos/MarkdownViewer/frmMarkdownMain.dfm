@@ -12,7 +12,7 @@ object Form1: TForm1
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -18
-  Font.Name = 'Segoe UI'
+  Font.Name = 'Tahoma'
   Font.Style = []
   PixelsPerInch = 144
   TextHeight = 25
@@ -91,7 +91,7 @@ object Form1: TForm1
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
     Font.Height = -23
-    Font.Name = 'Consolas'
+    Font.Name = 'Tahoma'
     Font.Style = []
     Lines.Strings = (
       '# Demo of the Markdown Viewer component'

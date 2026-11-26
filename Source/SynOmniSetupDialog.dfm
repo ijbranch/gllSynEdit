@@ -11,7 +11,7 @@ object SynOmniSynSetup: TSynOmniSynSetup
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
-  Font.Name = 'Segoe UI'
+  Font.Name = 'Tahoma'
   Font.Style = []
   Position = poMainFormCenter
   ShowHint = True
@@ -811,7 +811,7 @@ object SynOmniSynSetup: TSynOmniSynSetup
       Font.Charset = EASTEUROPE_CHARSET
       Font.Color = clWindowText
       Font.Height = -11
-      Font.Name = 'Courier New'
+      Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
       TabOrder = 2

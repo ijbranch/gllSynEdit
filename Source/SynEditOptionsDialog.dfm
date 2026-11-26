@@ -9,7 +9,7 @@ object fmEditorOptionsDialog: TfmEditorOptionsDialog
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
-  Font.Name = 'Segoe UI'
+  Font.Name = 'Tahoma'
   Font.Style = []
   Position = poMainFormCenter
   OnCreate = FormCreate
@@ -166,7 +166,7 @@ object fmEditorOptionsDialog: TfmEditorOptionsDialog
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
             Font.Height = -11
-            Font.Name = 'Courier New'
+            Font.Name = 'Tahoma'
             Font.Style = []
             ParentFont = False
           end
@@ -359,7 +359,7 @@ object fmEditorOptionsDialog: TfmEditorOptionsDialog
               Font.Charset = DEFAULT_CHARSET
               Font.Color = clWindowText
               Font.Height = -13
-              Font.Name = 'Courier New'
+              Font.Name = 'Tahoma'
               Font.Style = []
               ParentFont = False
             end

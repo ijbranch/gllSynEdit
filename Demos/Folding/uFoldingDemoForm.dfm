@@ -38,7 +38,7 @@ object FoldingDemoForm: TFoldingDemoForm
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlack
     Font.Height = -18
-    Font.Name = 'Segoe UI'
+    Font.Name = 'Tahoma'
     Font.Style = []
     Spacing = 0
   end

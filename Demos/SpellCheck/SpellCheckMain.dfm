@@ -12,7 +12,7 @@ object Form1: TForm1
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -18
-  Font.Name = 'Segoe UI'
+  Font.Name = 'Tahoma'
   Font.Style = []
   PixelsPerInch = 144
   TextHeight = 25

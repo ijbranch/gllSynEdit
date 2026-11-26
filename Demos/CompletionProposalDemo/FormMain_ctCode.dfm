@@ -415,7 +415,7 @@ object Form1: TForm1
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -17
-        Font.Name = 'Courier New'
+        Font.Name = 'Tahoma'
         Font.Style = []
         Lines.Strings = (
           'mmoInsert')
@@ -435,7 +435,7 @@ object Form1: TForm1
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -17
-        Font.Name = 'Courier New'
+        Font.Name = 'Tahoma'
         Font.Style = []
         Lines.Strings = (
           'mmoItem')
@@ -492,7 +492,7 @@ object Form1: TForm1
     GripperFont.Charset = DEFAULT_CHARSET
     GripperFont.Color = clBtnText
     GripperFont.Height = -12
-    GripperFont.Name = 'Segoe UI'
+    GripperFont.Name = 'Tahoma'
     GripperFont.Style = []
     Columns = <
       item
